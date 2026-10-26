@@ -1,60 +1,38 @@
-# Jwellbox Club - Premium Gold Investment Platform
+# Jwellbox Club - Complete Platform
 
-A comprehensive full-stack web application for gold investment, referral marketing, and team building. Built with modern technologies and featuring a premium, colorful design with extensive animations.
+A comprehensive full-stack gold investment and referral marketing platform with premium UI, admin panel, and member dashboard.
 
 ## 🌟 Features
 
 ### Public Website
-- **Landing Page**: Premium design with animated counters, floating elements, glassmorphism, gradient mesh backgrounds
-- **Income Calculator**: Interactive slider-based calculator showing potential earnings
-- **Gold Showroom**: Browse 850+ gold designs with weight in grams (no prices shown)
-- **Member/Leader Registration**: Simple forms with OTP verification
-- **Informational Pages**: About, How it Works, Income Plan, Leader Program, FAQ, Contact, Terms, Privacy, Refund Policy
+- Premium landing page with animations, glassmorphism, gradient mesh backgrounds
+- Income calculator, gold showroom, member/leader registration
+- Informational pages (About, FAQ, Contact, Terms, Privacy, etc.)
 
 ### Member Dashboard
-- **Dashboard Home**: Welcome card, leader badge/progress, animated stat cards, wallet cards, interactive charts (area, donut, line)
-- **My Team**: Interactive expandable tree view with search functionality
-- **Income Pages**: Level 1, Level 2, and Leader income with filters and CSV export
-- **Wallet & Withdraw**: Commission wallet (withdrawable anytime) and contribution wallet (12-month lock)
-- **Gold Showroom**: Browse designs, express interest, call/WhatsApp buttons
-- **My Orders**: Track gold purchases
-- **Referral Link**: Copy and share referral code via WhatsApp
-- **Profile**: Account details and settings
-- **Notifications**: Activity feed
-- **Support**: Contact form and help resources
+- Interactive dashboard with animated charts (Recharts)
+- Team tree view, income tracking, wallet management
+- Gold showroom, orders, referrals, notifications, support
+- Dark/light mode, mobile bottom navigation
 
-### Admin Panel
-- **Overview**: Platform statistics and pending actions
-- **Settings**: Configure all commission percentages (10%, 5%, 5%, 3%)
-- **Users Management**: View all users, promote to leader
-- **Withdrawals**: Approve/reject withdrawal requests
-- **Gold Management**: Add/edit gold designs, manage leads
-- **Leaders**: View and manually promote leaders
-
-## 🎨 Design Features
-
-- **Premium Color Palette**: Deep royal purple, gold gradients, emerald green, ruby pink, rich navy
-- **Typography**: Playfair Display (headings) + Poppins (body)
-- **Animations**: 
-  - Scroll-reveal effects
-  - Parallax scrolling
-  - Floating gold coins/diamonds
-  - Animated counters
-  - 3D hover tilt cards
-  - Magnetic buttons
-  - Gradient mesh backgrounds
-  - Glassmorphism cards
-  - Soft glow effects
-  - Shimmer animations on gold elements
-  - Smooth page transitions
-- **Responsive**: Mobile-first design with bottom navigation
-- **Dark/Light Mode**: Toggle between themes
-- **Toast Notifications**: Success, error, warning, info messages
+### Admin Panel (12 Modules)
+1. **Dashboard** - Overview with charts and key metrics
+2. **Users** - User management, search, filter, promote to leader
+3. **Contributions** - Manage member contributions, lock/unlock status
+4. **Commissions** - Track all commission types (L1, L2, Leader, Gold)
+5. **Withdrawals** - Approve/reject withdrawal requests
+6. **Leader Payouts** - Monthly payout management (3rd of month)
+7. **Gold Showroom** - Add/edit gold designs
+8. **Gold Orders** - Manage orders and leads
+9. **Settings** - Configure commission rates, lock periods
+10. **CMS** - Edit landing page content
+11. **Reports** - Generate and export CSV reports
+12. **Audit Logs** - Track all admin activities
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 18** with TypeScript
+- **React 18** + TypeScript
 - **Vite** for fast builds
 - **Tailwind CSS 4** for styling
 - **Framer Motion** for animations
@@ -67,48 +45,19 @@ A comprehensive full-stack web application for gold investment, referral marketi
 - **MySQL** database
 - **DB Transactions** for all money operations
 - **Immutable Ledger** for transaction tracking
-- **Cron Jobs** for automated leader payouts (3rd of every month)
-- **Configurable Settings** (all percentages editable by admin)
-
-## 📁 Project Structure
-
-```
-src/
-├── components/
-│   ├── Layout.tsx          # Premium sidebar + mobile bottom nav
-│   ├── Navbar.tsx          # Sticky glass navbar
-│   ├── Footer.tsx          # Rich footer with links
-│   └── JoinModal.tsx       # Member/Leader registration modal
-├── context/
-│   ├── AuthContext.tsx     # Authentication state
-│   ├── AppContext.tsx      # App settings
-│   └── ToastContext.tsx    # Toast notifications
-├── data/
-│   └── mockData.ts        # Demo data (users, transactions, etc.)
-├── pages/
-│   ├── Landing.tsx        # Public landing page
-│   ├── Dashboard.tsx      # Member dashboard home
-│   ├── Team.tsx           # My Team tree view
-│   ├── Income.tsx         # Income pages (L1, L2, Leader)
-│   ├── Wallet.tsx         # Wallet & Withdraw
-│   ├── Contributions.tsx  # My Contributions
-│   ├── Referral.tsx       # Referral Link
-│   ├── Orders.tsx         # My Orders
-│   ├── Notifications.tsx  # Notifications
-│   ├── Support.tsx        # Support page
-│   ├── Profile.tsx        # User profile
-│   ├── Admin.tsx          # Admin panel
-│   └── [Public Pages]     # About, FAQ, Contact, etc.
-└── App.tsx                # Main app with routing
-```
+- **Cron Jobs** for automated leader payouts
+- **Configurable Settings** (all percentages editable)
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js 18+
-- npm or yarn
+- PHP 8.3+
+- MySQL 8.0+
+- Composer
+- Nginx or Apache
 
-### Installation
+### Frontend Setup
 
 ```bash
 # Install dependencies
@@ -121,12 +70,85 @@ npm run dev
 npm run build
 ```
 
-### Demo Accounts
+### Backend Setup (Laravel)
+
+```bash
+# Clone the Laravel backend
+cd backend
+
+# Install PHP dependencies
+composer install
+
+# Copy environment file
+cp .env.example .env
+
+# Generate application key
+php artisan key:generate
+
+# Configure database in .env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=jwellbox_club
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+# Run migrations
+php artisan migrate
+
+# Seed demo data
+php artisan db:seed
+
+# Start queue worker (for emails, notifications)
+php artisan queue:work
+
+# Setup cron job for leader payouts
+crontab -e
+# Add: 0 10 3 * * php /path/to/artisan schedule:run >> /dev/null 2>&1
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── components/
+│   ├── Layout.tsx              # Member dashboard layout
+│   ├── AdminLayout.tsx         # Admin panel layout
+│   ├── Navbar.tsx              # Public navbar
+│   ├── Footer.tsx              # Public footer
+│   └── JoinModal.tsx           # Registration modal
+├── context/
+│   ├── AuthContext.tsx         # Authentication state
+│   ├── AppContext.tsx          # App settings
+│   └── ToastContext.tsx        # Toast notifications
+├── data/
+│   └── mockData.ts            # Demo data
+├── pages/
+│   ├── [Public Pages]         # Landing, About, FAQ, etc.
+│   ├── [Dashboard Pages]      # Member dashboard
+│   └── admin/                 # Admin panel (12 modules)
+│       ├── AdminDashboard.tsx
+│       ├── AdminUsers.tsx
+│       ├── AdminContributions.tsx
+│       ├── AdminCommissions.tsx
+│       ├── AdminWithdrawals.tsx
+│       ├── AdminLeaderPayouts.tsx
+│       ├── AdminGoldShowroom.tsx
+│       ├── AdminGoldOrders.tsx
+│       ├── AdminSettings.tsx
+│       ├── AdminCMS.tsx
+│       ├── AdminReports.tsx
+│       └── AdminAuditLogs.tsx
+└── App.tsx                    # Main app with routing
+```
+
+## 🔐 Demo Accounts
 
 **Login with any of these emails (password: any text):**
-- `admin@jwellbox.com` - Admin account
-- `rajesh@example.com` - Leader account
-- `priya@example.com` - Member account
+- `admin@jwellbox.com` - Super Admin
+- `subadmin@jwellbox.com` - Sub Admin
+- `rajesh@example.com` - Leader
+- `priya@example.com` - Member
 
 ## 💰 Business Logic
 
@@ -145,86 +167,175 @@ npm run build
 - Manual promotion by admin
 - Monthly payout on 3rd at 10:00 AM via cron job
 
-## 🎯 Key Features Implemented
+## 🚀 Deployment Guide
 
-✅ Premium colorful design with animations
-✅ Interactive income calculator
-✅ Animated charts (area, donut, line)
-✅ Team tree view with expand/collapse
-✅ CSV export for income data
-✅ Toast notifications
-✅ Dark/light mode toggle
-✅ Mobile bottom navigation
-✅ Glassmorphism UI
-✅ Gradient mesh backgrounds
-✅ Floating animations
-✅ Animated counters
-✅ Leader badge with progress
-✅ Wallet with countdown timers
-✅ Referral link sharing (WhatsApp)
-✅ Gold showroom with filters
-✅ Withdrawal request system
-✅ Transaction ledger
-✅ Admin panel with full CRUD
-✅ Configurable commission rates
-✅ Immutable transaction records
-✅ Responsive design (mobile-first)
+### Production Build
 
-## 📱 Pages & Routes
+```bash
+# Build frontend
+npm run build
 
-### Public Routes
-- `/` - Landing page
-- `/about` - About us
-- `/how-it-works` - How it works
-- `/income-plan` - Income plan details
-- `/leader-program` - Leader program
-- `/gold-showroom-public` - Public gold showroom
-- `/why-buy-gold` - Why buy gold
-- `/faq` - FAQ
-- `/contact` - Contact us
-- `/terms` - Terms & conditions
-- `/privacy` - Privacy policy
-- `/refund-policy` - Refund policy
-- `/login` - Login
-- `/register` - Register
-- `/register/:referralCode` - Register with referral
+# Output will be in dist/ folder
+```
 
-### Dashboard Routes (Protected)
-- `/dashboard` - Dashboard home
-- `/team` - My Team
-- `/income/level1` - Level 1 income
-- `/income/level2` - Level 2 income
-- `/income/leader` - Leader income
-- `/wallet` - Wallet & Withdraw
-- `/contributions` - My Contributions
-- `/gold-showroom` - Gold Showroom (logged in)
-- `/orders` - My Orders
-- `/referral` - Referral Link
-- `/profile` - Profile
-- `/notifications` - Notifications
-- `/support` - Support
-- `/admin` - Admin Panel
+### Nginx Configuration
 
-## 🎨 Design Highlights
+```nginx
+server {
+    listen 80;
+    server_name jwellbox.club www.jwellbox.club;
+    root /var/www/jwellbox/dist;
+    index index.html;
 
-- **Gold Shimmer Effect**: Animated gradient text for premium feel
-- **Glassmorphism**: Frosted glass cards with backdrop blur
-- **Gradient Mesh**: Multi-color radial gradients for backgrounds
-- **Floating Elements**: Animated gold coins and diamonds
-- **Pulse Glow**: Animated box shadows for emphasis
-- **3D Tilt**: Hover effects with perspective transforms
-- **Smooth Transitions**: Framer Motion for all animations
-- **Custom Scrollbar**: Gold-themed scrollbar styling
-- **Responsive**: Mobile-first with bottom navigation
+    # Frontend (React SPA)
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
 
-## 🔐 Security Features
+    # Laravel API
+    location /api {
+        root /var/www/jwellbox/backend/public;
+        try_files $uri $uri/ /index.php?$query_string;
+    }
 
-- Sanctum token authentication
-- DB transactions for all money operations
-- Immutable ledger for all transactions
-- Role-based access control (Member, Leader, Admin)
-- Input validation on all forms
-- Protected routes with redirects
+    # Laravel PHP processing
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    # Security
+    location ~ /\.(ht|git|env) {
+        deny all;
+    }
+
+    # Caching
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Gzip compression
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+}
+```
+
+### PM2 Configuration (for Laravel Queue Worker)
+
+```javascript
+// ecosystem.config.js
+module.exports = {
+  apps: [
+    {
+      name: 'jwellbox-queue',
+      script: 'artisan',
+      args: 'queue:work --sleep=3 --tries=3',
+      cwd: '/var/www/jwellbox/backend',
+      interpreter: '/usr/bin/php',
+      watch: false,
+      max_memory_restart: '256M',
+      env: {
+        APP_ENV: 'production',
+      },
+    },
+    {
+      name: 'jwellbox-scheduler',
+      script: 'artisan',
+      args: 'schedule:run',
+      cwd: '/var/www/jwellbox/backend',
+      interpreter: '/usr/bin/php',
+      watch: false,
+    },
+  ],
+};
+```
+
+```bash
+# Start PM2 processes
+pm2 start ecosystem.config.js
+
+# Save PM2 configuration
+pm2 save
+
+# Setup PM2 to start on boot
+pm2 startup
+```
+
+### SSL Configuration (Let's Encrypt)
+
+```bash
+# Install Certbot
+sudo apt install certbot python3-certbot-nginx
+
+# Get SSL certificate
+sudo certbot --nginx -d jwellbox.club -d www.jwellbox.club
+
+# Auto-renewal (already configured by Certbot)
+sudo certbot renew --dry-run
+```
+
+### Database Backup Script
+
+```bash
+#!/bin/bash
+# backup.sh - Run daily via cron
+
+BACKUP_DIR="/var/backups/jwellbox"
+DATE=$(date +%Y%m%d_%H%M%S)
+DB_NAME="jwellbox_club"
+
+mkdir -p $BACKUP_DIR
+
+# Backup database
+mysqldump -u your_user -p'your_password' $DB_NAME | gzip > $BACKUP_DIR/db_$DATE.sql.gz
+
+# Keep only last 30 days
+find $BACKUP_DIR -name "db_*.sql.gz" -mtime +30 -delete
+
+echo "Backup completed: db_$DATE.sql.gz"
+```
+
+```bash
+# Add to crontab
+crontab -e
+# Add: 0 2 * * * /path/to/backup.sh
+```
+
+### Environment Variables (.env)
+
+```env
+# Frontend
+VITE_API_URL=https://jwellbox.club/api
+VITE_APP_NAME=Jwellbox Club
+
+# Backend (Laravel)
+APP_NAME="Jwellbox Club"
+APP_ENV=production
+APP_KEY=base64:your-key-here
+APP_DEBUG=false
+APP_URL=https://jwellbox.club
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=jwellbox_club
+DB_USERNAME=jwellbox_user
+DB_PASSWORD=secure_password
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@jwellbox.club
+MAIL_FROM_NAME="Jwellbox Club"
+
+SANCTUM_STATEFUL_DOMAINS=jwellbox.club,www.jwellbox.club
+SESSION_DOMAIN=.jwellbox.club
+```
 
 ## 📊 Database Schema
 
@@ -241,14 +352,39 @@ npm run build
 - `gold_orders` - Gold purchase orders
 - `settings` - Configurable commission rates
 - `notifications` - User notifications
+- `audit_logs` - Admin activity logs
 
-## 🚀 Performance
+## 🔒 Security Features
 
-- Optimized builds with Vite
-- Code splitting for routes
-- Lazy loading for images
-- Efficient re-renders with React hooks
-- Minimal bundle size (254KB gzipped)
+- Sanctum token authentication
+- DB transactions for all money operations
+- Immutable ledger for all transactions
+- Role-based access control (Member, Leader, Admin)
+- Input validation on all forms
+- Protected routes with redirects
+- Audit logging for admin actions
+- Rate limiting on API endpoints
+- CSRF protection
+- SQL injection prevention (Eloquent ORM)
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Bottom navigation for mobile
+- Touch-friendly buttons and inputs
+- Optimized images and assets
+- Fast loading with code splitting
+
+## 🎨 Design Highlights
+
+- Premium colorful design with animations
+- Glassmorphism UI components
+- Gradient mesh backgrounds
+- Floating animations and parallax
+- Animated counters and charts
+- Dark/light mode toggle
+- Custom scrollbar styling
+- Smooth page transitions
 
 ## 📝 License
 

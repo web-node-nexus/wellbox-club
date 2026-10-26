@@ -100,6 +100,25 @@ export const users: User[] = [
   { id: '6', name: 'Vikram Singh', email: 'vikram@example.com', phone: '+91 9876543215', referralCode: 'VIK006', referredBy: '1', isLeader: false, teamSize: 30, joinDate: '2023-07-15' },
   { id: '7', name: 'Meena Joshi', email: 'meena@example.com', phone: '+91 9876543216', referralCode: 'MEE007', referredBy: '6', isLeader: false, teamSize: 8, joinDate: '2023-09-01' },
   { id: '8', name: 'Deepak Verma', email: 'deepak@example.com', phone: '+91 9876543217', referralCode: 'DEE008', referredBy: '4', isLeader: false, teamSize: 3, joinDate: '2024-01-10' },
+  { id: '9', name: 'Sub Admin', email: 'subadmin@jwellbox.com', phone: '+91 9876543218', referralCode: 'SUB009', referredBy: null, isLeader: false, teamSize: 0, joinDate: '2023-02-01' },
+];
+
+// Audit Logs
+export interface AuditLog {
+  id: string;
+  userId: string;
+  action: string;
+  details: string;
+  ipAddress: string;
+  timestamp: string;
+}
+
+export const auditLogs: AuditLog[] = [
+  { id: 'al1', userId: '1', action: 'LOGIN', details: 'Admin logged in', ipAddress: '192.168.1.100', timestamp: '2024-06-15 10:30:00' },
+  { id: 'al2', userId: '1', action: 'APPROVE_WITHDRAWAL', details: 'Approved withdrawal w1 for ₹1,000', ipAddress: '192.168.1.100', timestamp: '2024-06-15 11:00:00' },
+  { id: 'al3', userId: '1', action: 'UPDATE_SETTINGS', details: 'Updated commission rates', ipAddress: '192.168.1.100', timestamp: '2024-06-14 15:20:00' },
+  { id: 'al4', userId: '1', action: 'ADD_GOLD_DESIGN', details: 'Added new gold design: Royal Necklace Set', ipAddress: '192.168.1.100', timestamp: '2024-06-14 14:00:00' },
+  { id: 'al5', userId: '1', action: 'PROMOTE_LEADER', details: 'Promoted user 2 to Leader', ipAddress: '192.168.1.100', timestamp: '2024-06-13 09:00:00' },
 ];
 
 // Contributions

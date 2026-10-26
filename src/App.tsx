@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import { ToastProvider } from './context/ToastContext';
 import Layout from './components/Layout';
+import AdminLayout from './components/AdminLayout';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import JoinModal from './components/JoinModal';
@@ -35,7 +36,20 @@ import Orders from './pages/Orders';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications';
 import Support from './pages/Support';
-import Admin from './pages/Admin';
+
+// Admin Pages
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminContributions from './pages/admin/AdminContributions';
+import AdminCommissions from './pages/admin/AdminCommissions';
+import AdminWithdrawals from './pages/admin/AdminWithdrawals';
+import AdminLeaderPayouts from './pages/admin/AdminLeaderPayouts';
+import AdminGoldShowroom from './pages/admin/AdminGoldShowroom';
+import AdminGoldOrders from './pages/admin/AdminGoldOrders';
+import AdminSettings from './pages/admin/AdminSettings';
+import AdminCMS from './pages/admin/AdminCMS';
+import AdminReports from './pages/admin/AdminReports';
+import AdminAuditLogs from './pages/admin/AdminAuditLogs';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -45,7 +59,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
-  if (!user || user.role !== 'admin') return <Navigate to="/dashboard" replace />;
+  if (!user || (user.role !== 'admin')) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 }
 
@@ -104,7 +118,20 @@ function AppRoutes() {
         <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute><Layout><Notifications /></Layout></ProtectedRoute>} />
         <Route path="/support" element={<ProtectedRoute><Layout><Support /></Layout></ProtectedRoute>} />
-        <Route path="/admin" element={<AdminRoute><Layout><Admin /></Layout></AdminRoute>} />
+
+        {/* Admin Pages */}
+        <Route path="/admin" element={<AdminRoute><AdminLayout><AdminDashboard /></AdminLayout></AdminRoute>} />
+        <Route path="/admin/users" element={<AdminRoute><AdminLayout><AdminUsers /></AdminLayout></AdminRoute>} />
+        <Route path="/admin/contributions" element={<AdminRoute><AdminLayout><AdminContributions /></AdminLayout></AdminRoute>} />
+        <Route path="/admin/commissions" element={<AdminRoute><AdminLayout><AdminCommissions /></AdminLayout></AdminRoute>} />
+        <Route path="/admin/withdrawals" element={<AdminRoute><AdminLayout><AdminWithdrawals /></AdminLayout></AdminRoute>} />
+        <Route path="/admin/leader-payouts" element={<AdminRoute><AdminLayout><AdminLeaderPayouts /></AdminLayout></AdminRoute>} />
+        <Route path="/admin/gold-showroom" element={<AdminRoute><AdminLayout><AdminGoldShowroom /></AdminLayout></AdminRoute>} />
+        <Route path="/admin/gold-orders" element={<AdminRoute><AdminLayout><AdminGoldOrders /></AdminLayout></AdminRoute>} />
+        <Route path="/admin/settings" element={<AdminRoute><AdminLayout><AdminSettings /></AdminLayout></AdminRoute>} />
+        <Route path="/admin/cms" element={<AdminRoute><AdminLayout><AdminCMS /></AdminLayout></AdminRoute>} />
+        <Route path="/admin/reports" element={<AdminRoute><AdminLayout><AdminReports /></AdminLayout></AdminRoute>} />
+        <Route path="/admin/audit-logs" element={<AdminRoute><AdminLayout><AdminAuditLogs /></AdminLayout></AdminRoute>} />
       </Routes>
       <JoinModal isOpen={joinOpen} onClose={() => setJoinOpen(false)} initialTab={joinTab} />
     </>
