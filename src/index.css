@@ -214,6 +214,123 @@ input[type="number"] { -moz-appearance: textfield; }
   background-clip: text;
 }
 
+/* Gold border animation */
+@keyframes gold-border {
+  0%, 100% { border-color: rgba(255, 215, 0, 0.3); }
+  50% { border-color: rgba(255, 215, 0, 0.8); }
+}
+
+.gold-border {
+  animation: gold-border 2s ease-in-out infinite;
+}
+
+/* Floating gold particles */
+@keyframes float-particle {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+  50% { transform: translateY(-100px) rotate(180deg); opacity: 0.8; }
+}
+
+.gold-particle {
+  animation: float-particle 8s ease-in-out infinite;
+}
+
+/* Shine effect */
+@keyframes shine {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-effect::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+  animation: shine 3s infinite;
+}
+
+/* Gold card hover */
+.gold-card {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.gold-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(255, 215, 0, 0.2), 0 0 60px rgba(255, 215, 0, 0.1);
+}
+
+/* Premium button */
+.premium-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.premium-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.premium-btn:hover::before {
+  left: 100%;
+}
+
+.premium-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+}
+
+/* Rotating gold ring */
+@keyframes rotate-ring {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.gold-ring {
+  animation: rotate-ring 20s linear infinite;
+}
+
+/* Text reveal animation */
+@keyframes text-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+.text-reveal {
+  animation: text-reveal 1s ease-out forwards;
+}
+
+/* Premium section background */
+.premium-bg {
+  background: 
+    radial-gradient(ellipse at top, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    linear-gradient(135deg, #0f0520 0%, #1a0a2e 50%, #0f0520 100%);
+}
+
+/* Gold icon pulse */
+@keyframes icon-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.icon-pulse:hover {
+  animation: icon-pulse 0.6s ease-in-out;
+}
+
 /* Background utilities */
 .bg-mesh-purple {
   background: 

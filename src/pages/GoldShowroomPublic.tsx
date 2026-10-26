@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { Gem, Phone, MessageCircle, Scale, Award, Filter } from 'lucide-react';
+import { Gem, Phone, MessageCircle, Scale, Award, Filter, Sparkles } from 'lucide-react';
 import { useState } from 'react';
+import GoldSection from '../components/GoldSection';
 interface PageProps { onJoinClick: () => void; }
 
 export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
@@ -24,58 +25,113 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
   const filtered = category === 'all' ? designs : designs.filter(d => d.category === category);
 
   return (
-    <div className="min-h-screen bg-[#0f0520] text-white pt-24">
-      <section className="relative py-20">
-        <div className="absolute inset-0 mesh-gradient opacity-50" />
+    <div className="min-h-screen bg-[#0f0520] text-white">
+      {/* Hero */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute inset-0 premium-bg" />
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute text-4xl"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -70, 0],
+                rotate: [0, 360],
+                opacity: [0.2, 0.6, 0.2],
+              }}
+              transition={{
+                duration: 6 + Math.random() * 4,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            >
+              {['💎', '👑', '✨', '🪙', '💍'][i % 5]}
+            </motion.div>
+          ))}
+        </div>
         <div className="relative max-w-4xl mx-auto px-4 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-            <span className="text-sm font-medium text-amber-400 uppercase tracking-wider">Digital Showroom</span>
-            <h1 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mt-3 mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-full mb-6">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span className="text-sm text-amber-300 font-medium">Digital Showroom</span>
+            </div>
+            <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
               Gold <span className="gradient-text">Showroom</span>
             </h1>
-            <p className="text-lg text-white/60 max-w-2xl mx-auto mb-4">
+            <p className="text-xl text-white/70 max-w-2xl mx-auto mb-6">
               Get gold at very cheap price - directly from the manufacturer! No middlemen, no markup, just pure gold at wholesale rates.
             </p>
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full">
-              <Award className="w-4 h-4 text-amber-400" />
-              <span className="text-sm text-amber-300">BIS Hallmarked • 100% Certified</span>
+            <div className="inline-flex items-center gap-2 px-5 py-3 bg-amber-500/10 border border-amber-500/30 rounded-full">
+              <Award className="w-5 h-5 text-amber-400" />
+              <span className="text-amber-300 font-medium">BIS Hallmarked • 100% Certified</span>
             </div>
           </motion.div>
         </div>
       </section>
 
-      <section className="py-8 max-w-6xl mx-auto px-4">
-        <div className="flex items-center gap-2 overflow-x-auto pb-4">
-          <Filter className="w-4 h-4 text-white/40 flex-shrink-0" />
+      <GoldSection>
+        {/* Category Filter */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8">
+          <Filter className="w-5 h-5 text-white/40 flex-shrink-0" />
           {categories.map(cat => (
-            <button key={cat} onClick={() => setCategory(cat)} className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${category === cat ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-white/5 text-white/60 border border-white/10 hover:border-amber-500/20'}`}>
-              {cat === 'all' ? 'All Designs' : cat}
-            </button>
+            <motion.button
+              key={cat}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setCategory(cat)}
+              className={`px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
+                category === cat
+                  ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 shadow-lg shadow-amber-500/30'
+                  : 'bg-white/5 text-white/60 border border-white/10 hover:border-amber-500/30 hover:text-amber-400'
+              }`}
+            >
+              {cat === 'all' ? '✨ All Designs' : cat}
+            </motion.button>
           ))}
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        {/* Designs Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {filtered.map((item, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} whileHover={{ y: -5, scale: 1.02 }} className="glass rounded-2xl overflow-hidden border border-white/5 hover:border-amber-500/20 transition-all group">
-              <div className="h-40 bg-gradient-to-br from-amber-900/20 to-purple-900/20 flex items-center justify-center relative">
-                <span className="text-6xl group-hover:scale-125 transition-transform duration-500">{item.emoji}</span>
-                <span className="absolute top-2 right-2 px-2 py-0.5 bg-white/10 rounded text-[10px] text-amber-300">{item.purity}</span>
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="glass rounded-2xl overflow-hidden border border-white/5 hover:border-amber-500/30 transition-all group gold-card"
+            >
+              <div className="h-48 bg-gradient-to-br from-amber-900/30 to-purple-900/30 flex items-center justify-center relative overflow-hidden">
+                <motion.span
+                  className="text-7xl"
+                  whileHover={{ scale: 1.3, rotate: 10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {item.emoji}
+                </motion.span>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="absolute top-3 right-3 px-2.5 py-1 bg-white/10 backdrop-blur rounded-lg text-xs text-amber-300 font-semibold border border-amber-500/20">{item.purity}</span>
               </div>
               <div className="p-4">
-                <h3 className="font-semibold text-sm truncate">{item.name}</h3>
+                <h3 className="font-bold text-sm mb-1 group-hover:text-amber-400 transition-colors">{item.name}</h3>
                 <p className="text-xs text-white/50 mt-1 line-clamp-2">{item.desc}</p>
                 <div className="flex items-center gap-3 mt-3 pt-3 border-t border-white/5">
                   <div className="flex items-center gap-1">
-                    <Scale className="w-3 h-3 text-white/40" />
-                    <span className="text-xs font-medium">{item.weight}g</span>
+                    <Scale className="w-3 h-3 text-amber-400" />
+                    <span className="text-xs font-bold text-amber-400">{item.weight}g</span>
                   </div>
                   <span className="text-xs text-white/40">{item.making}</span>
                 </div>
                 <div className="flex gap-2 mt-3">
-                  <a href="tel:+919876543210" className="flex-1 py-2 bg-green-600/20 border border-green-500/30 rounded-lg text-xs text-green-400 text-center hover:bg-green-600/30 flex items-center justify-center gap-1">
+                  <a href="tel:+919876543210" className="flex-1 py-2 bg-green-600/20 border border-green-500/30 rounded-lg text-xs text-green-400 text-center hover:bg-green-600/30 flex items-center justify-center gap-1 transition-colors">
                     <Phone className="w-3 h-3" /> Call
                   </a>
-                  <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="flex-1 py-2 bg-emerald-600/20 border border-emerald-500/30 rounded-lg text-xs text-emerald-400 text-center hover:bg-emerald-600/30 flex items-center justify-center gap-1">
+                  <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="flex-1 py-2 bg-emerald-600/20 border border-emerald-500/30 rounded-lg text-xs text-emerald-400 text-center hover:bg-emerald-600/30 flex items-center justify-center gap-1 transition-colors">
                     <MessageCircle className="w-3 h-3" /> WhatsApp
                   </a>
                 </div>
@@ -84,11 +140,11 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
           ))}
         </div>
 
-        <div className="text-center mt-8 p-6 glass rounded-2xl border border-amber-500/10">
-          <p className="text-sm text-white/60 mb-2">Want to see more designs or place a custom order?</p>
-          <p className="text-amber-400 font-medium">Contact us on WhatsApp: +91 98765 43210</p>
+        <div className="text-center mt-12 p-8 glass rounded-2xl border border-amber-500/20 gold-border">
+          <p className="text-lg text-white/70 mb-3">Want to see more designs or place a custom order?</p>
+          <p className="text-amber-400 font-bold text-xl">Contact us on WhatsApp: +91 98765 43210</p>
         </div>
-      </section>
+      </GoldSection>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Sparkles } from 'lucide-react';
 import { useState } from 'react';
+import GoldSection from '../components/GoldSection';
 
 export default function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
@@ -20,30 +21,79 @@ export default function FAQ() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0f0520] text-white pt-24">
-      <section className="relative py-20">
-        <div className="absolute inset-0 mesh-gradient opacity-50" />
+    <div className="min-h-screen bg-[#0f0520] text-white">
+      {/* Hero */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute inset-0 premium-bg" />
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(12)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute text-3xl"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -50, 0],
+                opacity: [0.2, 0.5, 0.2],
+              }}
+              transition={{
+                duration: 5 + Math.random() * 3,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            >
+              ❓
+            </motion.div>
+          ))}
+        </div>
         <div className="relative max-w-3xl mx-auto px-4 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-full mb-6">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span className="text-sm text-amber-300 font-medium">Got Questions?</span>
+            </div>
+            <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
               Frequently Asked <span className="gradient-text">Questions</span>
             </h1>
-            <p className="text-lg text-white/60">Everything you need to know about Jwellbox Club</p>
+            <p className="text-xl text-white/70">Everything you need to know about Jwellbox Club</p>
           </motion.div>
         </div>
       </section>
 
-      <section className="py-8 pb-20 max-w-3xl mx-auto px-4">
-        <div className="space-y-3">
+      <GoldSection>
+        <div className="space-y-3 max-w-3xl mx-auto">
           {faqs.map((faq, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.03 }} className="glass rounded-2xl border border-white/5 overflow-hidden">
-              <button onClick={() => setOpen(open === i ? null : i)} className="w-full flex items-center justify-between p-5 text-left hover:bg-white/5 transition-colors">
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.03 }}
+              className="glass rounded-2xl border border-white/5 overflow-hidden hover:border-amber-500/20 transition-all"
+            >
+              <button
+                onClick={() => setOpen(open === i ? null : i)}
+                className="w-full flex items-center justify-between p-5 text-left hover:bg-white/5 transition-colors"
+              >
                 <span className="font-medium text-sm lg:text-base pr-4">{faq.q}</span>
-                <ChevronDown className={`w-5 h-5 text-amber-400 flex-shrink-0 transition-transform ${open === i ? 'rotate-180' : ''}`} />
+                <motion.div
+                  animate={{ rotate: open === i ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ChevronDown className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                </motion.div>
               </button>
               <AnimatePresence>
                 {open === i && (
-                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden">
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
                     <p className="px-5 pb-5 text-sm text-white/60 leading-relaxed">{faq.a}</p>
                   </motion.div>
                 )}
@@ -51,7 +101,7 @@ export default function FAQ() {
             </motion.div>
           ))}
         </div>
-      </section>
+      </GoldSection>
     </div>
   );
 }
