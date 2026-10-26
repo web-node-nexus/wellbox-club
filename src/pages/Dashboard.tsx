@@ -1,10 +1,11 @@
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { Crown, Copy, Share2, CheckCircle, Wallet, Lock, Unlock, Calendar, TrendingUp, DollarSign, Users, Gift, ArrowUpRight } from 'lucide-react';
+import { Crown, Copy, Share2, CheckCircle, Wallet, Lock, Unlock, Calendar, TrendingUp, DollarSign, Users, Gift, ArrowUpRight, ArrowDownRight, Target, Zap, Award } from 'lucide-react';
 import { walletTransactions, contributions, getCommissionWalletBalance, getContributionWalletBalance, users } from '../data/mockData';
 import { useState, useEffect } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, BarChart, Bar } from 'recharts';
 import { useToast } from '../context/ToastContext';
+import { Link } from 'react-router-dom';
 
 function AnimatedCounter({ target, prefix = '', suffix = '' }: { target: number; prefix?: string; suffix?: string }) {
   const [count, setCount] = useState(0);
@@ -85,68 +86,66 @@ export default function Dashboard() {
   const nextPayout = getNextPayoutDate();
   const daysUntilPayout = Math.ceil((nextPayout.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
 
-  const statCards = [
-    { label: 'Own Contribution', value: contributionBalance, icon: DollarSign, color: 'from-blue-500 to-indigo-600' },
-    { label: 'Level 1 Income', value: l1Income, icon: Users, color: 'from-green-500 to-emerald-600' },
-    { label: 'Level 2 Income', value: l2Income, icon: TrendingUp, color: 'from-purple-500 to-violet-600' },
-    { label: 'Leader Income', value: leaderIncome, icon: Crown, color: 'from-amber-500 to-orange-600' },
-    { label: 'Gold Order Bonus', value: goldBonus, icon: Gift, color: 'from-pink-500 to-rose-600' },
-    { label: 'Total Earnings', value: totalEarnings, icon: TrendingUp, color: 'from-teal-500 to-cyan-600' },
-  ];
-
   return (
     <div className="space-y-6">
       {/* Welcome Card */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 rounded-2xl p-6 text-purple-900 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl" />
         <div className="relative">
-          <h1 className="text-2xl lg:text-3xl font-bold font-[var(--font-heading)] mb-2">
-            Welcome back, {user.name.split(' ')[0]}! 👋
-          </h1>
-          <p className="text-purple-900/70 mb-4">Here's your portfolio overview</p>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="flex-1">
-              <p className="text-xs font-medium text-purple-900/60 mb-1">Your Referral Code</p>
-              <p className="text-2xl font-bold font-mono">{user.referralCode}</p>
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-bold font-[var(--font-heading)] mb-2">
+                Welcome back, {user.name.split(' ')[0]}! 👋
+              </h1>
+              <p className="text-white/80 text-lg">Your gold investment journey continues</p>
             </div>
-            <div className="flex gap-2">
-              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={copyReferral} className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl backdrop-blur transition-colors">
-                {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                <span className="text-sm font-medium">{copied ? 'Copied!' : 'Copy'}</span>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={copyReferral} className="flex items-center gap-2 px-5 py-3 bg-white/20 hover:bg-white/30 rounded-xl backdrop-blur transition-colors font-medium">
+                {copied ? <CheckCircle className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                <span>{copied ? 'Copied!' : 'Copy Referral'}</span>
               </motion.button>
-              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={shareWhatsApp} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors">
-                <Share2 className="w-4 h-4" />
-                <span className="text-sm font-medium">Share</span>
+              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={shareWhatsApp} className="flex items-center gap-2 px-5 py-3 bg-green-500 hover:bg-green-600 rounded-xl transition-colors font-medium shadow-lg">
+                <Share2 className="w-5 h-5" />
+                <span>Share on WhatsApp</span>
               </motion.button>
             </div>
+          </div>
+          <div className="mt-6 p-4 bg-white/10 backdrop-blur rounded-xl border border-white/20">
+            <p className="text-sm text-white/70 mb-1">Your Referral Code</p>
+            <p className="text-3xl font-bold font-mono">{user.referralCode}</p>
           </div>
         </div>
       </motion.div>
 
       {/* Leader Badge / Progress */}
       {!user.isLeader ? (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-2xl p-6 border border-purple-500/20">
-          <div className="flex items-center gap-3 mb-3">
-            <Crown className="w-6 h-6 text-purple-400" />
-            <h3 className="font-semibold text-lg">Leader Progress</h3>
-          </div>
-          <p className="text-sm text-white/60 mb-3">Build your team to 100 members to become a Leader!</p>
-          <div className="flex items-center gap-4">
-            <div className="flex-1 bg-white/10 rounded-full h-3">
-              <motion.div initial={{ width: 0 }} animate={{ width: `${(teamMembers / 100) * 100}%` }} transition={{ duration: 1.5, ease: 'easeOut' }} className="h-3 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full" />
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 text-white shadow-xl">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
+              <Target className="w-7 h-7" />
             </div>
-            <span className="text-sm font-bold text-purple-400">{teamMembers}/100</span>
+            <div>
+              <h3 className="text-xl font-bold">Leader Progress</h3>
+              <p className="text-white/70 text-sm">Build your team to 100 members to become a Leader!</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex-1 bg-white/20 rounded-full h-4 overflow-hidden">
+              <motion.div initial={{ width: 0 }} animate={{ width: `${(teamMembers / 100) * 100}%` }} transition={{ duration: 1.5, ease: 'easeOut' }} className="h-full bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full shadow-lg" />
+            </div>
+            <span className="text-lg font-bold">{teamMembers}/100</span>
           </div>
         </motion.div>
       ) : (
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-gradient-to-r from-amber-500/20 to-yellow-500/20 rounded-2xl p-6 border border-amber-500/30 glow-gold">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 rounded-2xl p-6 text-purple-900 shadow-2xl">
           <div className="flex items-center gap-4">
-            <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 3, repeat: Infinity }} className="w-16 h-16 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center shadow-xl shadow-amber-500/30 pulse-glow">
-              <Crown className="w-8 h-8 text-purple-900" />
+            <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 3, repeat: Infinity }} className="w-20 h-20 bg-white/30 rounded-full flex items-center justify-center shadow-xl">
+              <Crown className="w-10 h-10" />
             </motion.div>
             <div>
-              <h3 className="text-xl font-bold gradient-text">Leader Status Active!</h3>
-              <p className="text-sm text-white/60">You're earning 5% monthly on your team's income</p>
+              <h3 className="text-2xl font-bold font-[var(--font-heading)]">Leader Status Active! 👑</h3>
+              <p className="text-purple-900/80">You're earning 5% monthly on your team's income</p>
             </div>
           </div>
         </motion.div>
@@ -154,51 +153,62 @@ export default function Dashboard() {
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {statCards.map((stat, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.05 }} className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-5 hover:border-amber-500/20 transition-all">
-            <div className={`w-10 h-10 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center mb-3`}>
-              <stat.icon className="w-5 h-5 text-white" />
-            </div>
-            <p className="text-2xl font-bold">
-              <AnimatedCounter target={stat.value} prefix="₹" />
-            </p>
-            <p className="text-xs text-white/50 mt-1">{stat.label}</p>
+        {[
+          { label: 'Own Contribution', value: contributionBalance, icon: DollarSign, color: 'from-blue-500 to-cyan-600', link: '/contributions' },
+          { label: 'Level 1 Income', value: l1Income, icon: Users, color: 'from-green-500 to-emerald-600', link: '/income/level1' },
+          { label: 'Level 2 Income', value: l2Income, icon: TrendingUp, color: 'from-purple-500 to-violet-600', link: '/income/level2' },
+          { label: 'Leader Income', value: leaderIncome, icon: Crown, color: 'from-amber-500 to-orange-600', link: user.isLeader ? '/income/leader' : '#' },
+          { label: 'Gold Order Bonus', value: goldBonus, icon: Gift, color: 'from-pink-500 to-rose-600', link: '/gold-showroom' },
+          { label: 'Total Earnings', value: totalEarnings, icon: Zap, color: 'from-teal-500 to-cyan-600', link: '/commissions' },
+        ].map((stat, i) => (
+          <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.05 }}>
+            <Link to={stat.link} className="block bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-xl hover:border-amber-300 transition-all group">
+              <div className={`w-12 h-12 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                <stat.icon className="w-6 h-6 text-white" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900">
+                <AnimatedCounter target={stat.value} prefix="₹" />
+              </p>
+              <p className="text-sm text-gray-600 mt-1 font-medium">{stat.label}</p>
+            </Link>
           </motion.div>
         ))}
       </div>
 
       {/* Wallet Cards */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 text-white">
+      <div className="grid md:grid-cols-2 gap-6">
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} className="bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600 rounded-3xl p-6 text-white shadow-2xl">
           <div className="flex items-center justify-between mb-4">
-            <Wallet className="w-8 h-8" />
-            <Unlock className="w-5 h-5 text-green-200" />
+            <Wallet className="w-10 h-10" />
+            <Unlock className="w-6 h-6 text-green-200" />
           </div>
-          <p className="text-sm text-green-100">Commission Wallet</p>
-          <p className="text-3xl font-bold mt-1">₹{commissionBalance.toLocaleString()}</p>
-          <p className="text-xs text-green-200 mt-2 mb-4">Withdrawable anytime</p>
-          <button className="w-full py-2.5 bg-white/20 hover:bg-white/30 rounded-xl font-medium transition-colors backdrop-blur">
-            Withdraw Now
-          </button>
+          <p className="text-sm text-green-100 font-medium">Commission Wallet</p>
+          <p className="text-4xl font-bold mt-2">₹{commissionBalance.toLocaleString()}</p>
+          <p className="text-sm text-green-200 mt-2">💰 Withdrawable anytime</p>
+          <Link to="/wallet">
+            <button className="mt-4 w-full py-3 bg-white/20 hover:bg-white/30 rounded-xl font-semibold transition-colors backdrop-blur">
+              Withdraw Now →
+            </button>
+          </Link>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 text-white">
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} className="bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-3xl p-6 text-white shadow-2xl">
           <div className="flex items-center justify-between mb-4">
-            <Lock className="w-8 h-8" />
-            <Lock className="w-5 h-5 text-blue-200" />
+            <Lock className="w-10 h-10" />
+            <Lock className="w-6 h-6 text-blue-200" />
           </div>
-          <p className="text-sm text-blue-100">Contribution Wallet</p>
-          <p className="text-3xl font-bold mt-1">₹{contributionBalance.toLocaleString()}</p>
-          <p className="text-xs text-blue-200 mt-2 mb-4">Locked for 12 months</p>
+          <p className="text-sm text-blue-100 font-medium">Contribution Wallet</p>
+          <p className="text-4xl font-bold mt-2">₹{contributionBalance.toLocaleString()}</p>
+          <p className="text-sm text-blue-200 mt-2">🔒 Locked for 12 months</p>
           {myContributions.length > 0 && myContributions[0].status === 'unlocked' ? (
-            <div className="flex gap-2">
-              <button className="flex-1 py-2.5 bg-white/20 hover:bg-white/30 rounded-xl font-medium transition-colors backdrop-blur">Withdraw</button>
-              <button className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 rounded-xl font-medium transition-colors">Buy Gold</button>
+            <div className="flex gap-2 mt-4">
+              <button className="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-xl font-semibold transition-colors backdrop-blur">Withdraw</button>
+              <button className="flex-1 py-3 bg-amber-500 hover:bg-amber-600 rounded-xl font-semibold transition-colors">Buy Gold</button>
             </div>
           ) : (
-            <div className="flex items-center gap-2 text-xs text-blue-200">
-              <Calendar className="w-4 h-4" />
-              <span>Unlocks in {Math.max(0, Math.ceil((new Date(myContributions[0]?.lockedUntil || Date.now()).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days</span>
+            <div className="flex items-center gap-2 mt-4 p-3 bg-white/10 rounded-xl">
+              <Calendar className="w-5 h-5" />
+              <span className="text-sm">Unlocks in {Math.max(0, Math.ceil((new Date(myContributions[0]?.lockedUntil || Date.now()).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days</span>
             </div>
           )}
         </motion.div>
@@ -206,15 +216,15 @@ export default function Dashboard() {
 
       {/* Next Leader Payout */}
       {user.isLeader && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-gradient-to-r from-amber-500/10 to-purple-500/10 rounded-2xl p-6 border border-amber-500/20">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl p-6 text-purple-900 shadow-xl">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white/60">Next Leader Payout</p>
-              <p className="text-2xl font-bold gradient-text mt-1">{daysUntilPayout} days</p>
-              <p className="text-xs text-white/50 mt-1">Credited on 3rd of every month at 10:00 AM</p>
+              <p className="text-sm font-medium text-purple-900/70">Next Leader Payout</p>
+              <p className="text-3xl font-bold mt-1">{daysUntilPayout} days</p>
+              <p className="text-sm text-purple-900/70 mt-1">Credited on 3rd of every month at 10:00 AM</p>
             </div>
-            <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center">
-              <Crown className="w-8 h-8 text-purple-900" />
+            <div className="w-20 h-20 bg-white/30 rounded-full flex items-center justify-center">
+              <Crown className="w-10 h-10" />
             </div>
           </div>
         </motion.div>
@@ -223,9 +233,9 @@ export default function Dashboard() {
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Monthly Earnings */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6">
-          <h3 className="font-semibold mb-4">Monthly Earnings</h3>
-          <ResponsiveContainer width="100%" height={250}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Monthly Earnings</h3>
+          <ResponsiveContainer width="100%" height={280}>
             <AreaChart data={monthlyEarnings}>
               <defs>
                 <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
@@ -233,52 +243,82 @@ export default function Dashboard() {
                   <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis dataKey="month" stroke="rgba(255,255,255,0.5)" style={{ fontSize: '12px' }} />
-              <YAxis stroke="rgba(255,255,255,0.5)" style={{ fontSize: '12px' }} />
-              <Tooltip contentStyle={{ backgroundColor: '#1a0a2e', border: '1px solid rgba(255,215,0,0.2)', borderRadius: '12px' }} />
-              <Area type="monotone" dataKey="amount" stroke="#f59e0b" fillOpacity={1} fill="url(#colorAmount)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+              <XAxis dataKey="month" stroke="#6b7280" style={{ fontSize: '12px', fontWeight: '500' }} />
+              <YAxis stroke="#6b7280" style={{ fontSize: '12px', fontWeight: '500' }} />
+              <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
+              <Area type="monotone" dataKey="amount" stroke="#f59e0b" strokeWidth={3} fillOpacity={1} fill="url(#colorAmount)" />
             </AreaChart>
           </ResponsiveContainer>
         </motion.div>
 
         {/* Income Split */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6">
-          <h3 className="font-semibold mb-4">Income Split</h3>
-          <ResponsiveContainer width="100%" height={250}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Income Split</h3>
+          <ResponsiveContainer width="100%" height={280}>
             <PieChart>
-              <Pie data={incomeSplit} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={5} dataKey="value">
+              <Pie data={incomeSplit} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={5} dataKey="value">
                 {incomeSplit.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip contentStyle={{ backgroundColor: '#1a0a2e', border: '1px solid rgba(255,215,0,0.2)', borderRadius: '12px' }} />
+              <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px' }} />
             </PieChart>
           </ResponsiveContainer>
-          <div className="grid grid-cols-2 gap-2 mt-4">
+          <div className="grid grid-cols-2 gap-3 mt-4">
             {incomeSplit.map((item, i) => (
-              <div key={i} className="flex items-center gap-2">
+              <div key={i} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                <span className="text-xs text-white/60">{item.name}</span>
+                <span className="text-sm font-medium text-gray-700">{item.name}</span>
               </div>
             ))}
           </div>
         </motion.div>
 
         {/* Team Growth */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="lg:col-span-2 bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6">
-          <h3 className="font-semibold mb-4">Team Growth</h3>
-          <ResponsiveContainer width="100%" height={250}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="lg:col-span-2 bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Team Growth</h3>
+          <ResponsiveContainer width="100%" height={280}>
             <LineChart data={teamGrowth}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis dataKey="month" stroke="rgba(255,255,255,0.5)" style={{ fontSize: '12px' }} />
-              <YAxis stroke="rgba(255,255,255,0.5)" style={{ fontSize: '12px' }} />
-              <Tooltip contentStyle={{ backgroundColor: '#1a0a2e', border: '1px solid rgba(255,215,0,0.2)', borderRadius: '12px' }} />
-              <Line type="monotone" dataKey="members" stroke="#8b5cf6" strokeWidth={3} dot={{ fill: '#8b5cf6', r: 5 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+              <XAxis dataKey="month" stroke="#6b7280" style={{ fontSize: '12px', fontWeight: '500' }} />
+              <YAxis stroke="#6b7280" style={{ fontSize: '12px', fontWeight: '500' }} />
+              <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px' }} />
+              <Line type="monotone" dataKey="members" stroke="#8b5cf6" strokeWidth={3} dot={{ fill: '#8b5cf6', r: 6 }} activeDot={{ r: 8 }} />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
       </div>
+
+      {/* Recent Activity */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Activity</h3>
+        <div className="space-y-3">
+          {myTransactions.slice(0, 5).map(tx => (
+            <div key={tx.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                tx.type.includes('commission') || tx.type === 'leader_payout' || tx.type === 'gold_order_commission'
+                  ? 'bg-green-100' : 'bg-blue-100'
+              }`}>
+                {tx.type.includes('commission') || tx.type === 'leader_payout' || tx.type === 'gold_order_commission'
+                  ? <ArrowDownRight className="w-5 h-5 text-green-600" />
+                  : <ArrowUpRight className="w-5 h-5 text-blue-600" />
+                }
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900">{tx.description}</p>
+                <p className="text-sm text-gray-500">{tx.createdAt}</p>
+              </div>
+              <p className={`text-lg font-bold ${
+                tx.type.includes('commission') || tx.type === 'leader_payout' || tx.type === 'gold_order_commission'
+                  ? 'text-green-600' : 'text-blue-600'
+              }`}>
+                +₹{tx.amount.toLocaleString()}
+              </p>
+            </div>
+          ))}
+        </div>
+      </motion.div>
     </div>
   );
 }
