@@ -68,7 +68,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">{user?.name}</p>
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-500/20 text-red-300 text-[10px] font-medium rounded-full">
-                  <Shield className="w-2.5 h-2.5" /> {user?.role === 'admin' ? 'Super Admin' : 'Sub Admin'}
+                  <Shield className="w-2.5 h-2.5" /> {user?.role === 'admin' ? 'Super Admin' : 'Admin'}
                 </span>
               </div>
             </div>

@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { Crown, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Crown, Phone, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -17,12 +17,13 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    
     setTimeout(() => {
-      const success = login(email, password);
-      if (success) {
+      const result = login(mobile, password);
+      if (result.success) {
         navigate('/dashboard');
       } else {
-        setError('Invalid credentials. Try: admin@jwellbox.com, rajesh@example.com, or priya@example.com');
+        setError(result.message);
       }
       setLoading(false);
     }, 500);
@@ -55,15 +56,16 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Mobile Number</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <span className="absolute left-10 top-1/2 -translate-y-1/2 text-sm text-gray-500">+91</span>
                 <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+                  type="tel"
+                  value={mobile}
+                  onChange={e => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  placeholder="Enter your mobile number"
+                  className="w-full pl-20 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                   required
                 />
               </div>
@@ -106,10 +108,9 @@ export default function Login() {
           <div className="mt-6 p-4 bg-amber-50 rounded-xl border border-amber-100">
             <p className="text-xs font-medium text-amber-700 mb-2">Demo Accounts:</p>
             <div className="space-y-1 text-xs text-amber-600">
-              <p>• admin@jwellbox.com (Admin)</p>
-              <p>• rajesh@example.com (Leader)</p>
-              <p>• priya@example.com (Member)</p>
-              <p>• Password: any text works</p>
+              <p>• Mobile: 9876543210 | Password: admin123 (Admin)</p>
+              <p>• Mobile: 9876543211 | Password: raj123 (Leader)</p>
+              <p>• Mobile: 9876543212 | Password: pri123 (Member)</p>
             </div>
           </div>
         </div>

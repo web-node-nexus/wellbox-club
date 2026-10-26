@@ -1,6 +1,6 @@
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { User, Mail, Phone, Tag, Calendar, Crown, Users, Copy, CheckCircle, Shield } from 'lucide-react';
+import { User, Phone, Tag, Calendar, Crown, Users, Copy, CheckCircle, Shield } from 'lucide-react';
 import { useState } from 'react';
 import { getCommissionWalletBalance, getContributionWalletBalance } from '../data/mockData';
 
@@ -54,19 +54,21 @@ export default function Profile() {
 
           <div className="mt-6 space-y-4">
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-              <Mail className="w-5 h-5 text-gray-400" />
-              <div>
-                <p className="text-xs text-gray-500">Email</p>
-                <p className="text-sm font-medium text-gray-900">{user.email}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
               <Phone className="w-5 h-5 text-gray-400" />
               <div>
-                <p className="text-xs text-gray-500">Phone</p>
-                <p className="text-sm font-medium text-gray-900">{user.phone}</p>
+                <p className="text-xs text-gray-500">Mobile</p>
+                <p className="text-sm font-medium text-gray-900">+91 {user.mobile}</p>
               </div>
             </div>
+            {user.city && (
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                <User className="w-5 h-5 text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-500">City</p>
+                  <p className="text-sm font-medium text-gray-900">{user.city}</p>
+                </div>
+              </div>
+            )}
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
               <Calendar className="w-5 h-5 text-gray-400" />
               <div>
@@ -131,38 +133,6 @@ export default function Profile() {
                   <p className="text-sm text-gray-500">Team Members</p>
                 </div>
               </div>
-            </div>
-          </motion.div>
-
-          {/* Security */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm"
-          >
-            <h3 className="font-semibold text-gray-900 mb-4">Security</h3>
-            <div className="space-y-3">
-              <button className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-200 hover:border-amber-200 hover:bg-amber-50 transition-all">
-                <div className="flex items-center gap-3">
-                  <User className="w-5 h-5 text-gray-400" />
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-gray-900">Change Password</p>
-                    <p className="text-xs text-gray-500">Update your account password</p>
-                  </div>
-                </div>
-                <span className="text-amber-600 text-sm">Update →</span>
-              </button>
-              <button className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-200 hover:border-amber-200 hover:bg-amber-50 transition-all">
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-gray-400" />
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-gray-900">Update Phone</p>
-                    <p className="text-xs text-gray-500">Change your registered phone number</p>
-                  </div>
-                </div>
-                <span className="text-amber-600 text-sm">Update →</span>
-              </button>
             </div>
           </motion.div>
 
