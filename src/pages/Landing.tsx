@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Crown, Users, DollarSign, TrendingUp, Gem, Shield, Star, ChevronDown, ChevronRight, Play, Sparkles, ArrowRight, CheckCircle, Lock, Unlock, Phone, MessageCircle, Award, Zap, Heart, Target } from 'lucide-react';
+import { Crown, Users, DollarSign, TrendingUp, Gem, Shield, Star, ChevronDown, ChevronRight, Play, Sparkles, ArrowRight, CheckCircle, Lock, Unlock, Phone, MessageCircle, Award, Zap, Heart, Target, Scale } from 'lucide-react';
 
 interface LandingProps {
   onJoinClick: () => void;
@@ -173,6 +173,197 @@ export default function Landing({ onJoinClick }: LandingProps) {
         >
           <ChevronDown className="w-6 h-6 text-amber-400/50" />
         </motion.div>
+      </section>
+
+      {/* ============ GOLD SHOWROOM - MAIN HIGHLIGHT ============ */}
+      <section className="relative py-24 lg:py-32 overflow-hidden">
+        {/* Premium background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0f0520] via-purple-950/40 to-[#0f0520]" />
+        
+        {/* Floating gold particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(25)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute text-4xl"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -100, 0],
+                rotate: [0, 360],
+                opacity: [0.2, 0.8, 0.2],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{
+                duration: 8 + Math.random() * 4,
+                repeat: Infinity,
+                delay: Math.random() * 3,
+              }}
+            >
+              {['💎', '💍', '👑', '✨', '🪙'][i % 5]}
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Gold glow orbs */}
+        <div className="absolute top-20 left-10 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ type: 'spring', delay: 0.2 }}
+              className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-2 border-amber-500/30 rounded-full mb-6 gold-border"
+            >
+              <Gem className="w-6 h-6 text-amber-400" />
+              <span className="text-lg font-bold text-amber-300">Digital Gold Showroom</span>
+              <Sparkles className="w-5 h-5 text-amber-400" />
+            </motion.div>
+            
+            <h2 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
+              <span className="text-white">Get Gold at</span>
+              <br />
+              <span className="gradient-text">Very Cheap Price</span>
+            </h2>
+            
+            <p className="text-xl text-white/70 max-w-3xl mx-auto mb-4">
+              Directly from the manufacturer. No middlemen. No markup.
+            </p>
+            
+            <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
+              <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-full">
+                <CheckCircle className="w-5 h-5 text-amber-400" />
+                <span className="text-sm font-semibold text-amber-300">BIS Hallmarked</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-full">
+                <CheckCircle className="w-5 h-5 text-amber-400" />
+                <span className="text-sm font-semibold text-amber-300">850+ Designs</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-full">
+                <CheckCircle className="w-5 h-5 text-amber-400" />
+                <span className="text-sm font-semibold text-amber-300">22K & 24K Gold</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-full">
+                <CheckCircle className="w-5 h-5 text-amber-400" />
+                <span className="text-sm font-semibold text-amber-300">30% Cheaper</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Featured Designs Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+            {[
+              { name: 'Royal Necklace', weight: '45.5g', purity: '22K', emoji: '📿', category: 'Necklace' },
+              { name: 'Diamond Ring', weight: '4.8g', purity: '24K', emoji: '💍', category: 'Ring' },
+              { name: 'Temple Set', weight: '120g', purity: '22K', emoji: '👑', category: 'Set' },
+              { name: 'Gold Coin', weight: '10g', purity: '24K', emoji: '🪙', category: 'Coins' },
+              { name: 'Jhumka Earrings', weight: '18.5g', purity: '22K', emoji: '✨', category: 'Earrings' },
+              { name: 'Antique Bangles', weight: '28g', purity: '22K', emoji: '⭕', category: 'Bangles' },
+              { name: 'Bridal Choker', weight: '85g', purity: '22K', emoji: '💎', category: 'Necklace' },
+              { name: 'Gold Bar', weight: '50g', purity: '24K', emoji: '🏅', category: 'Coins' },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ y: -10, scale: 1.05 }}
+                className="group relative glass rounded-2xl overflow-hidden border border-white/5 hover:border-amber-500/40 transition-all duration-300 gold-card"
+              >
+                {/* Image Area */}
+                <div className="h-48 bg-gradient-to-br from-amber-900/30 via-purple-900/30 to-amber-900/30 flex items-center justify-center relative overflow-hidden">
+                  <motion.span
+                    className="text-7xl"
+                    whileHover={{ scale: 1.3, rotate: 10 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {item.emoji}
+                  </motion.span>
+                  
+                  {/* Overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  
+                  {/* Purity Badge */}
+                  <div className="absolute top-3 right-3 px-3 py-1 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full text-xs font-bold text-purple-900 shadow-lg">
+                    {item.purity}
+                  </div>
+                  
+                  {/* Category Badge */}
+                  <div className="absolute top-3 left-3 px-3 py-1 bg-white/10 backdrop-blur rounded-full text-xs font-semibold text-white border border-white/20">
+                    {item.category}
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-4">
+                  <h3 className="font-bold text-base mb-2 group-hover:text-amber-400 transition-colors">{item.name}</h3>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <Scale className="w-4 h-4 text-amber-400" />
+                      <span className="text-sm font-bold text-amber-400">{item.weight}</span>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 text-xs font-bold rounded-lg shadow-lg"
+                    >
+                      View Details
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link to="/gold-showroom-public">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-10 py-5 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-bold text-lg rounded-2xl shadow-2xl shadow-amber-500/40 hover:shadow-amber-500/60 transition-shadow flex items-center gap-3 premium-btn"
+                >
+                  <Gem className="w-6 h-6" />
+                  Explore Full Showroom
+                  <ArrowRight className="w-6 h-6" />
+                </motion.button>
+              </Link>
+              
+              <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-10 py-5 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold text-lg rounded-2xl shadow-2xl shadow-green-500/30 hover:shadow-green-500/50 transition-shadow flex items-center gap-3 premium-btn"
+                >
+                  <MessageCircle className="w-6 h-6" />
+                  WhatsApp Us
+                </motion.button>
+              </a>
+            </div>
+
+            <p className="text-white/50 mt-6 text-sm">
+              💡 <span className="text-amber-400 font-semibold">Pro Tip:</span> Join as a member and earn 3% commission on every gold order you refer!
+            </p>
+          </motion.div>
+        </div>
       </section>
 
       {/* ============ HOW IT WORKS ============ */}
