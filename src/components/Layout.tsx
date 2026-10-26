@@ -3,28 +3,37 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard, Users, DollarSign, Wallet, Gift, Crown,
-  Menu, X, LogOut, User, ChevronRight, Gem, Settings, Coins
+  LayoutDashboard, Users, DollarSign, Wallet, Gem, Crown,
+  Menu, X, LogOut, User, ChevronRight, Coins, Bell, HelpCircle,
+  Link2, ShoppingBag, Sun, Moon, TrendingUp
 } from 'lucide-react';
 
 export default function Layout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/referrals', label: 'My Referrals', icon: Users },
-    { path: '/commissions', label: 'Commissions', icon: DollarSign },
-    { path: '/wallet', label: 'Wallet', icon: Wallet },
-    { path: '/contributions', label: 'Contributions', icon: Coins },
+    { path: '/contributions', label: 'My Contribution', icon: Coins },
+    { path: '/income/level1', label: 'Level 1 Income', icon: DollarSign },
+    { path: '/income/level2', label: 'Level 2 Income', icon: TrendingUp },
+    ...(user?.isLeader ? [{ path: '/income/leader', label: 'Leader Income', icon: Crown }] : []),
+    { path: '/team', label: 'My Team', icon: Users },
+    { path: '/wallet', label: 'Wallet & Withdraw', icon: Wallet },
     { path: '/gold-showroom', label: 'Gold Showroom', icon: Gem },
+    { path: '/orders', label: 'My Orders', icon: ShoppingBag },
+    { path: '/referral', label: 'Referral Link', icon: Link2 },
     { path: '/profile', label: 'Profile', icon: User },
-    ...(user?.role === 'admin' ? [{ path: '/admin', label: 'Admin Panel', icon: Settings }] : []),
+    { path: '/notifications', label: 'Notifications', icon: Bell },
+    { path: '/support', label: 'Support', icon: HelpCircle },
   ];
 
+  const mobileNavItems = navItems.slice(0, 5);
+
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className={`min-h-screen ${darkMode ? 'bg-[#0f0520]' : 'bg-gray-50'} flex`}>
       {/* Mobile overlay */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -32,44 +41,46 @@ export default function Layout({ children }: { children: ReactNode }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
       </AnimatePresence>
 
       {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-amber-900 via-amber-800 to-amber-900 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 ${darkMode ? 'bg-gradient-to-b from-purple-950 via-[#1a0a2e] to-purple-950' : 'bg-white'} border-r ${darkMode ? 'border-amber-500/10' : 'border-gray-200'} transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6 border-b border-amber-700/50">
+          <div className={`p-6 border-b ${darkMode ? 'border-amber-500/10' : 'border-gray-200'}`}>
             <Link to="/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Crown className="w-6 h-6 text-amber-900" />
-              </div>
+              <motion.div
+                whileHover={{ rotate: 10, scale: 1.1 }}
+                className="w-10 h-10 bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30"
+              >
+                <Crown className="w-6 h-6 text-purple-900" />
+              </motion.div>
               <div>
-                <h1 className="text-xl font-bold text-white">Jwellbox</h1>
-                <p className="text-xs text-amber-200">Gold Club</p>
+                <h1 className={`text-xl font-bold font-[var(--font-heading)] ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <span className="gradient-text">Jwellbox</span>
+                </h1>
+                <p className={`text-[10px] ${darkMode ? 'text-amber-300/70' : 'text-amber-600'} -mt-1 tracking-wider`}>MEMBER DASHBOARD</p>
               </div>
             </Link>
           </div>
 
           {/* User Info */}
-          <div className="p-4 mx-3 mt-4 bg-amber-800/50 rounded-xl border border-amber-700/30">
+          <div className={`p-4 mx-3 mt-4 ${darkMode ? 'bg-amber-500/5 border-amber-500/10' : 'bg-amber-50 border-amber-200'} rounded-xl border`}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center text-amber-900 font-bold">
+              <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center text-purple-900 font-bold">
                 {user?.name.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">{user?.name}</p>
+                <p className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-900'} truncate`}>{user?.name}</p>
                 <div className="flex items-center gap-1">
                   {user?.isLeader && (
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-yellow-500/20 text-yellow-300 text-[10px] font-medium rounded-full">
                       <Crown className="w-2.5 h-2.5" /> Leader
                     </span>
-                  )}
-                  {user?.role === 'admin' && (
-                    <span className="px-1.5 py-0.5 bg-red-500/20 text-red-300 text-[10px] font-medium rounded-full">Admin</span>
                   )}
                 </div>
               </div>
@@ -79,7 +90,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           {/* Navigation */}
           <nav className="flex-1 p-3 mt-2 space-y-1 overflow-y-auto">
             {navItems.map(item => {
-              const isActive = location.pathname === item.path;
+              const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
               return (
                 <Link
                   key={item.path}
@@ -87,23 +98,38 @@ export default function Layout({ children }: { children: ReactNode }) {
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? 'bg-white/15 text-white shadow-lg shadow-amber-900/20'
-                      : 'text-amber-100 hover:bg-white/10 hover:text-white'
+                      ? darkMode
+                        ? 'bg-gradient-to-r from-amber-500/20 to-purple-500/10 text-amber-400 border border-amber-500/20'
+                        : 'bg-amber-100 text-amber-700 border border-amber-200'
+                      : darkMode
+                        ? 'text-white/70 hover:bg-white/5 hover:text-white'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                   }`}
                 >
-                  <item.icon className={`w-5 h-5 ${isActive ? 'text-yellow-400' : ''}`} />
+                  <item.icon className={`w-5 h-5 ${isActive ? (darkMode ? 'text-amber-400' : 'text-amber-600') : ''}`} />
                   <span className="flex-1">{item.label}</span>
-                  {isActive && <ChevronRight className="w-4 h-4 text-yellow-400" />}
+                  {isActive && <ChevronRight className={`w-4 h-4 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />}
                 </Link>
               );
             })}
           </nav>
 
+          {/* Dark Mode Toggle */}
+          <div className={`p-3 border-t ${darkMode ? 'border-amber-500/10' : 'border-gray-200'}`}>
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium ${darkMode ? 'text-white/70 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'} transition-all`}
+            >
+              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              <span>{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
+            </button>
+          </div>
+
           {/* Logout */}
-          <div className="p-3 border-t border-amber-700/50">
+          <div className={`p-3 border-t ${darkMode ? 'border-amber-500/10' : 'border-gray-200'}`}>
             <button
               onClick={logout}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-amber-100 hover:bg-white/10 hover:text-white transition-all"
+              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium ${darkMode ? 'text-white/70 hover:bg-red-500/10 hover:text-red-400' : 'text-gray-600 hover:bg-red-50 hover:text-red-600'} transition-all`}
             >
               <LogOut className="w-5 h-5" />
               <span>Sign Out</span>
@@ -115,23 +141,23 @@ export default function Layout({ children }: { children: ReactNode }) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Top Bar */}
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 px-4 lg:px-8 py-4">
+        <header className={`sticky top-0 z-30 ${darkMode ? 'bg-[#0f0520]/80' : 'bg-white/80'} backdrop-blur-xl border-b ${darkMode ? 'border-amber-500/10' : 'border-gray-200'} px-4 lg:px-8 py-4`}>
           <div className="flex items-center justify-between">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
+              className={`lg:hidden p-2 rounded-xl ${darkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'} transition-colors`}
             >
-              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {sidebarOpen ? <X className={`w-5 h-5 ${darkMode ? 'text-white' : 'text-gray-900'}`} /> : <Menu className={`w-5 h-5 ${darkMode ? 'text-white' : 'text-gray-900'}`} />}
             </button>
             <div className="flex items-center gap-4 ml-auto">
               {user?.isLeader && (
-                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-yellow-100 to-amber-100 rounded-full border border-yellow-200">
-                  <Crown className="w-4 h-4 text-amber-600" />
-                  <span className="text-xs font-semibold text-amber-700">Leader Status Active</span>
+                <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 ${darkMode ? 'bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border-yellow-500/20' : 'bg-gradient-to-r from-yellow-100 to-amber-100 border-yellow-200'} rounded-full border`}>
+                  <Crown className={`w-4 h-4 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
+                  <span className={`text-xs font-semibold ${darkMode ? 'text-amber-300' : 'text-amber-700'}`}>Leader Status Active</span>
                 </div>
               )}
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-purple-900 text-sm font-bold">
                   {user?.name.charAt(0)}
                 </div>
               </div>
@@ -140,16 +166,40 @@ export default function Layout({ children }: { children: ReactNode }) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 lg:p-8">
+        <main className="flex-1 p-4 lg:p-8 pb-20 lg:pb-8">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
+            className={darkMode ? 'text-white' : 'text-gray-900'}
           >
             {children}
           </motion.div>
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className={`fixed bottom-0 left-0 right-0 z-40 lg:hidden ${darkMode ? 'bg-purple-950/95 border-amber-500/10' : 'bg-white/95 border-gray-200'} backdrop-blur-xl border-t`}>
+        <div className="flex items-center justify-around py-2">
+          {mobileNavItems.map(item => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all ${
+                  isActive
+                    ? darkMode ? 'text-amber-400' : 'text-amber-600'
+                    : darkMode ? 'text-white/50' : 'text-gray-500'
+                }`}
+              >
+                <item.icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''} transition-transform`} />
+                <span className="text-[10px] font-medium">{item.label.split(' ')[0]}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }

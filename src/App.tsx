@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
+import { ToastProvider } from './context/ToastContext';
 import Layout from './components/Layout';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -25,11 +26,15 @@ import RefundPolicy from './pages/RefundPolicy';
 
 // Dashboard Pages
 import Dashboard from './pages/Dashboard';
-import Referrals from './pages/Referrals';
-import Commissions from './pages/Commissions';
+import Team from './pages/Team';
+import Income from './pages/Income';
 import Wallet from './pages/Wallet';
 import Contributions from './pages/Contributions';
+import Referral from './pages/Referral';
+import Orders from './pages/Orders';
 import Profile from './pages/Profile';
+import Notifications from './pages/Notifications';
+import Support from './pages/Support';
 import Admin from './pages/Admin';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -47,15 +52,10 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 function PublicPageWrapper({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <ScrollToTop />
       {children}
       <Footer />
     </>
   );
-}
-
-function ScrollToTop() {
-  return null; // Could implement scroll restoration
 }
 
 function AppRoutes() {
@@ -92,12 +92,18 @@ function AppRoutes() {
 
         {/* Dashboard Pages */}
         <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
-        <Route path="/referrals" element={<ProtectedRoute><Layout><Referrals /></Layout></ProtectedRoute>} />
-        <Route path="/commissions" element={<ProtectedRoute><Layout><Commissions /></Layout></ProtectedRoute>} />
+        <Route path="/team" element={<ProtectedRoute><Layout><Team /></Layout></ProtectedRoute>} />
+        <Route path="/income/level1" element={<ProtectedRoute><Layout><Income /></Layout></ProtectedRoute>} />
+        <Route path="/income/level2" element={<ProtectedRoute><Layout><Income /></Layout></ProtectedRoute>} />
+        <Route path="/income/leader" element={<ProtectedRoute><Layout><Income /></Layout></ProtectedRoute>} />
         <Route path="/wallet" element={<ProtectedRoute><Layout><Wallet /></Layout></ProtectedRoute>} />
         <Route path="/contributions" element={<ProtectedRoute><Layout><Contributions /></Layout></ProtectedRoute>} />
         <Route path="/gold-showroom" element={<ProtectedRoute><Layout><GoldShowroomPublic onJoinClick={() => {}} /></Layout></ProtectedRoute>} />
+        <Route path="/orders" element={<ProtectedRoute><Layout><Orders /></Layout></ProtectedRoute>} />
+        <Route path="/referral" element={<ProtectedRoute><Layout><Referral /></Layout></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute><Layout><Notifications /></Layout></ProtectedRoute>} />
+        <Route path="/support" element={<ProtectedRoute><Layout><Support /></Layout></ProtectedRoute>} />
         <Route path="/admin" element={<AdminRoute><Layout><Admin /></Layout></AdminRoute>} />
       </Routes>
       <JoinModal isOpen={joinOpen} onClose={() => setJoinOpen(false)} initialTab={joinTab} />
@@ -110,7 +116,9 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <AppProvider>
-          <AppRoutes />
+          <ToastProvider>
+            <AppRoutes />
+          </ToastProvider>
         </AppProvider>
       </AuthProvider>
     </BrowserRouter>
