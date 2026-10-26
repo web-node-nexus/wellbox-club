@@ -7,12 +7,14 @@ import {
   Menu, X, LogOut, User, ChevronRight, Coins, Bell, HelpCircle,
   Link2, ShoppingBag, Sun, Moon, TrendingUp
 } from 'lucide-react';
+import LogoutModal from './LogoutModal';
 
 export default function Layout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -128,7 +130,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           {/* Logout */}
           <div className={`p-3 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
             <button
-              onClick={logout}
+              onClick={() => setShowLogoutModal(true)}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold ${darkMode ? 'text-gray-300 hover:bg-red-500/10 hover:text-red-400' : 'text-gray-700 hover:bg-red-50 hover:text-red-600'} transition-all`}
             >
               <LogOut className="w-5 h-5" />
@@ -200,6 +202,16 @@ export default function Layout({ children }: { children: ReactNode }) {
           })}
         </div>
       </nav>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={() => {
+          logout();
+          setShowLogoutModal(false);
+        }}
+      />
     </div>
   );
 }
