@@ -10,14 +10,13 @@ interface JoinModalProps {
 
 export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: JoinModalProps) {
   const [activeTab, setActiveTab] = useState<'member' | 'leader'>(initialTab);
-  const [step, setStep] = useState<'form' | 'otp' | 'success'>('form');
+  const [step, setStep] = useState<'form' | 'success'>('form');
   const [formData, setFormData] = useState({
     name: '',
     mobile: '',
     referralCode: '',
     city: '',
   });
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -35,14 +34,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setStep('otp');
-    }, 1000);
-  };
-
-  const handleOtpSubmit = () => {
-    setLoading(true);
+    // Direct registration - no OTP required
     setTimeout(() => {
       setLoading(false);
       setStep('success');
@@ -52,7 +44,6 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
   const handleClose = () => {
     setStep('form');
     setFormData({ name: '', mobile: '', referralCode: '', city: '' });
-    setOtp(['', '', '', '', '', '']);
     setErrors({});
     onClose();
   };
@@ -215,47 +206,6 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                     By joining, you agree to our Terms & Privacy Policy
                   </p>
                 </motion.form>
-              )}
-
-              {step === 'otp' && (
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="text-center">
-                  <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Phone className="w-8 h-8 text-amber-400" />
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-1">Verify OTP</h3>
-                  <p className="text-sm text-white/60 mb-6">
-                    Enter the 6-digit code sent to <span className="text-amber-400">+91 {formData.mobile}</span>
-                  </p>
-                  <div className="flex gap-2 justify-center mb-6">
-                    {otp.map((digit, i) => (
-                      <input
-                        key={i}
-                        type="text"
-                        maxLength={1}
-                        value={digit}
-                        onChange={e => {
-                          const newOtp = [...otp];
-                          newOtp[i] = e.target.value;
-                          setOtp(newOtp);
-                        }}
-                        className="w-11 h-13 bg-white/5 border border-white/20 rounded-xl text-center text-xl font-bold text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 transition-all"
-                      />
-                    ))}
-                  </div>
-                  <p className="text-xs text-white/40 mb-4">
-                    Demo: Enter any 6 digits (e.g., 123456)
-                  </p>
-                  <button
-                    onClick={handleOtpSubmit}
-                    disabled={loading || otp.join('').length < 6}
-                    className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-semibold rounded-xl shadow-lg disabled:opacity-50"
-                  >
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Verify & Continue'}
-                  </button>
-                  <button className="mt-3 text-sm text-amber-400 hover:text-amber-300">
-                    Resend OTP
-                  </button>
-                </motion.div>
               )}
 
               {step === 'success' && (
