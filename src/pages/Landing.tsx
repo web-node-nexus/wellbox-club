@@ -1,10 +1,64 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Crown, Users, DollarSign, TrendingUp, Gem, Shield, Star, ChevronDown, ChevronRight, Sparkles, ArrowRight, CheckCircle, Lock, Unlock, Phone, MessageCircle, Award, Zap, Heart, Target, Scale, Play, TrendingDown } from 'lucide-react';
+import { Crown, Users, TrendingUp, Gem, Shield, Star, ChevronDown, Sparkles, ArrowRight, CheckCircle, Lock, Unlock, Phone, MessageCircle, Award, Zap, Heart, Target, Scale, Play, TrendingDown, ShoppingCart, Eye, DollarSign } from 'lucide-react';
 
 interface LandingProps {
   onJoinClick: () => void;
+}
+
+// 3D Gold Coin Component
+function GoldCoin({ delay = 0, x = 0, y = 0, size = 60 }: { delay?: number; x?: number; y?: number; size?: number }) {
+  return (
+    <motion.div
+      className="absolute"
+      style={{ left: `${x}%`, top: `${y}%` }}
+      initial={{ opacity: 0, scale: 0, rotateY: 0 }}
+      animate={{ 
+        opacity: [0, 1, 1, 0],
+        scale: [0, 1.2, 1, 0.8],
+        rotateY: [0, 360, 720, 1080],
+        y: [0, -50, -100, -150]
+      }}
+      transition={{ 
+        duration: 4,
+        delay: delay,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }}
+    >
+      <div 
+        className="rounded-full bg-gradient-to-br from-yellow-300 via-amber-500 to-yellow-600 shadow-2xl shadow-amber-500/50 flex items-center justify-center border-4 border-yellow-400"
+        style={{ width: size, height: size }}
+      >
+        <div className="text-center">
+          <div className="text-purple-900 font-bold" style={{ fontSize: size * 0.4 }}>₹</div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// Floating Jewellery Component
+function FloatingJewellery({ emoji, delay = 0, x = 0, y = 0 }: { emoji: string; delay?: number; x?: number; y?: number }) {
+  return (
+    <motion.div
+      className="absolute text-4xl md:text-6xl"
+      style={{ left: `${x}%`, top: `${y}%` }}
+      animate={{
+        y: [0, -30, 0],
+        rotate: [0, 10, -10, 0],
+        scale: [1, 1.1, 1],
+      }}
+      transition={{
+        duration: 5 + delay,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+    >
+      {emoji}
+    </motion.div>
+  );
 }
 
 // Animated Counter Component
@@ -40,71 +94,25 @@ function AnimatedCounter({ target, suffix = '', prefix = '' }: { target: number;
   }, [inView, target]);
 
   return (
-    <div ref={ref} className="text-3xl lg:text-4xl font-bold gradient-text glow-text">
+    <div ref={ref} className="text-4xl lg:text-5xl font-bold gradient-text">
       {prefix}{count.toLocaleString()}{suffix}
     </div>
   );
 }
 
-// Marquee Ticker Component
-function MarqueeTicker() {
-  const items = [
-    { icon: '💰', text: 'Gold Price: ₹6,250/gram', trend: 'up' },
-    { icon: '👑', text: '500+ Active Leaders', trend: 'up' },
-    { icon: '💎', text: '850+ Gold Designs', trend: 'neutral' },
-    { icon: '📈', text: '₹2Cr+ Commission Paid', trend: 'up' },
-    { icon: '🏆', text: '12,500+ Happy Members', trend: 'up' },
-    { icon: '✨', text: '30% Cheaper Than Market', trend: 'up' },
-  ];
-
-  return (
-    <div className="relative bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border-y border-amber-500/20 py-3 overflow-hidden">
-      <div className="marquee-container">
-        <div className="marquee-content">
-          {[...items, ...items].map((item, i) => (
-            <span key={i} className="inline-flex items-center gap-2 mx-8 text-sm">
-              <span className="text-xl">{item.icon}</span>
-              <span className="font-semibold text-amber-300">{item.text}</span>
-              {item.trend === 'up' && <TrendingUp className="w-4 h-4 text-green-400" />}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Landing({ onJoinClick }: LandingProps) {
-  const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
   const [calcMembers, setCalcMembers] = useState(20);
   const [calcContribution, setCalcContribution] = useState(3000);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 150]);
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   const testimonials = [
     { name: 'Rajesh Kumar', city: 'Jaipur', text: 'Jwellbox Club ne meri zindagi badal di! 6 months mein 50 members ki team banayi aur ab leader hoon. Monthly income ₹45,000+ hai!', rating: 5, earning: '₹45,000/mo' },
-    { name: 'Priya Sharma', city: 'Delhi', text: 'Best platform for gold savings. Monthly contribution lock karke 12 months baad gold le sakti hoon. Commission bhi milta hai!', rating: 5, earning: '₹28,000/mo' },
-    { name: 'Amit Patel', city: 'Mumbai', text: 'Gold showroom se directly manufacturer se gold mila - 30% sasta! Aur referral se extra income. Win-win situation!', rating: 5, earning: '₹62,000/mo' },
-    { name: 'Sunita Devi', city: 'Lucknow', text: 'Ghar baithe kaam karke achhi income ho rahi hai. Team build karna easy hai kyunki product trusted hai. Thank you Jwellbox!', rating: 5, earning: '₹35,000/mo' },
-    { name: 'Vikram Singh', city: 'Ahmedabad', text: 'Leader banne ka sapna poora hua! 100 members ki team complete ki aur ab monthly payout milta hai. Life changing experience!', rating: 5, earning: '₹78,000/mo' },
-  ];
-
-  const faqs = [
-    { q: 'What is Jwellbox Club?', a: 'Jwellbox Club is India\'s premium gold investment and referral platform where members contribute monthly, earn commissions by building teams, and access gold directly from manufacturers at wholesale prices.' },
-    { q: 'How much do I need to invest to join?', a: 'You can start with a minimum monthly contribution of ₹1,000. There is no joining fee. Your contribution is locked for 12 months after which you can withdraw or convert to gold.' },
-    { q: 'How does the referral commission work?', a: 'You earn 10% commission on your direct referral\'s contribution (Level 1) and 5% on their referral\'s contribution (Level 2). All commissions are credited to your withdrawable wallet instantly.' },
-    { q: 'When can I withdraw my commission?', a: 'Commission wallet balance can be withdrawn anytime! Submit a withdrawal request and it gets processed within 24-48 hours directly to your bank account.' },
-    { q: 'What happens to my contribution after 12 months?', a: 'After the 12-month lock period, you have two options: (1) Withdraw the full amount to your bank account, or (2) Convert it into gold purchase from our showroom at manufacturer prices.' },
-    { q: 'How do I become a Leader?', a: 'When your total team reaches 100 members (direct + indirect), you automatically become a Leader! Leaders earn an additional 5% monthly payout on their entire team\'s income.' },
-    { q: 'Is the gold BIS hallmarked?', a: 'Yes! All gold available in our showroom is BIS hallmarked and comes directly from certified manufacturers. We guarantee purity and quality.' },
-    { q: 'What is the gold order commission?', a: 'When a member in your team purchases gold through the showroom, you earn 3% of the order value as commission. This is credited to your commission wallet instantly.' },
-    { q: 'Is my money safe?', a: 'Absolutely! Every transaction is recorded in an immutable ledger. Your contribution is locked securely and all commission calculations are automated and transparent.' },
-    { q: 'Can I see gold designs before buying?', a: 'Yes! Our digital gold showroom displays all designs with weight in grams, purity (22K/24K), and making charges. You can express interest and our team will arrange viewing.' },
-    { q: 'How is the leader payout calculated?', a: 'Leader payout is calculated on the 3rd of every month. It\'s 5% of the total contribution income generated by your team in the previous month. Credited automatically to your wallet.' },
-    { q: 'Do I need experience to become a leader?', a: 'No prior experience needed! We provide complete training, marketing materials, and support. Many of our top leaders started as homemakers and students.' },
+    { name: 'Priya Sharma', city: 'Delhi', text: 'Digital gold showroom se directly manufacturer se gold mila - 30% sasta! Aur referral se extra income. Win-win situation!', rating: 5, earning: '₹28,000/mo' },
+    { name: 'Amit Patel', city: 'Mumbai', text: 'Best platform for digital gold investment. Monthly contribution lock karke 12 months baad gold le sakti hoon. Commission bhi milta hai!', rating: 5, earning: '₹62,000/mo' },
   ];
 
   const incomeL1 = calcMembers * calcContribution * 0.10;
@@ -113,96 +121,111 @@ export default function Landing({ onJoinClick }: LandingProps) {
   const totalMonthly = incomeL1 + incomeL2 + leaderIncome;
 
   return (
-    <div className="min-h-screen bg-[#0f0520] text-white overflow-hidden noise-overlay">
-      {/* ============ MARQUEE TICKER ============ */}
-      <MarqueeTicker />
-
-      {/* ============ HERO SECTION ============ */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center mesh-gradient overflow-hidden">
-        {/* Floating gold elements */}
+    <div className="min-h-screen bg-[#0f0520] text-white overflow-hidden">
+      {/* ============ HERO SECTION - GOLD HUB ============ */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Premium Gold Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-[#1a0a2e] to-amber-950/30" />
+        
+        {/* Animated Gold Particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute text-3xl"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -80, 0],
-                rotate: [0, 360],
-                opacity: [0.2, 0.7, 0.2],
-                scale: [1, 1.3, 1],
-              }}
-              transition={{
-                duration: 6 + Math.random() * 4,
-                repeat: Infinity,
-                delay: Math.random() * 3,
-              }}
-            >
-              {['💰', '💎', '👑', '✨', '🪙', '💍'][i % 6]}
-            </motion.div>
-          ))}
-          {/* Gradient orbs */}
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-yellow-500/5 rounded-full blur-3xl" />
+          {/* Gold Coins */}
+          <GoldCoin delay={0} x={10} y={20} size={80} />
+          <GoldCoin delay={1} x={85} y={30} size={60} />
+          <GoldCoin delay={2} x={20} y={70} size={70} />
+          <GoldCoin delay={3} x={75} y={60} size={50} />
+          <GoldCoin delay={4} x={50} y={15} size={90} />
+          <GoldCoin delay={5} x={30} y={80} size={65} />
+          <GoldCoin delay={6} x={90} y={50} size={75} />
+          
+          {/* Floating Jewellery */}
+          <FloatingJewellery emoji="💎" delay={0} x={15} y={25} />
+          <FloatingJewellery emoji="💍" delay={1} x={80} y={20} />
+          <FloatingJewellery emoji="👑" delay={2} x={25} y={75} />
+          <FloatingJewellery emoji="✨" delay={3} x={70} y={70} />
+          <FloatingJewellery emoji="🪙" delay={4} x={45} y={10} />
+          <FloatingJewellery emoji="📿" delay={5} x={60} y={85} />
+          <FloatingJewellery emoji="💰" delay={6} x={5} y={50} />
+          <FloatingJewellery emoji="🏆" delay={7} x={95} y={40} />
         </div>
 
+        {/* Gold Glow Orbs */}
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-amber-500/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-yellow-500/10 rounded-full blur-3xl" />
+
+        {/* Hero Content */}
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-24 pb-16">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
+            {/* Badge */}
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, type: 'spring' }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-2 border-amber-500/30 rounded-full mb-8 float-badge"
+              className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-2 border-amber-500/40 rounded-full mb-8 backdrop-blur-xl shadow-2xl shadow-amber-500/20"
             >
-              <Sparkles className="w-5 h-5 text-amber-400" />
-              <span className="text-sm font-bold text-amber-300">India's #1 Gold Investment Club</span>
-              <Sparkles className="w-5 h-5 text-amber-400" />
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              >
+                <Sparkles className="w-6 h-6 text-amber-400" />
+              </motion.div>
+              <span className="text-lg font-bold text-amber-300">India's #1 Digital Gold Platform</span>
+              <motion.div
+                animate={{ rotate: [0, -360] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              >
+                <Sparkles className="w-6 h-6 text-amber-400" />
+              </motion.div>
             </motion.div>
             
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-[var(--font-heading)] leading-tight mb-8 text-shadow-gold">
+            {/* Main Heading */}
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-[var(--font-heading)] leading-tight mb-8">
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
                 className="block text-white"
+                style={{ textShadow: '0 0 40px rgba(255, 215, 0, 0.3)' }}
               >
-                Earn Together.
+                Buy Gold
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
                 className="block gradient-text"
+                style={{ textShadow: '0 0 60px rgba(255, 215, 0, 0.5)' }}
               >
-                Grow Together.
+                Digitally
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
-                className="block text-white"
+                className="block text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl mt-4"
               >
-                Own Gold.
+                Earn & Grow Together
               </motion.span>
             </h1>
             
+            {/* Subtitle */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9 }}
-              className="text-lg sm:text-xl lg:text-2xl text-white/70 max-w-3xl mx-auto mb-10 leading-relaxed"
+              className="text-xl sm:text-2xl lg:text-3xl text-white/80 max-w-4xl mx-auto mb-12 leading-relaxed font-medium"
             >
-              Join thousands of members building wealth through gold savings, team commissions, and direct manufacturer gold access. <span className="text-amber-400 font-bold">Sapna apka, saath humara!</span>
+              Direct from manufacturer. <span className="text-amber-400 font-bold">30% cheaper than market.</span>
+              <br />
+              <span className="text-2xl sm:text-3xl">BIS Hallmarked • 850+ Designs • Instant Delivery</span>
             </motion.p>
 
+            {/* CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -213,42 +236,49 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onJoinClick}
-                className="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-bold text-lg rounded-2xl shadow-2xl shadow-amber-500/40 hover:shadow-amber-500/60 transition-all flex items-center justify-center gap-3 btn-premium"
+                className="w-full sm:w-auto px-12 py-6 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-bold text-xl rounded-2xl shadow-2xl shadow-amber-500/50 hover:shadow-amber-500/70 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
               >
-                <Users className="w-6 h-6" />
-                Become a Member
-                <ArrowRight className="w-6 h-6" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <ShoppingCart className="w-7 h-7" />
+                <span className="relative">Buy Gold Now</span>
+                <ArrowRight className="w-7 h-7 relative" />
               </motion.button>
+              
               <motion.button
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => onJoinClick()}
-                className="w-full sm:w-auto px-10 py-5 bg-white/5 border-2 border-purple-400/30 text-white font-bold text-lg rounded-2xl hover:bg-purple-500/10 hover:border-purple-400/50 transition-all flex items-center justify-center gap-3 backdrop-blur-xl"
+                className="w-full sm:w-auto px-12 py-6 bg-white/10 border-2 border-amber-400/50 text-white font-bold text-xl rounded-2xl hover:bg-amber-500/10 hover:border-amber-400 transition-all flex items-center justify-center gap-3 backdrop-blur-xl relative overflow-hidden group"
               >
-                <Crown className="w-6 h-6 text-purple-400" />
-                Become a Leader
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <Crown className="w-7 h-7 text-amber-400 relative" />
+                <span className="relative">Become a Leader</span>
               </motion.button>
             </motion.div>
           </motion.div>
 
-          {/* Live Counters */}
+          {/* Live Stats */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.3, duration: 0.8 }}
-            className="grid grid-cols-3 gap-4 max-w-2xl mx-auto"
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto"
           >
-            <div className="glass-premium rounded-2xl p-5 premium-card-hover">
+            <div className="bg-white/5 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 hover:border-amber-500/40 transition-all hover:scale-105">
               <AnimatedCounter target={12500} suffix="+" />
-              <p className="text-sm text-white/60 mt-2 font-medium">Active Members</p>
+              <p className="text-sm text-white/60 mt-2 font-medium">Happy Members</p>
             </div>
-            <div className="glass-premium rounded-2xl p-5 premium-card-hover">
+            <div className="bg-white/5 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 hover:border-amber-500/40 transition-all hover:scale-105">
               <AnimatedCounter target={850} suffix="+" />
               <p className="text-sm text-white/60 mt-2 font-medium">Gold Designs</p>
             </div>
-            <div className="glass-premium rounded-2xl p-5 premium-card-hover">
+            <div className="bg-white/5 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 hover:border-amber-500/40 transition-all hover:scale-105">
               <AnimatedCounter target={2} prefix="₹" suffix="Cr+" />
-              <p className="text-sm text-white/60 mt-2 font-medium">Commission Paid</p>
+              <p className="text-sm text-white/60 mt-2 font-medium">Gold Sold</p>
+            </div>
+            <div className="bg-white/5 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 hover:border-amber-500/40 transition-all hover:scale-105">
+              <AnimatedCounter target={500} suffix="+" />
+              <p className="text-sm text-white/60 mt-2 font-medium">Active Leaders</p>
             </div>
           </motion.div>
         </motion.div>
@@ -259,32 +289,29 @@ export default function Landing({ onJoinClick }: LandingProps) {
           transition={{ duration: 2, repeat: Infinity }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
         >
-          <ChevronDown className="w-8 h-8 text-amber-400/50" />
+          <ChevronDown className="w-10 h-10 text-amber-400/50" />
         </motion.div>
       </section>
 
-      {/* Section Divider */}
-      <div className="section-divider" />
-
-      {/* ============ GOLD SHOWROOM - MAIN HIGHLIGHT ============ */}
+      {/* ============ DIGITAL GOLD SHOWROOM - MAIN HIGHLIGHT ============ */}
       <section className="relative py-24 lg:py-32 overflow-hidden">
-        {/* Premium background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0f0520] via-purple-950/40 to-[#0f0520]" />
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0f0520] via-purple-950/50 to-[#0f0520]" />
         
-        {/* Floating gold particles */}
+        {/* Floating Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(25)].map((_, i) => (
+          {[...Array(30)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute text-4xl"
+              className="absolute text-5xl"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
               }}
               animate={{
-                y: [0, -100, 0],
+                y: [0, -120, 0],
                 rotate: [0, 360],
-                opacity: [0.2, 0.8, 0.2],
+                opacity: [0.3, 0.8, 0.3],
                 scale: [1, 1.5, 1],
               }}
               transition={{
@@ -293,14 +320,14 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 delay: Math.random() * 3,
               }}
             >
-              {['💎', '💍', '👑', '✨', '🪙'][i % 5]}
+              {['💎', '💍', '👑', '✨', '🪙', '📿'][i % 6]}
             </motion.div>
           ))}
         </div>
 
-        {/* Gold glow orbs */}
-        <div className="absolute top-20 left-10 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+        {/* Gold Glow */}
+        <div className="absolute top-20 left-10 w-[600px] h-[600px] bg-amber-500/15 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-3xl" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
@@ -315,29 +342,43 @@ export default function Landing({ onJoinClick }: LandingProps) {
               whileInView={{ scale: 1 }}
               viewport={{ once: true }}
               transition={{ type: 'spring', delay: 0.2 }}
-              className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-2 border-amber-500/30 rounded-full mb-6 animated-gradient-border"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-500/30 to-yellow-500/30 border-3 border-amber-500/50 rounded-full mb-8 backdrop-blur-xl shadow-2xl shadow-amber-500/30"
             >
-              <Gem className="w-6 h-6 text-amber-400" />
-              <span className="text-lg font-bold text-amber-300">Digital Gold Showroom</span>
-              <Sparkles className="w-5 h-5 text-amber-400" />
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              >
+                <Gem className="w-8 h-8 text-amber-400" />
+              </motion.div>
+              <span className="text-2xl font-bold text-amber-300">Digital Gold Showroom</span>
+              <motion.div
+                animate={{ rotate: [0, -360] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              >
+                <Sparkles className="w-7 h-7 text-amber-400" />
+              </motion.div>
             </motion.div>
             
-            <h2 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6 text-shadow-gold">
-              <span className="text-white">Get Gold at</span>
+            <h2 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6" style={{ textShadow: '0 0 60px rgba(255, 215, 0, 0.4)' }}>
+              <span className="text-white">Buy Gold at</span>
               <br />
-              <span className="gradient-text">Very Cheap Price</span>
+              <span className="gradient-text">Wholesale Prices</span>
             </h2>
             
-            <p className="text-xl text-white/70 max-w-3xl mx-auto mb-4">
-              Directly from the manufacturer. No middlemen. No markup.
+            <p className="text-2xl text-white/80 max-w-3xl mx-auto mb-8 font-medium">
+              Directly from manufacturer. <span className="text-amber-400 font-bold">No middlemen. No markup.</span>
+              <br />
+              <span className="text-3xl font-bold text-amber-400">Save 30% on every purchase!</span>
             </p>
             
+            {/* Trust Badges */}
             <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
               {[
-                { icon: CheckCircle, text: 'BIS Hallmarked' },
-                { icon: CheckCircle, text: '850+ Designs' },
-                { icon: CheckCircle, text: '22K & 24K Gold' },
-                { icon: CheckCircle, text: '30% Cheaper' },
+                { icon: CheckCircle, text: 'BIS Hallmarked', color: 'text-green-400' },
+                { icon: CheckCircle, text: '850+ Designs', color: 'text-blue-400' },
+                { icon: CheckCircle, text: '22K & 24K Gold', color: 'text-amber-400' },
+                { icon: CheckCircle, text: '30% Cheaper', color: 'text-purple-400' },
+                { icon: CheckCircle, text: 'Instant Delivery', color: 'text-pink-400' },
               ].map((badge, i) => (
                 <motion.div
                   key={i}
@@ -345,10 +386,11 @@ export default function Landing({ onJoinClick }: LandingProps) {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-amber-500/10 border border-amber-500/30 rounded-full backdrop-blur-xl"
+                  whileHover={{ scale: 1.1, y: -5 }}
+                  className="flex items-center gap-2 px-6 py-3 bg-white/5 border-2 border-amber-500/30 rounded-full backdrop-blur-xl hover:border-amber-500/50 transition-all"
                 >
-                  <badge.icon className="w-5 h-5 text-amber-400" />
-                  <span className="text-sm font-bold text-amber-300">{badge.text}</span>
+                  <badge.icon className={`w-6 h-6 ${badge.color}`} />
+                  <span className="text-base font-bold text-white">{badge.text}</span>
                 </motion.div>
               ))}
             </div>
@@ -357,14 +399,14 @@ export default function Landing({ onJoinClick }: LandingProps) {
           {/* Featured Designs Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
             {[
-              { name: 'Royal Necklace', weight: '45.5g', purity: '22K', emoji: '📿', category: 'Necklace' },
-              { name: 'Diamond Ring', weight: '4.8g', purity: '24K', emoji: '💍', category: 'Ring' },
-              { name: 'Temple Set', weight: '120g', purity: '22K', emoji: '👑', category: 'Set' },
-              { name: 'Gold Coin', weight: '10g', purity: '24K', emoji: '🪙', category: 'Coins' },
-              { name: 'Jhumka Earrings', weight: '18.5g', purity: '22K', emoji: '✨', category: 'Earrings' },
-              { name: 'Antique Bangles', weight: '28g', purity: '22K', emoji: '⭕', category: 'Bangles' },
-              { name: 'Bridal Choker', weight: '85g', purity: '22K', emoji: '💎', category: 'Necklace' },
-              { name: 'Gold Bar', weight: '50g', purity: '24K', emoji: '🏅', category: 'Coins' },
+              { name: 'Royal Necklace', weight: '45.5g', purity: '22K', emoji: '📿', category: 'Necklace', price: '₹2,85,000' },
+              { name: 'Diamond Ring', weight: '4.8g', purity: '24K', emoji: '💍', category: 'Ring', price: '₹30,000' },
+              { name: 'Temple Set', weight: '120g', purity: '22K', emoji: '👑', category: 'Set', price: '₹7,50,000' },
+              { name: 'Gold Coin', weight: '10g', purity: '24K', emoji: '🪙', category: 'Coins', price: '₹62,500' },
+              { name: 'Jhumka Earrings', weight: '18.5g', purity: '22K', emoji: '✨', category: 'Earrings', price: '₹1,16,000' },
+              { name: 'Antique Bangles', weight: '28g', purity: '22K', emoji: '⭕', category: 'Bangles', price: '₹1,76,000' },
+              { name: 'Bridal Choker', weight: '85g', purity: '22K', emoji: '💎', category: 'Necklace', price: '₹5,35,000' },
+              { name: 'Gold Bar', weight: '50g', purity: '24K', emoji: '🏅', category: 'Coins', price: '₹3,12,500' },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -372,49 +414,69 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -10, scale: 1.05 }}
-                className="group relative glass-premium rounded-2xl overflow-hidden border border-white/5 hover:border-amber-500/40 transition-all duration-300 premium-card-hover"
+                whileHover={{ y: -15, scale: 1.05 }}
+                className="group relative bg-white/5 backdrop-blur-xl rounded-3xl overflow-hidden border-2 border-white/10 hover:border-amber-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-amber-500/20 cursor-pointer"
               >
                 {/* Image Area */}
-                <div className="h-48 bg-gradient-to-br from-amber-900/30 via-purple-900/30 to-amber-900/30 flex items-center justify-center relative overflow-hidden">
+                <div className="h-56 bg-gradient-to-br from-amber-900/40 via-purple-900/40 to-amber-900/40 flex items-center justify-center relative overflow-hidden">
                   <motion.span
-                    className="text-7xl"
-                    whileHover={{ scale: 1.3, rotate: 10 }}
+                    className="text-8xl"
+                    whileHover={{ scale: 1.4, rotate: 15 }}
                     transition={{ duration: 0.3 }}
                   >
                     {item.emoji}
                   </motion.span>
                   
                   {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  
+                  {/* Action buttons on hover */}
+                  <div className="absolute bottom-4 left-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="flex-1 py-2.5 bg-white/20 backdrop-blur-xl rounded-xl text-xs font-bold flex items-center justify-center gap-1 hover:bg-white/30 transition-colors"
+                    >
+                      <Eye className="w-4 h-4" /> View
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 rounded-xl text-xs font-bold flex items-center justify-center gap-1"
+                    >
+                      <ShoppingCart className="w-4 h-4" /> Buy
+                    </motion.button>
+                  </div>
                   
                   {/* Purity Badge */}
-                  <div className="absolute top-3 right-3 px-3 py-1 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full text-xs font-bold text-purple-900 shadow-lg">
+                  <div className="absolute top-3 right-3 px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full text-sm font-bold text-purple-900 shadow-lg">
                     {item.purity}
                   </div>
                   
                   {/* Category Badge */}
-                  <div className="absolute top-3 left-3 px-3 py-1 bg-white/10 backdrop-blur rounded-full text-xs font-semibold text-white border border-white/20">
+                  <div className="absolute top-3 left-3 px-4 py-2 bg-white/10 backdrop-blur-xl rounded-full text-sm font-semibold text-white border-2 border-white/20">
                     {item.category}
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-4">
-                  <h3 className="font-bold text-base mb-2 group-hover:text-amber-400 transition-colors">{item.name}</h3>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <Scale className="w-4 h-4 text-amber-400" />
-                      <span className="text-sm font-bold text-amber-400">{item.weight}</span>
+                <div className="p-5">
+                  <h3 className="font-bold text-lg mb-2 group-hover:text-amber-400 transition-colors">{item.name}</h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Scale className="w-5 h-5 text-amber-400" />
+                      <span className="text-base font-bold text-amber-400">{item.weight}</span>
                     </div>
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 text-xs font-bold rounded-lg shadow-lg btn-premium"
-                    >
-                      View Details
-                    </motion.button>
+                    <span className="text-sm font-bold text-white">{item.price}</span>
                   </div>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 text-sm font-bold rounded-xl shadow-lg hover:shadow-xl hover:shadow-amber-500/30 transition-all relative overflow-hidden group/btn"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
+                    <span className="relative">Buy Now →</span>
+                  </motion.button>
                 </div>
               </motion.div>
             ))}
@@ -427,40 +489,44 @@ export default function Landing({ onJoinClick }: LandingProps) {
             viewport={{ once: true }}
             className="text-center"
           >
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
               <Link to="/gold-showroom-public">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.05, y: -5 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-10 py-5 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-bold text-lg rounded-2xl shadow-2xl shadow-amber-500/40 hover:shadow-amber-500/60 transition-shadow flex items-center gap-3 btn-premium"
+                  className="px-12 py-6 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-bold text-xl rounded-2xl shadow-2xl shadow-amber-500/50 hover:shadow-amber-500/70 transition-all flex items-center gap-3 relative overflow-hidden group"
                 >
-                  <Gem className="w-6 h-6" />
-                  Explore Full Showroom
-                  <ArrowRight className="w-6 h-6" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <Gem className="w-7 h-7 relative" />
+                  <span className="relative">Explore Full Showroom</span>
+                  <ArrowRight className="w-7 h-7 relative" />
                 </motion.button>
               </Link>
               
               <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.05, y: -5 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-10 py-5 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold text-lg rounded-2xl shadow-2xl shadow-green-500/30 hover:shadow-green-500/50 transition-shadow flex items-center gap-3 btn-premium"
+                  className="px-12 py-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold text-xl rounded-2xl shadow-2xl shadow-green-500/40 hover:shadow-green-500/60 transition-all flex items-center gap-3 relative overflow-hidden group"
                 >
-                  <MessageCircle className="w-6 h-6" />
-                  WhatsApp Us
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <MessageCircle className="w-7 h-7 relative" />
+                  <span className="relative">WhatsApp Us</span>
                 </motion.button>
               </a>
             </div>
 
-            <p className="text-white/50 mt-6 text-sm">
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-white/60 mt-8 text-lg"
+            >
               💡 <span className="text-amber-400 font-bold">Pro Tip:</span> Join as a member and earn 3% commission on every gold order you refer!
-            </p>
+            </motion.p>
           </motion.div>
         </div>
       </section>
-
-      {/* Section Divider */}
-      <div className="section-divider" />
 
       {/* ============ HOW IT WORKS ============ */}
       <section className="py-24 lg:py-32 relative">
@@ -473,7 +539,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
             className="text-center mb-16"
           >
             <span className="text-sm font-bold text-amber-400 uppercase tracking-wider">Simple Process</span>
-            <h2 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mt-3 mb-4 text-shadow-gold">
+            <h2 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mt-3 mb-4" style={{ textShadow: '0 0 40px rgba(255, 215, 0, 0.3)' }}>
               How It <span className="gradient-text">Works</span>
             </h2>
             <p className="text-lg text-white/60 max-w-xl mx-auto">Bas 3 simple steps mein shuru karein apna gold journey</p>
@@ -493,8 +559,8 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 transition={{ delay: i * 0.2 }}
                 className="relative group"
               >
-                <div className="glass-premium rounded-3xl p-8 h-full border border-white/5 hover:border-amber-500/20 transition-all duration-500 group-hover:shadow-xl group-hover:shadow-amber-500/5 premium-card-hover">
-                  <div className={`w-16 h-16 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}>
+                <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 h-full border-2 border-white/10 hover:border-amber-500/30 transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-amber-500/10 hover:scale-105">
+                  <div className={`w-16 h-16 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center mb-5 shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all`}>
                     <item.icon className="w-8 h-8 text-white" />
                   </div>
                   <span className="text-6xl font-bold text-white/5 absolute top-6 right-6 font-[var(--font-heading)]">{item.step}</span>
@@ -507,9 +573,6 @@ export default function Landing({ onJoinClick }: LandingProps) {
         </div>
       </section>
 
-      {/* Section Divider */}
-      <div className="section-divider" />
-
       {/* ============ INCOME PLAN + CALCULATOR ============ */}
       <section className="py-24 lg:py-32 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0f0520] to-purple-950/30" />
@@ -521,7 +584,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
             className="text-center mb-16"
           >
             <span className="text-sm font-bold text-amber-400 uppercase tracking-wider">Multiple Income Streams</span>
-            <h2 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mt-3 mb-4 text-shadow-gold">
+            <h2 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mt-3 mb-4" style={{ textShadow: '0 0 40px rgba(255, 215, 0, 0.3)' }}>
               Income <span className="gradient-text">Plan</span>
             </h2>
             <p className="text-lg text-white/60 max-w-xl mx-auto">4 ways to earn - the more you build, the more you make!</p>
@@ -541,8 +604,8 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -8, scale: 1.03 }}
-                className="glass-premium rounded-2xl p-6 border border-white/5 hover:border-amber-500/20 transition-all cursor-pointer premium-card-hover"
+                whileHover={{ y: -10, scale: 1.05 }}
+                className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border-2 border-white/10 hover:border-amber-500/30 transition-all cursor-pointer shadow-xl hover:shadow-2xl hover:shadow-amber-500/10"
               >
                 <div className={`w-14 h-14 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center mb-4 shadow-lg`}>
                   <item.icon className="w-7 h-7 text-white" />
@@ -559,7 +622,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="glass-premium rounded-3xl p-8 lg:p-10 border border-amber-500/10 animated-gradient-border"
+            className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 lg:p-10 border-2 border-amber-500/20 shadow-2xl"
           >
             <div className="flex items-center gap-3 mb-8">
               <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -604,7 +667,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-amber-500/10 to-purple-500/10 rounded-2xl p-6 border border-amber-500/10">
+              <div className="bg-gradient-to-br from-amber-500/10 to-purple-500/10 rounded-2xl p-6 border-2 border-amber-500/20">
                 <p className="text-sm text-white/50 mb-4">Estimated Monthly Income</p>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
@@ -622,7 +685,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                   <div className="border-t border-white/10 pt-3 mt-3">
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-lg">Total Monthly</span>
-                      <span className="text-3xl font-bold gradient-text glow-text">₹{totalMonthly.toLocaleString()}</span>
+                      <span className="text-3xl font-bold gradient-text">₹{totalMonthly.toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -632,88 +695,9 @@ export default function Landing({ onJoinClick }: LandingProps) {
         </div>
       </section>
 
-      {/* Section Divider */}
-      <div className="section-divider" />
-
-      {/* ============ MEMBER vs LEADER ============ */}
-      <section className="py-24 lg:py-32 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-950/30 to-[#0f0520]" />
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mb-4 text-shadow-gold">
-              Member vs <span className="gradient-text">Leader</span>
-            </h2>
-            <p className="text-lg text-white/60">Choose your path to gold prosperity</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Member Card */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="glass-premium rounded-3xl p-8 border border-white/10 premium-card-hover"
-            >
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg">
-                <Users className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-3xl font-bold mb-2">Member</h3>
-              <p className="text-white/50 mb-6">Start your gold journey</p>
-              <ul className="space-y-3">
-                {['Monthly gold savings plan', '10% Level 1 commission', '5% Level 2 commission', '3% gold order bonus', 'Withdraw commissions anytime', 'Access to gold showroom', '12-month contribution lock'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-white/80">
-                    <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <button onClick={onJoinClick} className="mt-8 w-full py-4 bg-white/5 border border-white/20 rounded-xl font-bold hover:bg-white/10 transition-colors btn-premium">
-                Join as Member
-              </button>
-            </motion.div>
-
-            {/* Leader Card */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="relative glass-premium rounded-3xl p-8 border border-amber-500/20 shadow-2xl shadow-amber-500/10 premium-card-hover"
-            >
-              <div className="absolute -top-4 right-6 px-4 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 text-sm font-bold rounded-full shadow-lg">
-                MOST POPULAR
-              </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg">
-                <Crown className="w-8 h-8 text-purple-900" />
-              </div>
-              <h3 className="text-3xl font-bold mb-2">Leader <span className="text-amber-400">👑</span></h3>
-              <p className="text-white/50 mb-6">100+ team members • Premium benefits</p>
-              <ul className="space-y-3">
-                {['Everything in Member plan', 'Additional 5% monthly leader payout', 'Auto-promotion at 100 members', 'Priority support & training', 'Exclusive leader events', 'Higher gold order commissions', 'Recognition & certificates'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-white/80">
-                    <CheckCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <button onClick={onJoinClick} className="mt-8 w-full py-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-shadow btn-premium">
-                Apply as Leader
-              </button>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section Divider */}
-      <div className="section-divider" />
-
       {/* ============ TESTIMONIALS ============ */}
       <section className="py-24 lg:py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0f0520] to-purple-950/30" />
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-950/30 to-[#0f0520]" />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -721,7 +705,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mb-4 text-shadow-gold">
+            <h2 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mb-4" style={{ textShadow: '0 0 40px rgba(255, 215, 0, 0.3)' }}>
               Success <span className="gradient-text">Stories</span>
             </h2>
             <p className="text-lg text-white/60">Real members, real earnings, real gold!</p>
@@ -736,7 +720,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.4 }}
-                className="glass-premium rounded-3xl p-8 lg:p-10 border border-amber-500/10 max-w-3xl mx-auto"
+                className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 lg:p-10 border-2 border-amber-500/20 max-w-3xl mx-auto shadow-2xl"
               >
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-1">
@@ -744,7 +728,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                       <Star key={i} className="w-6 h-6 text-amber-400 fill-amber-400" />
                     ))}
                   </div>
-                  <div className="px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-full">
+                  <div className="px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-2 border-green-500/30 rounded-full">
                     <span className="text-sm font-bold text-green-400">{testimonials[testimonialIdx].earning}</span>
                   </div>
                 </div>
@@ -778,9 +762,6 @@ export default function Landing({ onJoinClick }: LandingProps) {
         </div>
       </section>
 
-      {/* Section Divider */}
-      <div className="section-divider" />
-
       {/* ============ FINAL CTA ============ */}
       <section className="py-24 lg:py-32 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0f0520] to-purple-950/50" />
@@ -789,16 +770,16 @@ export default function Landing({ onJoinClick }: LandingProps) {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="glass-premium rounded-3xl p-10 lg:p-16 border border-amber-500/20 relative overflow-hidden animated-gradient-border"
+            className="bg-white/5 backdrop-blur-xl rounded-3xl p-10 lg:p-16 border-2 border-amber-500/30 relative overflow-hidden shadow-2xl"
           >
-            <div className="absolute -top-20 -right-20 w-60 h-60 bg-amber-500/10 rounded-full blur-3xl" />
-            <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-purple-500/10 rounded-full blur-3xl" />
+            <div className="absolute -top-20 -right-20 w-60 h-60 bg-amber-500/20 rounded-full blur-3xl" />
+            <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-purple-500/20 rounded-full blur-3xl" />
             
             <div className="relative">
-              <h2 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6 text-shadow-gold">
+              <h2 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6" style={{ textShadow: '0 0 60px rgba(255, 215, 0, 0.4)' }}>
                 Ready to Start Your <span className="gradient-text">Gold Journey</span>?
               </h2>
-              <p className="text-xl text-white/60 mb-10 max-w-2xl mx-auto">
+              <p className="text-xl text-white/70 mb-10 max-w-2xl mx-auto">
                 Join 12,000+ members already building wealth. Ab der kis baat ki? 🚀
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
@@ -806,9 +787,10 @@ export default function Landing({ onJoinClick }: LandingProps) {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={onJoinClick}
-                  className="w-full sm:w-auto px-12 py-6 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold text-xl rounded-2xl shadow-2xl shadow-amber-500/40 btn-premium"
+                  className="w-full sm:w-auto px-12 py-6 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold text-xl rounded-2xl shadow-2xl shadow-amber-500/50 hover:shadow-amber-500/70 transition-shadow relative overflow-hidden group"
                 >
-                  Join Now - It's Free ✨
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <span className="relative">Join Now - It's Free ✨</span>
                 </motion.button>
                 <a
                   href="https://wa.me/919876543210"
