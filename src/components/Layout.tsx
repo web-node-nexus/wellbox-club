@@ -62,19 +62,19 @@ export default function Layout({ children }: { children: ReactNode }) {
       </AnimatePresence>
 
       {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-r transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} shadow-xl`}>
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 h-screen overflow-hidden ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-r transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} shadow-xl`}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className={`p-6 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+          <div className={`p-4 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
             <Link to="/dashboard" className="flex items-center gap-3">
               <motion.div
                 whileHover={{ rotate: 10, scale: 1.1 }}
-                className="w-12 h-12 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30"
+                className="w-10 h-10 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30"
               >
-                <Crown className="w-7 h-7 text-white" />
+                <Crown className="w-6 h-6 text-white" />
               </motion.div>
               <div>
-                <h1 className={`text-2xl font-bold font-[var(--font-heading)] ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                <h1 className={`text-xl font-bold font-[var(--font-heading)] ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   Jewellbox
                 </h1>
                 <p className={`text-xs ${darkMode ? 'text-amber-400' : 'text-amber-600'} -mt-1 tracking-wider font-semibold`}>MEMBER DASHBOARD</p>
@@ -83,14 +83,14 @@ export default function Layout({ children }: { children: ReactNode }) {
           </div>
 
           {/* User Info */}
-          <div className={`p-4 mx-3 mt-4 ${darkMode ? 'bg-gradient-to-r from-amber-500/10 to-purple-500/10 border-amber-500/20' : 'bg-gradient-to-r from-amber-50 to-yellow-50 border-amber-200'} rounded-xl border`}>
+          <div className={`p-3 mx-3 mt-3 ${darkMode ? 'bg-gradient-to-r from-amber-500/10 to-purple-500/10 border-amber-500/20' : 'bg-gradient-to-r from-amber-50 to-yellow-50 border-amber-200'} rounded-xl border`}>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white font-bold text-base shadow-lg">
                 {user?.name.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'} truncate`}>{user?.name}</p>
-                <div className="flex items-center gap-1 mt-1">
+                <div className="flex items-center gap-1 mt-0.5">
                   {user?.isLeader && (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-500/20 text-amber-600 text-xs font-bold rounded-full">
                       <Crown className="w-3 h-3" /> Leader
@@ -102,7 +102,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-3 mt-2 space-y-1 overflow-y-auto">
+          <nav className="flex-1 p-2 mt-2 space-y-0.5 overflow-hidden">
             {navItems.map(item => {
               const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
               return (
@@ -110,7 +110,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                   key={item.path}
                   to={item.path}
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive
                       ? darkMode
                         ? 'bg-gradient-to-r from-amber-500/20 to-purple-500/10 text-amber-400 border border-amber-500/30 shadow-lg'
@@ -120,32 +120,32 @@ export default function Layout({ children }: { children: ReactNode }) {
                         : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                   }`}
                 >
-                  <item.icon className={`w-5 h-5 ${isActive ? (darkMode ? 'text-amber-400' : 'text-amber-600') : ''}`} />
-                  <span className="flex-1">{item.label}</span>
-                  {isActive && <ChevronRight className={`w-4 h-4 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />}
+                  <item.icon className={`w-4 h-4 ${isActive ? (darkMode ? 'text-amber-400' : 'text-amber-600') : ''}`} />
+                  <span className="flex-1 text-xs">{item.label}</span>
+                  {isActive && <ChevronRight className={`w-3 h-3 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />}
                 </Link>
               );
             })}
           </nav>
 
           {/* Dark Mode Toggle */}
-          <div className={`p-3 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+          <div className={`p-2 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} transition-all`}
+              className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-xs font-medium ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'} transition-all`}
             >
-              {darkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-gray-600" />}
+              {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-gray-600" />}
               <span>{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
             </button>
           </div>
 
           {/* Logout */}
-          <div className={`p-3 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+          <div className={`p-2 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
             <button
               onClick={() => setShowLogoutModal(true)}
-              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-semibold ${darkMode ? 'text-gray-300 hover:bg-red-500/10 hover:text-red-400' : 'text-gray-700 hover:bg-red-50 hover:text-red-600'} transition-all`}
+              className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-xs font-medium ${darkMode ? 'text-gray-300 hover:bg-red-500/10 hover:text-red-400' : 'text-gray-700 hover:bg-red-50 hover:text-red-600'} transition-all`}
             >
-              <LogOut className="w-5 h-5" />
+              <LogOut className="w-4 h-4" />
               <span>Sign Out</span>
             </button>
           </div>

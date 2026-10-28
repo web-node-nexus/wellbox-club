@@ -44,10 +44,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       </AnimatePresence>
 
       {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-slate-900 via-purple-950 to-slate-900 border-r border-amber-500/10 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 h-screen overflow-hidden bg-gradient-to-b from-slate-900 via-purple-950 to-slate-900 border-r border-amber-500/10 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6 border-b border-amber-500/10">
+          <div className="p-4 border-b border-amber-500/10">
             <Link to="/admin" className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
                 <Shield className="w-6 h-6 text-purple-900" />
@@ -60,7 +60,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </div>
 
           {/* User Info */}
-          <div className="p-4 mx-3 mt-4 bg-amber-500/5 border border-amber-500/10 rounded-xl">
+          <div className="p-3 mx-3 mt-3 bg-amber-500/5 border border-amber-500/10 rounded-xl">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-purple-900 font-bold">
                 {user?.name.charAt(0)}
@@ -75,7 +75,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-3 mt-2 space-y-1 overflow-y-auto">
+          <nav className="flex-1 p-2 mt-2 space-y-0.5 overflow-hidden">
             {navItems.map(item => {
               const isActive = location.pathname === item.path;
               return (
@@ -83,14 +83,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   key={item.path}
                   to={item.path}
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive
                       ? 'bg-gradient-to-r from-amber-500/20 to-purple-500/10 text-amber-400 border border-amber-500/20'
                       : 'text-white/70 hover:bg-white/5 hover:text-white'
                   }`}
                 >
-                  <item.icon className={`w-5 h-5 ${isActive ? 'text-amber-400' : ''}`} />
-                  <span className="flex-1">{item.label}</span>
+                  <item.icon className={`w-4 h-4 ${isActive ? 'text-amber-400' : ''}`} />
+                  <span className="flex-1 text-xs">{item.label}</span>
                   {isActive && <div className="w-1.5 h-1.5 bg-amber-400 rounded-full" />}
                 </Link>
               );
@@ -98,12 +98,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </nav>
 
           {/* Logout */}
-          <div className="p-3 border-t border-amber-500/10">
+          <div className="p-2 border-t border-amber-500/10">
             <button
               onClick={logout}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/10 hover:text-red-400 transition-all"
+              className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-xs font-medium text-white/70 hover:bg-red-500/10 hover:text-red-400 transition-all"
             >
-              <LogOut className="w-5 h-5" />
+              <LogOut className="w-4 h-4" />
               <span>Sign Out</span>
             </button>
           </div>
