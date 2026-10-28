@@ -1,13 +1,15 @@
 import { motion } from 'framer-motion';
 import { Gem, Phone, MessageCircle, Scale, Award, Filter, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import GoldBackground from '../components/GoldBackground';
 import { designImages } from '../data/goldImages';
 interface PageProps { onJoinClick: () => void; }
 
 export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
   const [category, setCategory] = useState('all');
-  const designs = [
+  
+  // Default designs with real images
+  const defaultDesigns = [
     { name: 'Royal Necklace Set', category: 'Necklace', weight: 45.5, purity: '22K', making: '₹800/g', image: designImages['Royal Necklace Set'], desc: 'Exquisite traditional necklace with intricate kundan work. Perfect for weddings.' },
     { name: 'Antique Bangles Pair', category: 'Bangles', weight: 28, purity: '22K', making: '₹600/g', image: designImages['Antique Bangles Pair'], desc: 'Beautiful antique finish bangles with traditional motifs. Lightweight daily wear.' },
     { name: 'Diamond Cut Chain', category: 'Chain', weight: 15.2, purity: '22K', making: '₹500/g', image: designImages['Diamond Cut Chain'], desc: 'Stunning diamond cut gold chain with brilliant shine. Modern design.' },
@@ -21,6 +23,28 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
     { name: 'Nose Ring', category: 'Earrings', weight: 2.5, purity: '22K', making: '₹450/g', image: designImages['Nose Ring'], desc: 'Delicate nose ring with tiny diamond accent. Elegant and subtle.' },
     { name: 'Gold Bar 50g', category: 'Coins', weight: 50, purity: '24K', making: '₹150/g', image: designImages['Gold Bar 50g'], desc: 'Investment-grade 24K gold bar. Perfect for wealth building.' },
   ];
+
+  // Get designs from localStorage (admin added) + default designs
+  const [designs, setDesigns] = useState(() => {
+    const adminDesigns = localStorage.getItem('admin_gold_designs');
+    if (adminDesigns) {
+      const parsed = JSON.parse(adminDesigns);
+      // Convert admin designs to public format
+      const adminFormatted = parsed
+        .filter((d: any) => d.isActive) // Only show active designs
+        .map((d: any) => ({
+          name: d.name,
+          category: d.category,
+          weight: d.weightGrams,
+          purity: d.purity,
+          making: d.makingCharges,
+          image: d.images[0] || designImages[d.name] || designImages['Royal Necklace Set'],
+          desc: d.description || 'Premium gold jewellery design',
+        }));
+      return [...adminFormatted, ...defaultDesigns];
+    }
+    return defaultDesigns;
+  });
 
   const categories = ['all', ...new Set(designs.map(d => d.category))];
   const filtered = category === 'all' ? designs : designs.filter(d => d.category === category);
@@ -97,13 +121,23 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
               className="gold-card-premium rounded-3xl overflow-hidden group cursor-pointer"
             >
               <div className="h-56 bg-gradient-to-br from-amber-900/30 to-purple-900/30 flex items-center justify-center relative overflow-hidden">
-                <motion.img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-full object-cover"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.3 }}
-                />
+                {item.image ? (
+                  <motion.img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                ) : (
+                  <motion.div
+                    className="text-8xl"
+                    whileHover={{ scale: 1.2 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    💎
+                  </motion.div>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="absolute top-3 right-3 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full text-xs font-bold text-purple-900 shadow-lg">
                   {item.purity}
