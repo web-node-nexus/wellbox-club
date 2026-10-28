@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { Crown, Heart, Target, Award, Users, Shield, Sparkles, CheckCircle, TrendingUp } from 'lucide-react';
+import { Crown, Heart, Target, Award, Users, Shield, Sparkles, CheckCircle, TrendingUp, Gem } from 'lucide-react';
+import GoldBackground from '../components/GoldBackground';
 interface PageProps { onJoinClick: () => void; }
 
 export default function About({ onJoinClick }: PageProps) {
@@ -23,57 +24,40 @@ export default function About({ onJoinClick }: PageProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-amber-900 text-white">
+    <div className="min-h-screen bg-[#0f0520] text-white">
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0">
-          {/* Real Gold Background Images */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-[#1a0a2e] to-amber-950/40" />
-          <div className="absolute top-0 right-0 w-1/2 h-full opacity-20 mix-blend-overlay">
-            <img src="https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1200&q=80" alt="Gold" className="w-full h-full object-cover" />
-          </div>
-          <div className="absolute top-20 left-10 w-72 h-72 bg-amber-500/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
-          {/* Floating Gold Coins & Jewellery */}
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute text-4xl"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -80, 0],
-                rotate: [0, 360],
-                opacity: [0.3, 0.8, 0.3],
-                scale: [1, 1.3, 1],
-              }}
-              transition={{
-                duration: 6 + Math.random() * 4,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            >
-              {['💎', '👑', '✨', '🪙', '💰', '💍', '📿'][i % 7]}
-            </motion.div>
-          ))}
-        </div>
-        <div className="relative max-w-4xl mx-auto px-4 text-center">
+      <section className="relative pt-32 pb-20 overflow-hidden luxury-bg">
+        <GoldBackground intensity="heavy" />
+        
+        <div className="relative max-w-5xl mx-auto px-4 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', delay: 0.2 }}
-              className="inline-flex items-center gap-3 px-6 py-3 bg-amber-500/20 border-2 border-amber-500/30 rounded-full mb-8 animated-gradient-border"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', delay: 0.2, duration: 1 }}
+              className="inline-block mb-8"
             >
-              <Crown className="w-6 h-6 text-amber-400" />
-              <span className="text-lg font-bold text-amber-300">Our Story</span>
-              <Crown className="w-6 h-6 text-amber-400" />
+              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
+                <Crown className="w-16 h-16 text-purple-900" />
+              </div>
             </motion.div>
-            <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6 text-shadow-gold">
-              About <span className="gradient-text">Jewellbox Club</span>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-2 border-amber-500/40 rounded-full mb-8 backdrop-blur-xl"
+            >
+              <Sparkles className="w-5 h-5 text-amber-400" />
+              <span className="text-lg font-bold text-amber-300">Our Story</span>
+              <Sparkles className="w-5 h-5 text-amber-400" />
+            </motion.div>
+            
+            <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
+              <span className="text-white">About </span>
+              <span className="gold-text-shimmer">Jewellbox Club</span>
             </h1>
+            
             <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
               Born from a simple idea — make gold affordable, accessible, and rewarding for every Indian family. We connect you directly with manufacturers, cutting out middlemen and passing the savings to you.
             </p>
@@ -82,39 +66,48 @@ export default function About({ onJoinClick }: PageProps) {
       </section>
 
       {/* Stats */}
-      <section className="py-16 max-w-6xl mx-auto px-4">
+      <section className="py-20 max-w-6xl mx-auto px-4 relative">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((item, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 30, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              className="glass-premium border border-white/20 rounded-3xl p-8 text-center premium-card-hover"
+              transition={{ delay: i * 0.1, type: 'spring' }}
+              whileHover={{ y: -10, scale: 1.05 }}
+              className="card-inner-glow rounded-3xl p-8 text-center"
             >
-              <div className="text-5xl mb-4">{item.emoji}</div>
-              <p className="text-4xl font-bold gradient-text glow-text mb-2">{item.value}</p>
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 4, repeat: Infinity, delay: i * 0.5 }}
+                className="text-6xl mb-4"
+              >
+                {item.emoji}
+              </motion.div>
+              <p className="text-5xl font-bold gold-text-shimmer mb-2">{item.value}</p>
               <p className="text-sm text-white/60 font-medium">{item.label}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
+      <div className="gold-divider" />
+
       {/* Mission */}
       <section className="py-20 max-w-6xl mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-            <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-6 text-shadow-gold">
-              Our <span className="gradient-text">Mission</span>
+            <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-6">
+              Our <span className="gold-text-shimmer">Mission</span>
             </h2>
             <p className="text-white/80 leading-relaxed mb-6 text-lg">
-              Jwellbox Club was founded with a vision to democratize gold ownership in India. We believe every family deserves access to pure gold at fair prices, and every individual deserves the opportunity to build wealth through community.
+              Jewellbox Club was founded with a vision to democratize gold ownership in India. We believe every family deserves access to pure gold at fair prices, and every individual deserves the opportunity to build wealth through community.
             </p>
             <p className="text-white/80 leading-relaxed mb-6 text-lg">
-              Our platform combines the timeless value of gold with modern technology — creating a unique ecosystem where saving, earning, and growing happen together. From homemakers in small towns to professionals in metros, Jwellbox Club is for everyone.
+              Our platform combines the timeless value of gold with modern technology — creating a unique ecosystem where saving, earning, and growing happen together.
             </p>
+            
             <div className="flex flex-wrap gap-3 mt-8">
               {['BIS Hallmarked', 'Direct from Manufacturer', '100% Transparent', 'Secure Platform'].map((badge, i) => (
                 <motion.div
@@ -123,28 +116,36 @@ export default function About({ onJoinClick }: PageProps) {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-full backdrop-blur-xl"
+                  whileHover={{ scale: 1.1 }}
+                  className="gold-badge"
                 >
-                  <CheckCircle className="w-4 h-4 text-amber-400" />
-                  <span className="text-sm font-semibold text-amber-300">{badge}</span>
+                  <CheckCircle className="w-4 h-4" />
+                  <span className="text-sm">{badge}</span>
                 </motion.div>
               ))}
             </div>
-            <p className="text-amber-400 italic font-[var(--font-heading)] text-2xl mt-8 glow-text">
+            
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-amber-400 italic font-[var(--font-heading)] text-2xl mt-8 gold-text-shimmer"
+            >
               "Hum sirf gold nahi bechte, hum sapne poore karte hain." 💛
-            </p>
+            </motion.p>
           </motion.div>
+          
           <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="grid grid-cols-2 gap-4">
             {stats.map((item, i) => (
               <motion.div
                 key={i}
                 whileHover={{ scale: 1.05, rotate: 2 }}
-                className="glass-premium border border-white/20 rounded-2xl p-6 text-center premium-card-hover"
+                className="card-inner-glow rounded-2xl p-6 text-center"
               >
-                <div className={`w-14 h-14 bg-gradient-to-br ${item.color} rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg`}>
-                  <item.icon className="w-7 h-7 text-white" />
+                <div className={`w-16 h-16 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-xl`}>
+                  <item.icon className="w-8 h-8 text-white" />
                 </div>
-                <p className="text-3xl font-bold gradient-text">{item.value}</p>
+                <p className="text-3xl font-bold gold-text-shimmer">{item.value}</p>
                 <p className="text-sm text-white/60 mt-1">{item.label}</p>
               </motion.div>
             ))}
@@ -152,62 +153,74 @@ export default function About({ onJoinClick }: PageProps) {
         </div>
       </section>
 
+      <div className="gold-divider" />
+
       {/* Values */}
       <section className="py-20 max-w-6xl mx-auto px-4">
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-          <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-4 text-shadow-gold">
-            Our <span className="gradient-text">Values</span>
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+          <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-4">
+            Our <span className="gold-text-shimmer">Values</span>
           </h2>
           <p className="text-white/60 text-lg">What drives us every day</p>
         </motion.div>
-        <div className="grid md:grid-cols-3 gap-6">
+        
+        <div className="grid md:grid-cols-3 gap-8">
           {values.map((item, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              whileHover={{ y: -10, scale: 1.02 }}
-              className="glass-premium border border-white/20 rounded-3xl p-8 premium-card-hover"
+              transition={{ delay: i * 0.15 }}
+              whileHover={{ y: -15, scale: 1.03 }}
+              className="gold-card-premium rounded-3xl p-8"
             >
-              <div className="text-6xl mb-4">{item.emoji}</div>
-              <h3 className="text-3xl font-bold mb-3 text-amber-400 glow-text">{item.title}</h3>
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                className="text-7xl mb-4 inline-block"
+              >
+                {item.emoji}
+              </motion.div>
+              <h3 className="text-3xl font-bold mb-3 gold-text-shimmer">{item.title}</h3>
               <p className="text-white/70 leading-relaxed text-lg">{item.desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
+      <div className="gold-divider" />
+
       {/* Journey Timeline */}
       <section className="py-20 max-w-5xl mx-auto px-4">
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-          <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-4 text-shadow-gold">
-            Our <span className="gradient-text">Journey</span>
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+          <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-4">
+            Our <span className="gold-text-shimmer">Journey</span>
           </h2>
           <p className="text-white/60 text-lg">From idea to impact</p>
         </motion.div>
+        
         <div className="space-y-8">
           {timeline.map((item, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, x: -30 }}
+              initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.15 }}
-              whileHover={{ x: 10 }}
+              transition={{ delay: i * 0.2 }}
+              whileHover={{ x: 15 }}
               className="flex gap-6 items-start"
             >
               <motion.div
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                className="flex-shrink-0 w-24 h-24 bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl flex items-center justify-center text-4xl font-bold shadow-2xl shadow-amber-500/30"
+                whileHover={{ scale: 1.2, rotate: 10 }}
+                className="flex-shrink-0 w-28 h-28 bg-gradient-to-br from-amber-500 via-yellow-500 to-orange-600 rounded-3xl flex items-center justify-center text-5xl font-bold shadow-2xl shadow-amber-500/40 gold-stack"
               >
                 {item.emoji}
               </motion.div>
-              <div className="flex-1 glass-premium border border-white/20 rounded-3xl p-8 premium-card-hover">
+              <div className="flex-1 card-inner-glow rounded-3xl p-8">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-3xl font-bold gradient-text">{item.year}</span>
-                  <span className="px-3 py-1 bg-amber-500/20 border border-amber-500/30 rounded-full text-xs font-bold text-amber-300">MILESTONE</span>
+                  <span className="text-4xl font-bold gold-text-shimmer">{item.year}</span>
+                  <span className="gold-badge text-xs">MILESTONE</span>
                 </div>
                 <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
                 <p className="text-white/70 text-lg">{item.desc}</p>
@@ -219,23 +232,28 @@ export default function About({ onJoinClick }: PageProps) {
 
       {/* CTA */}
       <section className="py-20 text-center relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
-        </div>
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative max-w-3xl mx-auto px-4">
-          <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-6 text-shadow-gold">
-            Ready to Start Your <span className="gradient-text">Gold Journey</span>?
-          </h2>
-          <p className="text-white/70 text-xl mb-10">Join thousands of members already building wealth with Jwellbox Club</p>
-          <motion.button
-            whileHover={{ scale: 1.05, y: -5 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={onJoinClick}
-            className="px-12 py-6 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold text-2xl rounded-2xl shadow-2xl shadow-amber-500/40 hover:shadow-amber-500/60 transition-shadow btn-premium"
+        <GoldBackground intensity="medium" />
+        <div className="relative max-w-3xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="card-inner-glow rounded-3xl p-12"
           >
-            Join Our Community ✨
-          </motion.button>
-        </motion.div>
+            <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-6">
+              Ready to Start Your <span className="gold-text-shimmer">Gold Journey</span>?
+            </h2>
+            <p className="text-white/70 text-xl mb-10">Join thousands of members already building wealth with Jewellbox Club</p>
+            <motion.button
+              whileHover={{ scale: 1.05, y: -5 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onJoinClick}
+              className="btn-gold-premium px-12 py-6 text-2xl rounded-2xl"
+            >
+              Join Our Community ✨
+            </motion.button>
+          </motion.div>
+        </div>
       </section>
     </div>
   );

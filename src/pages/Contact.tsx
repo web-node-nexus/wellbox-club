@@ -1,64 +1,47 @@
 import { motion } from 'framer-motion';
 import { Phone, Mail, MapPin, MessageCircle, Send, Sparkles } from 'lucide-react';
 import { useState } from 'react';
-import GoldSection from '../components/GoldSection';
+import GoldBackground from '../components/GoldBackground';
+import { useToast } from '../context/ToastContext';
 
 export default function Contact() {
+  const { showToast } = useToast();
   const [submitted, setSubmitted] = useState(false);
-  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); setSubmitted(true); setTimeout(() => setSubmitted(false), 3000); };
+  const handleSubmit = (e: React.FormEvent) => { 
+    e.preventDefault(); 
+    setSubmitted(true); 
+    showToast('success', 'Message sent successfully!', 'Success');
+    setTimeout(() => setSubmitted(false), 3000); 
+  };
 
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0">
-          {/* Real Gold Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-[#1a0a2e] to-amber-950/40" />
-          <div className="absolute top-0 left-0 w-full h-full opacity-15 mix-blend-overlay">
-            <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80" alt="Gold Jewellery" className="w-full h-full object-cover" />
-          </div>
-        </div>
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Gold Coins & Jewellery */}
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute text-4xl"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -80, 0],
-                rotate: [0, 360],
-                opacity: [0.3, 0.8, 0.3],
-                scale: [1, 1.3, 1],
-              }}
-              transition={{
-                duration: 6 + Math.random() * 4,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            >
-              {['💰', '💎', '👑', '✨', '🪙', '💍', '📿'][i % 7]}
-            </motion.div>
-          ))}
-        </div>
+      <section className="relative pt-32 pb-20 overflow-hidden luxury-bg">
+        <GoldBackground intensity="heavy" />
         <div className="relative max-w-4xl mx-auto px-4 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-full mb-6">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span className="text-sm text-amber-300 font-medium">Get in Touch</span>
-            </div>
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', delay: 0.2, duration: 1 }}
+              className="inline-block mb-8"
+            >
+              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
+                <MessageCircle className="w-16 h-16 text-purple-900" />
+              </div>
+            </motion.div>
+            
             <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
-              Contact <span className="gradient-text">Us</span>
+              <span className="text-white">Contact </span>
+              <span className="gold-text-shimmer">Us</span>
             </h1>
             <p className="text-xl text-white/70">We'd love to hear from you. Reach out anytime!</p>
           </motion.div>
         </div>
       </section>
 
-      <GoldSection>
+      <section className="py-20 max-w-5xl mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Contact Info */}
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
@@ -66,12 +49,16 @@ export default function Contact() {
             <div className="space-y-4 mb-8">
               {[
                 { icon: Phone, label: 'Phone', value: '+91 98765 43210', sub: 'Mon-Sat, 10AM-7PM', emoji: '📞' },
-                { icon: Mail, label: 'Email', value: 'support@jwellbox.club', sub: 'We reply within 24 hours', emoji: '📧' },
+                { icon: Mail, label: 'Email', value: 'support@jewellbox.club', sub: 'We reply within 24 hours', emoji: '📧' },
                 { icon: MapPin, label: 'Address', value: 'Jaipur, Rajasthan, India', sub: 'Head Office', emoji: '📍' },
               ].map((item, i) => (
-                <motion.div key={i} whileHover={{ scale: 1.02 }} className="flex items-start gap-4 p-5 glass rounded-2xl border border-white/5 hover:border-amber-500/30 transition-all gold-card">
-                  <div className="w-14 h-14 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center flex-shrink-0 border border-amber-500/20">
-                    <span className="text-3xl">{item.emoji}</span>
+                <motion.div
+                  key={i}
+                  whileHover={{ scale: 1.03, x: 5 }}
+                  className="card-inner-glow rounded-2xl p-5 flex items-start gap-4"
+                >
+                  <div className="w-16 h-16 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center flex-shrink-0 border-2 border-amber-500/30">
+                    <span className="text-4xl">{item.emoji}</span>
                   </div>
                   <div>
                     <p className="text-xs text-white/40 uppercase tracking-wider">{item.label}</p>
@@ -87,7 +74,7 @@ export default function Contact() {
               href="https://wa.me/919876543210"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl text-white font-bold shadow-lg shadow-green-500/30 premium-btn"
+              className="inline-flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl text-white font-bold shadow-lg shadow-green-500/30"
             >
               <MessageCircle className="w-6 h-6" />
               Chat on WhatsApp
@@ -96,7 +83,7 @@ export default function Contact() {
 
           {/* Contact Form */}
           <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-            <div className="glass rounded-3xl p-8 border border-amber-500/20 gold-border">
+            <div className="card-inner-glow rounded-3xl p-8 border-2 border-amber-500/30">
               <h2 className="text-2xl font-bold mb-6">Send a Message</h2>
               {submitted ? (
                 <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-12">
@@ -129,7 +116,7 @@ export default function Contact() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     type="submit"
-                    className="w-full py-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold rounded-xl shadow-lg shadow-amber-500/30 premium-btn"
+                    className="w-full btn-gold-premium py-4 rounded-xl text-lg"
                   >
                     Send Message ✨
                   </motion.button>
@@ -138,7 +125,7 @@ export default function Contact() {
             </div>
           </motion.div>
         </div>
-      </GoldSection>
+      </section>
     </div>
   );
 }

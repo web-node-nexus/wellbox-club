@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Users, TrendingUp, Gem, Wallet, Shield, ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import GoldSection from '../components/GoldSection';
+import GoldBackground from '../components/GoldBackground';
 interface PageProps { onJoinClick: () => void; }
 
 export default function HowItWorks({ onJoinClick }: PageProps) {
@@ -16,48 +16,25 @@ export default function HowItWorks({ onJoinClick }: PageProps) {
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0">
-          {/* Real Gold Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-[#1a0a2e] to-amber-950/40" />
-          <div className="absolute top-0 left-0 w-full h-full opacity-15 mix-blend-overlay">
-            <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80" alt="Gold Jewellery" className="w-full h-full object-cover" />
-          </div>
-        </div>
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* More Gold Coins & Jewellery */}
-          {[...Array(25)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute text-5xl"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -100, 0],
-                rotate: [0, 360],
-                opacity: [0.3, 0.9, 0.3],
-                scale: [1, 1.4, 1],
-              }}
-              transition={{
-                duration: 7 + Math.random() * 4,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            >
-              {['💰', '💎', '👑', '✨', '🪙', '💍', '📿', '🏆'][i % 8]}
-            </motion.div>
-          ))}
-        </div>
+      <section className="relative pt-32 pb-20 overflow-hidden luxury-bg">
+        <GoldBackground intensity="heavy" />
+        
         <div className="relative max-w-4xl mx-auto px-4 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-full mb-6">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span className="text-sm text-amber-300 font-medium">Simple Process</span>
-            </div>
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', delay: 0.2, duration: 1 }}
+              className="inline-block mb-8"
+            >
+              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
+                <Sparkles className="w-16 h-16 text-purple-900" />
+              </div>
+            </motion.div>
+            
             <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
-              How It <span className="gradient-text">Works</span>
+              <span className="text-white">How It </span>
+              <span className="gold-text-shimmer">Works</span>
             </h1>
             <p className="text-xl text-white/70 max-w-2xl mx-auto">
               5 simple steps to start your gold investment journey. Bas itna karna hai! 🚀
@@ -67,45 +44,57 @@ export default function HowItWorks({ onJoinClick }: PageProps) {
       </section>
 
       {/* Steps */}
-      <GoldSection>
+      <section className="py-20 max-w-4xl mx-auto px-4">
         <div className="relative">
           {/* Vertical line */}
-          <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-amber-500 via-purple-500 to-emerald-500 hidden md:block" />
+          <div className="absolute left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500 via-purple-500 to-emerald-500 hidden md:block shadow-lg shadow-amber-500/50" />
           
-          <div className="space-y-8">
+          <div className="space-y-12">
             {steps.map((step, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, x: -30 }}
+                initial={{ opacity: 0, x: -50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.15 }}
                 className="flex gap-6 items-start"
               >
-                <div className={`hidden md:flex w-12 h-12 bg-gradient-to-br ${step.color} rounded-xl items-center justify-center flex-shrink-0 shadow-lg z-10 gold-card`}>
-                  <span className="text-2xl">{step.emoji}</span>
-                </div>
-                <div className="glass rounded-2xl p-6 flex-1 border border-white/5 hover:border-amber-500/30 transition-all gold-card">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-xs font-bold text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full">STEP {i + 1}</span>
-                    <h3 className="text-xl font-bold">{step.title}</h3>
+                <motion.div
+                  whileHover={{ scale: 1.2, rotate: 10 }}
+                  className={`hidden md:flex w-12 h-12 bg-gradient-to-br ${step.color} rounded-xl items-center justify-center flex-shrink-0 shadow-xl z-10`}
+                >
+                  <span className="text-3xl">{step.emoji}</span>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.02, x: 10 }}
+                  className="card-inner-glow rounded-3xl p-8 flex-1"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="gold-badge text-xs">STEP {i + 1}</span>
+                    <h3 className="text-2xl font-bold">{step.title}</h3>
                   </div>
-                  <p className="text-white/70 leading-relaxed">{step.desc}</p>
-                </div>
+                  <p className="text-white/70 leading-relaxed text-lg">{step.desc}</p>
+                </motion.div>
               </motion.div>
             ))}
           </div>
         </div>
-      </GoldSection>
+      </section>
 
-      {/* CTA */}
+      <div className="gold-divider" />
+
       <section className="py-20 text-center relative overflow-hidden">
-        <div className="absolute inset-0 premium-bg" />
+        <GoldBackground intensity="medium" />
         <div className="relative">
-          <Link to="/income-plan" className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/20 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors mr-4">
+          <Link to="/income-plan" className="inline-flex items-center gap-2 px-6 py-3 card-inner-glow rounded-xl text-sm font-medium mr-4 hover:scale-105 transition-transform">
             View Income Plan <ArrowRight className="w-4 h-4" />
           </Link>
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={onJoinClick} className="px-8 py-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold text-lg rounded-2xl shadow-2xl shadow-amber-500/30 premium-btn">
+          <motion.button
+            whileHover={{ scale: 1.05, y: -5 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onJoinClick}
+            className="btn-gold-premium px-8 py-4 text-lg rounded-2xl"
+          >
             Get Started Now ✨
           </motion.button>
         </div>

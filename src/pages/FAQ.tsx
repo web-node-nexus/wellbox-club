@@ -1,12 +1,12 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Sparkles } from 'lucide-react';
 import { useState } from 'react';
-import GoldSection from '../components/GoldSection';
+import GoldBackground from '../components/GoldBackground';
 
 export default function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
   const faqs = [
-    { q: 'What is Jewellbox Club?', a: 'Jwellbox Club is India\'s premium gold investment and referral platform where members contribute monthly, earn commissions by building teams, and access gold directly from manufacturers at wholesale prices.' },
+    { q: 'What is Jewellbox Club?', a: 'Jewellbox Club is India\'s premium gold investment and referral platform where members contribute monthly, earn commissions by building teams, and access gold directly from manufacturers at wholesale prices.' },
     { q: 'How much do I need to invest?', a: 'You can start with a minimum monthly contribution of ₹1,000. There is no joining fee. Your contribution is locked for 12 months after which you can withdraw or convert to gold.' },
     { q: 'How does the referral commission work?', a: 'You earn 10% commission on your direct referral\'s contribution (Level 1) and 5% on their referral\'s contribution (Level 2). All commissions are credited to your withdrawable wallet instantly.' },
     { q: 'When can I withdraw my commission?', a: 'Commission wallet balance can be withdrawn anytime! Submit a withdrawal request and it gets processed within 24-48 hours directly to your bank account.' },
@@ -23,56 +23,32 @@ export default function FAQ() {
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0">
-          {/* Real Gold Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-[#1a0a2e] to-amber-950/40" />
-          <div className="absolute bottom-0 left-0 w-1/2 h-full opacity-20 mix-blend-overlay">
-            <img src="https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1200&q=80" alt="Gold Coins" className="w-full h-full object-cover" />
-          </div>
-        </div>
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Gold Coins & Jewellery */}
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute text-4xl"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -80, 0],
-                rotate: [0, 360],
-                opacity: [0.3, 0.8, 0.3],
-                scale: [1, 1.3, 1],
-              }}
-              transition={{
-                duration: 6 + Math.random() * 4,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            >
-              {['💰', '💎', '👑', '✨', '🪙', '💍'][i % 6]}
-            </motion.div>
-          ))}
-        </div>
+      <section className="relative pt-32 pb-20 overflow-hidden luxury-bg">
+        <GoldBackground intensity="heavy" />
         <div className="relative max-w-3xl mx-auto px-4 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-full mb-6">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span className="text-sm text-amber-300 font-medium">Got Questions?</span>
-            </div>
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', delay: 0.2, duration: 1 }}
+              className="inline-block mb-8"
+            >
+              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
+                <span className="text-6xl">❓</span>
+              </div>
+            </motion.div>
+            
             <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
-              Frequently Asked <span className="gradient-text">Questions</span>
+              <span className="text-white">Frequently Asked </span>
+              <span className="gold-text-shimmer">Questions</span>
             </h1>
-            <p className="text-xl text-white/70">Everything you need to know about Jwellbox Club</p>
+            <p className="text-xl text-white/70">Everything you need to know about Jewellbox Club</p>
           </motion.div>
         </div>
       </section>
 
-      <GoldSection>
-        <div className="space-y-3 max-w-3xl mx-auto">
+      <section className="py-20 max-w-3xl mx-auto px-4">
+        <div className="space-y-3">
           {faqs.map((faq, i) => (
             <motion.div
               key={i}
@@ -80,7 +56,7 @@ export default function FAQ() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.03 }}
-              className="glass rounded-2xl border border-white/5 overflow-hidden hover:border-amber-500/20 transition-all"
+              className="card-inner-glow rounded-2xl overflow-hidden"
             >
               <button
                 onClick={() => setOpen(open === i ? null : i)}
@@ -110,7 +86,7 @@ export default function FAQ() {
             </motion.div>
           ))}
         </div>
-      </GoldSection>
+      </section>
     </div>
   );
 }
