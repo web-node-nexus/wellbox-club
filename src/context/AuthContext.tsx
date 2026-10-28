@@ -9,7 +9,7 @@ interface RegisteredUser {
   referralCode: string;
   referredBy: string;
   city: string;
-  role: 'member' | 'leader' | 'admin';
+  role: 'member' | 'leader' | 'admin' | 'individual';
   isLeader: boolean;
   teamSize: number;
   joinDate: string;
@@ -19,7 +19,7 @@ interface RegisteredUser {
 interface AuthContextType {
   user: RegisteredUser | null;
   login: (mobile: string, password: string) => { success: boolean; message: string };
-  register: (data: { name: string; mobile: string; city?: string; referralCode?: string; role: 'member' | 'leader'; password: string }) => { success: boolean; message: string; user?: RegisteredUser };
+  register: (data: { name: string; mobile: string; city?: string; referralCode?: string; role: 'member' | 'leader' | 'individual'; password: string }) => { success: boolean; message: string; user?: RegisteredUser };
   logout: () => void;
   getAllUsers: () => RegisteredUser[];
 }
@@ -67,6 +67,19 @@ const DEMO_USERS: RegisteredUser[] = [
     joinDate: '2023-05-20',
     password: 'pri123',
   },
+  {
+    id: '4',
+    name: 'Amit Patel',
+    mobile: '9876543213',
+    referralCode: '',
+    referredBy: '',
+    city: 'Ahmedabad',
+    role: 'individual',
+    isLeader: false,
+    teamSize: 0,
+    joinDate: '2024-01-15',
+    password: 'amit123',
+  },
 ];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -104,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return DEMO_USERS;
   };
 
-  const register = (data: { name: string; mobile: string; city?: string; referralCode?: string; role: 'member' | 'leader'; password: string }) => {
+  const register = (data: { name: string; mobile: string; city?: string; referralCode?: string; role: 'member' | 'leader' | 'individual'; password: string }) => {
     const users = getAllUsers();
     
     // Check if mobile already exists
@@ -112,8 +125,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { success: false, message: 'This mobile number is already registered!' };
     }
 
-    // Generate referral code
-    const referralCode = data.name.substring(0, 3).toUpperCase() + Math.floor(100 + Math.random() * 900).toString();
+    // Generate referral code (empty for individual users)
+    const referralCode = data.role === 'individual' 
+      ? '' 
+      : data.name.substring(0, 3).toUpperCase() + Math.floor(100 + Math.random() * 900).toString();
 
     const newUser: RegisteredUser = {
       id: String(users.length + 1),

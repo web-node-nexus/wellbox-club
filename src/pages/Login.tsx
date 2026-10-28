@@ -111,6 +111,7 @@ export default function Login() {
               <p>• Mobile: 9876543210 | Password: admin123 (Admin)</p>
               <p>• Mobile: 9876543211 | Password: raj123 (Leader)</p>
               <p>• Mobile: 9876543212 | Password: pri123 (Member)</p>
+              <p>• Mobile: 9876543213 | Password: amit123 (Individual Buyer)</p>
             </div>
           </div>
         </div>

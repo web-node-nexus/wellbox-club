@@ -16,7 +16,17 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [darkMode, setDarkMode] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const navItems = [
+  // Different navigation for individual users
+  const individualNavItems = [
+    { path: '/individual-dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/gold-showroom', label: 'Gold Showroom', icon: Gem },
+    { path: '/orders', label: 'My Orders', icon: ShoppingBag },
+    { path: '/profile', label: 'Profile', icon: User },
+    { path: '/notifications', label: 'Notifications', icon: Bell },
+    { path: '/support', label: 'Support', icon: HelpCircle },
+  ];
+
+  const memberNavItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/contributions', label: 'My Contribution', icon: Coins },
     { path: '/income/level1', label: 'Level 1 Income', icon: DollarSign },
@@ -31,6 +41,8 @@ export default function Layout({ children }: { children: ReactNode }) {
     { path: '/notifications', label: 'Notifications', icon: Bell },
     { path: '/support', label: 'Support', icon: HelpCircle },
   ];
+
+  const navItems = user?.role === 'individual' ? individualNavItems : memberNavItems;
 
   const mobileNavItems = navItems.slice(0, 5);
 

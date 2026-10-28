@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Crown, User, Phone, MapPin, Tag, CheckCircle, Loader2, Sparkles, Key } from 'lucide-react';
+import { X, Crown, User, Phone, MapPin, Tag, CheckCircle, Loader2, Sparkles, Key, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface JoinModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialTab?: 'member' | 'leader';
+  initialTab?: 'member' | 'leader' | 'individual';
 }
 
 export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: JoinModalProps) {
   const { register } = useAuth();
-  const [activeTab, setActiveTab] = useState<'member' | 'leader'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'member' | 'leader' | 'individual'>(initialTab);
   const [step, setStep] = useState<'form' | 'success'>('form');
   const [formData, setFormData] = useState({
     name: '',
@@ -29,7 +29,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     if (!formData.name.trim()) newErrors.name = 'Name is required';
     if (!formData.mobile.trim()) newErrors.mobile = 'Mobile number is required';
     else if (!/^[6-9]\d{9}$/.test(formData.mobile)) newErrors.mobile = 'Enter valid 10-digit mobile';
-    if (activeTab === 'leader' && !formData.city.trim()) newErrors.city = 'City is required';
+    if ((activeTab === 'leader' || activeTab === 'individual') && !formData.city.trim()) newErrors.city = 'City is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -109,6 +109,9 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                 <button onClick={() => { setActiveTab('leader'); setStep('form'); }} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'leader' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' : 'text-white/60 hover:text-white'}`}>
                   <Crown className="w-4 h-4 inline mr-1" /> Leader
                 </button>
+                <button onClick={() => { setActiveTab('individual'); setStep('form'); }} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'individual' ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg' : 'text-white/60 hover:text-white'}`}>
+                  <ShoppingBag className="w-4 h-4 inline mr-1" /> Buyer
+                </button>
               </div>
             </div>
 
@@ -143,7 +146,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                     </div>
                   </div>
 
-                  {activeTab === 'leader' && (
+                  {(activeTab === 'leader' || activeTab === 'individual') && (
                     <div>
                       <label className="block text-xs font-medium text-white/60 mb-1.5">City *</label>
                       <div className="relative">
@@ -164,8 +167,17 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                     </div>
                   )}
 
-                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" disabled={loading} className={`w-full py-4 rounded-xl font-semibold text-base shadow-lg transition-all disabled:opacity-50 ${activeTab === 'member' ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 shadow-amber-500/30' : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-purple-500/30'}`}>
-                    {loading ? (<Loader2 className="w-5 h-5 animate-spin mx-auto" />) : (<><Sparkles className="w-4 h-4 inline mr-2" />{activeTab === 'member' ? 'Join as Member' : 'Apply as Leader'}</>)}
+                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" disabled={loading} className={`w-full py-4 rounded-xl font-semibold text-base shadow-lg transition-all disabled:opacity-50 ${
+                    activeTab === 'member' ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 shadow-amber-500/30' :
+                    activeTab === 'leader' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-purple-500/30' :
+                    'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-blue-500/30'
+                  }`}>
+                    {loading ? (<Loader2 className="w-5 h-5 animate-spin mx-auto" />) : (
+                      <>
+                        <Sparkles className="w-4 h-4 inline mr-2" />
+                        {activeTab === 'member' ? 'Join as Member' : activeTab === 'leader' ? 'Apply as Leader' : 'Register as Buyer'}
+                      </>
+                    )}
                   </motion.button>
                   <p className="text-center text-xs text-white/40">By joining, you agree to our Terms & Privacy Policy</p>
                 </motion.form>
@@ -180,7 +192,9 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                   <p className="text-sm text-white/60 mb-4">
                     {activeTab === 'member' 
                       ? 'Your membership is confirmed!'
-                      : 'Your leader application has been received!'}
+                      : activeTab === 'leader'
+                      ? 'Your leader application has been received!'
+                      : 'Your account has been created! Start shopping gold now.'}
                   </p>
                   
                   {/* Show credentials */}

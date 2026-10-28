@@ -27,6 +27,7 @@ import RefundPolicy from './pages/RefundPolicy';
 
 // Dashboard Pages
 import Dashboard from './pages/Dashboard';
+import IndividualDashboard from './pages/IndividualDashboard';
 import Team from './pages/Team';
 import Income from './pages/Income';
 import Wallet from './pages/Wallet';
@@ -61,6 +62,19 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   if (!user || user.role !== 'admin') return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
+}
+
+function SmartRedirect() {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  
+  // Redirect based on user role
+  if (user.role === 'individual') {
+    return <Navigate to="/individual-dashboard" replace />;
+  }
+  
+  // Default dashboard for member/leader
+  return <Layout><Dashboard /></Layout>;
 }
 
 function PublicPageWrapper({ children }: { children: React.ReactNode }) {
@@ -105,7 +119,8 @@ function AppRoutes() {
         <Route path="/register/:referralCode" element={<Register />} />
 
         {/* Dashboard Pages */}
-        <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
+        <Route path="/dashboard" element={<ProtectedRoute><SmartRedirect /></ProtectedRoute>} />
+        <Route path="/individual-dashboard" element={<ProtectedRoute><Layout><IndividualDashboard /></Layout></ProtectedRoute>} />
         <Route path="/team" element={<ProtectedRoute><Layout><Team /></Layout></ProtectedRoute>} />
         <Route path="/income/level1" element={<ProtectedRoute><Layout><Income /></Layout></ProtectedRoute>} />
         <Route path="/income/level2" element={<ProtectedRoute><Layout><Income /></Layout></ProtectedRoute>} />
