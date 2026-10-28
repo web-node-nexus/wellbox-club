@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Gem, Phone, MessageCircle, Heart, Filter, Scale, Award, X } from 'lucide-react';
 import { goldDesigns, GoldDesign } from '../data/mockData';
+import { designImages } from '../data/goldImages';
 import { useState } from 'react';
 
 export default function GoldShowroom() {
@@ -18,19 +19,6 @@ export default function GoldShowroom() {
       setInterestSubmitted(false);
       setShowInterest(false);
     }, 3000);
-  };
-
-  const getCategoryIcon = (cat: string) => {
-    switch (cat) {
-      case 'Necklace': return '📿';
-      case 'Bangles': return '⭕';
-      case 'Chain': return '⛓️';
-      case 'Ring': return '💍';
-      case 'Earrings': return '✨';
-      case 'Coins': return '🪙';
-      case 'Set': return '👑';
-      default: return '💎';
-    }
   };
 
   return (
@@ -71,7 +59,7 @@ export default function GoldShowroom() {
                 : 'bg-white text-gray-600 border border-gray-200 hover:border-amber-200 hover:text-amber-600'
             }`}
           >
-            {cat === 'all' ? 'All Designs' : `${getCategoryIcon(cat)} ${cat}`}
+            {cat === 'all' ? 'All Designs' : cat}
           </button>
         ))}
       </div>
@@ -86,11 +74,13 @@ export default function GoldShowroom() {
             transition={{ delay: i * 0.05 }}
             className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg hover:border-amber-200 transition-all group"
           >
-            {/* Image placeholder with gradient */}
-            <div className="h-48 bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-200 relative overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-6xl">{getCategoryIcon(design.category)}</span>
-              </div>
+            {/* Real Image */}
+            <div className="h-48 relative overflow-hidden">
+              <img 
+                src={designImages[design.name] || designImages['Royal Necklace Set']}
+                alt={design.name}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              />
               <div className="absolute top-3 right-3">
                 <span className="px-2.5 py-1 bg-white/90 backdrop-blur rounded-lg text-xs font-medium text-amber-700 shadow-sm">
                   {design.purity}
@@ -143,10 +133,12 @@ export default function GoldShowroom() {
             className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
-            <div className="h-56 bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-200 relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-8xl">{getCategoryIcon(selectedDesign.category)}</span>
-              </div>
+            <div className="h-56 relative">
+              <img 
+                src={designImages[selectedDesign.name] || designImages['Royal Necklace Set']}
+                alt={selectedDesign.name}
+                className="w-full h-full object-cover"
+              />
               <button onClick={() => setSelectedDesign(null)} className="absolute top-4 right-4 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center">
                 <X className="w-4 h-4" />
               </button>

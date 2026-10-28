@@ -1,48 +1,37 @@
-// Real Gold Jewellery Images from Unsplash
+// Real Gold Jewellery Images - Generated High Quality Images
 export const goldImages: Record<string, string> = {
   // Necklaces
-  necklace1: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&q=80',
-  necklace2: 'https://images.unsplash.com/photo-1515562141589-67f0d569b9c6?w=400&q=80',
-  necklace3: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80',
-  necklace4: 'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=400&q=80',
+  necklace1: 'https://image.qwenlm.ai/generated-images/b857601d-490d-4971-b37c-7f05cc5836cc/_result.png',
+  necklace2: 'https://image.qwenlm.ai/generated-images/332611c1-d3a8-4490-b58a-5e8b93d7291f/_result.png',
   
   // Rings
-  ring1: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=80',
-  ring2: 'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=400&q=80',
-  ring3: 'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=400&q=80',
+  ring1: 'https://image.qwenlm.ai/generated-images/355d4aa3-9861-4604-be9c-3475efc615e5/_result.png',
   
   // Bangles/Bracelets
-  bangle1: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=400&q=80',
-  bangle2: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&q=80',
-  bangle3: 'https://images.unsplash.com/photo-1601821366011-6a7f6a014c85?w=400&q=80',
+  bangle1: 'https://image.qwenlm.ai/generated-images/c1b95211-f127-4764-948b-aafa97cb7723/_result.png',
   
   // Earrings
-  earring1: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=400&q=80',
-  earring2: 'https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d?w=400&q=80',
-  earring3: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=400&q=80',
+  earring1: 'https://image.qwenlm.ai/generated-images/ebb7fd7d-9c81-4955-bfa2-b5c9d88d161d/_result.png',
   
   // Gold Coins & Bars
-  coin1: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&q=80',
-  coin2: 'https://images.unsplash.com/photo-1623282033858-168b164384dd?w=400&q=80',
-  coin3: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&q=80',
+  coin1: 'https://image.qwenlm.ai/generated-images/65b8b346-e8fb-49b4-9737-96bb6fff3068/_result.png',
+  coin2: 'https://image.qwenlm.ai/generated-images/65b8b346-e8fb-49b4-9737-96bb6fff3068/_result.png',
   
   // Sets
-  set1: 'https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=400&q=80',
-  set2: 'https://images.unsplash.com/photo-1573408301183-78f69db41560?w=400&q=80',
+  set1: 'https://image.qwenlm.ai/generated-images/8e749698-e423-4636-9a86-a298b6e072de/_result.png',
   
   // Chains
-  chain1: 'https://images.unsplash.com/photo-1620656798932-902f3736e64f?w=400&q=80',
-  chain2: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=400&q=80',
+  chain1: 'https://image.qwenlm.ai/generated-images/40009da1-5f3b-483e-93e5-332436911f14/_result.png',
   
   // General Gold/Jewellery
-  gold1: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=400&q=80',
-  gold2: 'https://images.unsplash.com/photo-1515562141589-67f0d569b9c6?w=400&q=80',
-  gold3: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&q=80',
-  gold4: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80',
-  gold5: 'https://images.unsplash.com/photo-1573408301183-78f69db41560?w=400&q=80',
-  gold6: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&q=80',
-  gold7: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=80',
-  gold8: 'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=400&q=80',
+  gold1: 'https://image.qwenlm.ai/generated-images/b857601d-490d-4971-b37c-7f05cc5836cc/_result.png',
+  gold2: 'https://image.qwenlm.ai/generated-images/355d4aa3-9861-4604-be9c-3475efc615e5/_result.png',
+  gold3: 'https://image.qwenlm.ai/generated-images/c1b95211-f127-4764-948b-aafa97cb7723/_result.png',
+  gold4: 'https://image.qwenlm.ai/generated-images/ebb7fd7d-9c81-4955-bfa2-b5c9d88d161d/_result.png',
+  gold5: 'https://image.qwenlm.ai/generated-images/65b8b346-e8fb-49b4-9737-96bb6fff3068/_result.png',
+  gold6: 'https://image.qwenlm.ai/generated-images/8e749698-e423-4636-9a86-a298b6e072de/_result.png',
+  gold7: 'https://image.qwenlm.ai/generated-images/332611c1-d3a8-4490-b58a-5e8b93d7291f/_result.png',
+  gold8: 'https://image.qwenlm.ai/generated-images/40009da1-5f3b-483e-93e5-332436911f14/_result.png',
 };
 
 // Design to image mapping
@@ -55,9 +44,9 @@ export const designImages: Record<string, string> = {
   'Jhumka Earrings': goldImages.earring1,
   'Gold Coin 10g': goldImages.coin1,
   'Bridal Choker': goldImages.necklace2,
-  'Anklet Pair': goldImages.bangle2,
-  'Mangalsutra': goldImages.chain2,
-  'Nose Ring': goldImages.earring2,
+  'Anklet Pair': goldImages.bangle1,
+  'Mangalsutra': goldImages.chain1,
+  'Nose Ring': goldImages.earring1,
   'Gold Bar 50g': goldImages.coin2,
 };
 
