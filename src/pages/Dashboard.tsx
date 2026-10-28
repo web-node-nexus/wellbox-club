@@ -1,9 +1,9 @@
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { Crown, Copy, Share2, CheckCircle, Wallet, Lock, Unlock, Calendar, TrendingUp, DollarSign, Users, Gift, ArrowUpRight, ArrowDownRight, Target, Zap, Award } from 'lucide-react';
+import { Crown, Copy, Share2, CheckCircle, Wallet, Lock, Unlock, Calendar, TrendingUp, DollarSign, Users, Gift, ArrowUpRight, ArrowDownRight, Target, Zap, Award, Eye, Bell } from 'lucide-react';
 import { walletTransactions, contributions, getCommissionWalletBalance, getContributionWalletBalance, users } from '../data/mockData';
 import { useState, useEffect } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, BarChart, Bar } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
 
@@ -28,6 +28,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [copied, setCopied] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   if (!user) return null;
 
   const commissionBalance = getCommissionWalletBalance(user.id);
@@ -52,6 +53,7 @@ export default function Dashboard() {
   const shareWhatsApp = () => {
     const text = `Join Jewellbox Club and start earning with gold! Use my referral code: ${user.referralCode}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    showToast('success', 'Opening WhatsApp...', 'Share');
   };
 
   // Chart data
@@ -86,6 +88,13 @@ export default function Dashboard() {
   const nextPayout = getNextPayoutDate();
   const daysUntilPayout = Math.ceil((nextPayout.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
 
+  // Notifications
+  const notifications = [
+    { id: 1, type: 'commission', title: 'Commission Credited', message: '₹500 Level 1 commission received', time: '2 hours ago', icon: DollarSign, color: 'text-green-400' },
+    { id: 2, type: 'team', title: 'New Team Member', message: 'Priya Sharma joined your team', time: '5 hours ago', icon: Users, color: 'text-blue-400' },
+    { id: 3, type: 'gold', title: 'Gold Order Bonus', message: '₹450 commission from gold order', time: '1 day ago', icon: Gift, color: 'text-purple-400' },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Welcome Card */}
@@ -109,6 +118,11 @@ export default function Dashboard() {
                 <Share2 className="w-5 h-5" />
                 <span>Share on WhatsApp</span>
               </motion.button>
+              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setShowNotifications(!showNotifications)} className="flex items-center gap-2 px-5 py-3 bg-white/20 hover:bg-white/30 rounded-xl backdrop-blur transition-colors font-medium relative">
+                <Bell className="w-5 h-5" />
+                <span>Notifications</span>
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs flex items-center justify-center">{notifications.length}</span>
+              </motion.button>
             </div>
           </div>
           <div className="mt-6 p-4 bg-white/10 backdrop-blur rounded-xl border border-white/20">
@@ -116,6 +130,35 @@ export default function Dashboard() {
             <p className="text-3xl font-bold font-mono">{user.referralCode}</p>
           </div>
         </div>
+
+        {/* Notifications Dropdown */}
+        {showNotifications && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute top-full right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50"
+          >
+            <div className="p-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+              <h3 className="font-bold">Notifications</h3>
+            </div>
+            <div className="max-h-96 overflow-y-auto">
+              {notifications.map(notif => (
+                <div key={notif.id} className="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100`}>
+                      <notif.icon className={`w-5 h-5 ${notif.color}`} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900 text-sm">{notif.title}</p>
+                      <p className="text-xs text-gray-600 mt-1">{notif.message}</p>
+                      <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </motion.div>
 
       {/* Leader Badge / Progress */}
@@ -292,7 +335,10 @@ export default function Dashboard() {
 
       {/* Recent Activity */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Activity</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-gray-900">Recent Activity</h3>
+          <Link to="/notifications" className="text-sm text-amber-600 hover:text-amber-700 font-medium">View All</Link>
+        </div>
         <div className="space-y-3">
           {myTransactions.slice(0, 5).map(tx => (
             <div key={tx.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors">

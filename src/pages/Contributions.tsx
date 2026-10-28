@@ -1,10 +1,14 @@
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { Coins, Lock, Unlock, Calendar, ArrowRight, Gem } from 'lucide-react';
+import { Coins, Lock, Unlock, Calendar, ArrowRight, Gem, Download, Eye, X, TrendingUp } from 'lucide-react';
 import { contributions } from '../data/mockData';
+import { useState } from 'react';
+import { useToast } from '../context/ToastContext';
 
 export default function Contributions() {
   const { user } = useAuth();
+  const { showToast } = useToast();
+  const [viewingContribution, setViewingContribution] = useState<any>(null);
   if (!user) return null;
 
   const myContributions = contributions.filter(c => c.userId === user.id);
@@ -20,11 +24,42 @@ export default function Contributions() {
     return days > 0 ? days : 0;
   };
 
+  const exportCSV = () => {
+    const csv = 'ID,Amount,Date,Locked Until,Status\n' +
+      myContributions.map(c => `${c.id},${c.amount},${c.date},${c.lockedUntil},${c.status}`).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'contributions.csv';
+    a.click();
+    showToast('success', 'Contributions exported successfully', 'Export');
+  };
+
+  const handleWithdraw = (contributionId: string) => {
+    showToast('success', 'Withdrawal request submitted', 'Success');
+  };
+
+  const handleConvertToGold = (contributionId: string) => {
+    showToast('success', 'Redirecting to Gold Showroom...', 'Convert');
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">My Contributions</h1>
-        <p className="text-gray-500 mt-1">Track your gold savings and lock periods</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold">My Contributions</h1>
+          <p className="text-white/50 mt-1">Track your gold savings and lock periods</p>
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={exportCSV}
+          className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm hover:bg-white/10 transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          Export CSV
+        </motion.button>
       </div>
 
       {/* Summary Cards */}
@@ -100,7 +135,12 @@ export default function Contributions() {
             {myContributions.map(c => {
               const daysLeft = getDaysUntilUnlock(c.lockedUntil);
               return (
-                <div key={c.id} className="p-4 hover:bg-gray-50 transition-colors">
+                <motion.div
+                  key={c.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="p-4 hover:bg-gray-50 transition-colors"
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
@@ -127,8 +167,18 @@ export default function Contributions() {
                             🔓 Unlocked
                           </span>
                           <div className="flex gap-2 mt-2">
-                            <button className="px-3 py-1 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700">Withdraw</button>
-                            <button className="px-3 py-1 bg-amber-600 text-white text-xs rounded-lg hover:bg-amber-700">Gold</button>
+                            <button
+                              onClick={() => handleWithdraw(c.id)}
+                              className="px-3 py-1 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 transition-colors"
+                            >
+                              Withdraw
+                            </button>
+                            <button
+                              onClick={() => handleConvertToGold(c.id)}
+                              className="px-3 py-1 bg-amber-600 text-white text-xs rounded-lg hover:bg-amber-700 transition-colors"
+                            >
+                              Buy Gold
+                            </button>
                           </div>
                         </div>
                       )}
@@ -145,7 +195,7 @@ export default function Contributions() {
                       <p className="text-xs text-gray-400 mt-1">{Math.round(100 - (daysLeft / 365) * 100)}% of lock period completed</p>
                     </div>
                   )}
-                </div>
+                </motion.div>
               );
             })}
           </div>
