@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Crown, Users, TrendingUp, Gem, Shield, Star, ChevronDown, Sparkles, ArrowRight, CheckCircle, Lock, Unlock, Phone, MessageCircle, Award, Zap, Heart, Target, Scale, Play, TrendingDown, ShoppingCart, Eye, DollarSign } from 'lucide-react';
+import { designImages } from '../data/goldImages';
 
 interface LandingProps {
   onJoinClick: () => void;
@@ -411,14 +412,14 @@ export default function Landing({ onJoinClick }: LandingProps) {
           {/* Featured Designs Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
             {[
-              { name: 'Royal Necklace', weight: '45.5g', purity: '22K', emoji: '📿', category: 'Necklace', price: '₹2,85,000' },
-              { name: 'Diamond Ring', weight: '4.8g', purity: '24K', emoji: '💍', category: 'Ring', price: '₹30,000' },
-              { name: 'Temple Set', weight: '120g', purity: '22K', emoji: '👑', category: 'Set', price: '₹7,50,000' },
-              { name: 'Gold Coin', weight: '10g', purity: '24K', emoji: '🪙', category: 'Coins', price: '₹62,500' },
-              { name: 'Jhumka Earrings', weight: '18.5g', purity: '22K', emoji: '✨', category: 'Earrings', price: '₹1,16,000' },
-              { name: 'Antique Bangles', weight: '28g', purity: '22K', emoji: '⭕', category: 'Bangles', price: '₹1,76,000' },
-              { name: 'Bridal Choker', weight: '85g', purity: '22K', emoji: '💎', category: 'Necklace', price: '₹5,35,000' },
-              { name: 'Gold Bar', weight: '50g', purity: '24K', emoji: '🏅', category: 'Coins', price: '₹3,12,500' },
+              { name: 'Royal Necklace', weight: '45.5g', purity: '22K', image: designImages['Royal Necklace Set'], category: 'Necklace', price: '₹2,85,000' },
+              { name: 'Diamond Ring', weight: '4.8g', purity: '24K', image: designImages['Minimalist Ring'], category: 'Ring', price: '₹30,000' },
+              { name: 'Temple Set', weight: '120g', purity: '22K', image: designImages['Temple Jewelry Set'], category: 'Set', price: '₹7,50,000' },
+              { name: 'Gold Coin', weight: '10g', purity: '24K', image: designImages['Gold Coin 10g'], category: 'Coins', price: '₹62,500' },
+              { name: 'Jhumka Earrings', weight: '18.5g', purity: '22K', image: designImages['Jhumka Earrings'], category: 'Earrings', price: '₹1,16,000' },
+              { name: 'Antique Bangles', weight: '28g', purity: '22K', image: designImages['Antique Bangles Pair'], category: 'Bangles', price: '₹1,76,000' },
+              { name: 'Bridal Choker', weight: '85g', purity: '22K', image: designImages['Bridal Choker'], category: 'Necklace', price: '₹5,35,000' },
+              { name: 'Gold Bar', weight: '50g', purity: '24K', image: designImages['Gold Bar 50g'], category: 'Coins', price: '₹3,12,500' },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -431,13 +432,13 @@ export default function Landing({ onJoinClick }: LandingProps) {
               >
                 {/* Image Area */}
                 <div className="h-56 bg-gradient-to-br from-amber-900/40 via-purple-900/40 to-amber-900/40 flex items-center justify-center relative overflow-hidden">
-                  <motion.span
-                    className="text-8xl"
-                    whileHover={{ scale: 1.4, rotate: 15 }}
+                  <motion.img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                    whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.3 }}
-                  >
-                    {item.emoji}
-                  </motion.span>
+                  />
                   
                   {/* Overlay on hover */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

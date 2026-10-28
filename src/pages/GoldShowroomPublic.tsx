@@ -2,23 +2,24 @@ import { motion } from 'framer-motion';
 import { Gem, Phone, MessageCircle, Scale, Award, Filter, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import GoldBackground from '../components/GoldBackground';
+import { designImages } from '../data/goldImages';
 interface PageProps { onJoinClick: () => void; }
 
 export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
   const [category, setCategory] = useState('all');
   const designs = [
-    { name: 'Royal Necklace Set', category: 'Necklace', weight: 45.5, purity: '22K', making: '₹800/g', emoji: '📿', desc: 'Exquisite traditional necklace with intricate kundan work. Perfect for weddings.' },
-    { name: 'Antique Bangles Pair', category: 'Bangles', weight: 28, purity: '22K', making: '₹600/g', emoji: '⭕', desc: 'Beautiful antique finish bangles with traditional motifs. Lightweight daily wear.' },
-    { name: 'Diamond Cut Chain', category: 'Chain', weight: 15.2, purity: '22K', making: '₹500/g', emoji: '⛓️', desc: 'Stunning diamond cut gold chain with brilliant shine. Modern design.' },
-    { name: 'Temple Jewelry Set', category: 'Set', weight: 120, purity: '22K', making: '₹1200/g', emoji: '👑', desc: 'Complete temple set including necklace, earrings, maang tikka. Handcrafted.' },
-    { name: 'Minimalist Ring', category: 'Ring', weight: 4.8, purity: '24K', making: '₹400/g', emoji: '💍', desc: 'Elegant minimalist ring in pure 24K gold. Perfect everyday wear.' },
-    { name: 'Jhumka Earrings', category: 'Earrings', weight: 18.5, purity: '22K', making: '₹700/g', emoji: '✨', desc: 'Traditional jhumka with pearl drops. Classic design that never fades.' },
-    { name: 'Gold Coin 10g', category: 'Coins', weight: 10, purity: '24K', making: '₹200/g', emoji: '🪙', desc: 'Pure 24K gold coin for investment and gifting. BIS hallmarked.' },
-    { name: 'Bridal Choker', category: 'Necklace', weight: 85, purity: '22K', making: '₹1500/g', emoji: '💎', desc: 'Magnificent bridal choker with precious stone embedding.' },
-    { name: 'Anklet Pair', category: 'Bangles', weight: 22, purity: '22K', making: '₹550/g', emoji: '🦶', desc: 'Traditional silver-gold plated anklets. Beautiful craftsmanship.' },
-    { name: 'Mangalsutra', category: 'Necklace', weight: 12, purity: '22K', making: '₹650/g', emoji: '📿', desc: 'Classic mangalsutra with black beads and gold pendant.' },
-    { name: 'Nose Ring', category: 'Earrings', weight: 2.5, purity: '22K', making: '₹450/g', emoji: '💫', desc: 'Delicate nose ring with tiny diamond accent. Elegant and subtle.' },
-    { name: 'Gold Bar 50g', category: 'Coins', weight: 50, purity: '24K', making: '₹150/g', emoji: '🏅', desc: 'Investment-grade 24K gold bar. Perfect for wealth building.' },
+    { name: 'Royal Necklace Set', category: 'Necklace', weight: 45.5, purity: '22K', making: '₹800/g', image: designImages['Royal Necklace Set'], desc: 'Exquisite traditional necklace with intricate kundan work. Perfect for weddings.' },
+    { name: 'Antique Bangles Pair', category: 'Bangles', weight: 28, purity: '22K', making: '₹600/g', image: designImages['Antique Bangles Pair'], desc: 'Beautiful antique finish bangles with traditional motifs. Lightweight daily wear.' },
+    { name: 'Diamond Cut Chain', category: 'Chain', weight: 15.2, purity: '22K', making: '₹500/g', image: designImages['Diamond Cut Chain'], desc: 'Stunning diamond cut gold chain with brilliant shine. Modern design.' },
+    { name: 'Temple Jewelry Set', category: 'Set', weight: 120, purity: '22K', making: '₹1200/g', image: designImages['Temple Jewelry Set'], desc: 'Complete temple set including necklace, earrings, maang tikka. Handcrafted.' },
+    { name: 'Minimalist Ring', category: 'Ring', weight: 4.8, purity: '24K', making: '₹400/g', image: designImages['Minimalist Ring'], desc: 'Elegant minimalist ring in pure 24K gold. Perfect everyday wear.' },
+    { name: 'Jhumka Earrings', category: 'Earrings', weight: 18.5, purity: '22K', making: '₹700/g', image: designImages['Jhumka Earrings'], desc: 'Traditional jhumka with pearl drops. Classic design that never fades.' },
+    { name: 'Gold Coin 10g', category: 'Coins', weight: 10, purity: '24K', making: '₹200/g', image: designImages['Gold Coin 10g'], desc: 'Pure 24K gold coin for investment and gifting. BIS hallmarked.' },
+    { name: 'Bridal Choker', category: 'Necklace', weight: 85, purity: '22K', making: '₹1500/g', image: designImages['Bridal Choker'], desc: 'Magnificent bridal choker with precious stone embedding.' },
+    { name: 'Anklet Pair', category: 'Bangles', weight: 22, purity: '22K', making: '₹550/g', image: designImages['Anklet Pair'], desc: 'Traditional silver-gold plated anklets. Beautiful craftsmanship.' },
+    { name: 'Mangalsutra', category: 'Necklace', weight: 12, purity: '22K', making: '₹650/g', image: designImages['Mangalsutra'], desc: 'Classic mangalsutra with black beads and gold pendant.' },
+    { name: 'Nose Ring', category: 'Earrings', weight: 2.5, purity: '22K', making: '₹450/g', image: designImages['Nose Ring'], desc: 'Delicate nose ring with tiny diamond accent. Elegant and subtle.' },
+    { name: 'Gold Bar 50g', category: 'Coins', weight: 50, purity: '24K', making: '₹150/g', image: designImages['Gold Bar 50g'], desc: 'Investment-grade 24K gold bar. Perfect for wealth building.' },
   ];
 
   const categories = ['all', ...new Set(designs.map(d => d.category))];
@@ -96,13 +97,13 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
               className="gold-card-premium rounded-3xl overflow-hidden group cursor-pointer"
             >
               <div className="h-56 bg-gradient-to-br from-amber-900/30 to-purple-900/30 flex items-center justify-center relative overflow-hidden">
-                <motion.span
-                  className="text-8xl"
-                  whileHover={{ scale: 1.4, rotate: 15 }}
+                <motion.img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-full object-cover"
+                  whileHover={{ scale: 1.1 }}
                   transition={{ duration: 0.3 }}
-                >
-                  {item.emoji}
-                </motion.span>
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="absolute top-3 right-3 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full text-xs font-bold text-purple-900 shadow-lg">
                   {item.purity}
