@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { Users, Crown, Coins, DollarSign, Wallet, ShoppingBag, TrendingUp, Activity } from 'lucide-react';
+import { Users, Crown, Coins, DollarSign, Wallet, ShoppingBag, TrendingUp, Activity, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { users, contributions, walletTransactions, withdrawals, goldLeads } from '../../data/mockData';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
@@ -114,16 +115,12 @@ export default function AdminDashboard() {
           <div className="bg-white/5 rounded-xl p-5 border border-purple-500/20">
             <div className="flex items-center gap-3 mb-3">
               <Activity className="w-6 h-6 text-purple-400" />
-              <h4 className="font-bold text-purple-400">Admin Actions</h4>
+              <h4 className="font-bold text-purple-400">Quick Actions</h4>
             </div>
             <ul className="space-y-2 text-sm text-white/70">
               <li className="flex items-start gap-2">
                 <span className="text-purple-400 font-bold">•</span>
-                <span>Promote members to Leader</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-purple-400 font-bold">•</span>
-                <span>View all member details</span>
+                <span>Manage users & leaders</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-purple-400 font-bold">•</span>
@@ -131,7 +128,11 @@ export default function AdminDashboard() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-purple-400 font-bold">•</span>
-                <span>Manage gold showroom</span>
+                <span>Configure settings</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-purple-400 font-bold">•</span>
+                <span>View audit logs</span>
               </li>
             </ul>
           </div>
@@ -140,53 +141,51 @@ export default function AdminDashboard() {
           <div className="bg-white/5 rounded-xl p-5 border border-green-500/20">
             <div className="flex items-center gap-3 mb-3">
               <TrendingUp className="w-6 h-6 text-green-400" />
-              <h4 className="font-bold text-green-400">Current Status</h4>
+              <h4 className="font-bold text-green-400">Platform Health</h4>
             </div>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-white/70">Total Members</span>
-                <span className="text-lg font-bold text-green-400">{totalMembers}</span>
+                <span className="text-sm text-white/70">Growth Rate</span>
+                <span className="text-lg font-bold text-green-400">+12%</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-white/70">Active Leaders</span>
-                <span className="text-lg font-bold text-amber-400">{totalLeaders}</span>
+                <span className="text-sm text-white/70">Active Users</span>
+                <span className="text-lg font-bold text-blue-400">
+                  {users.filter(u => u.teamSize > 0).length}
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-white/70">Pending Promotions</span>
-                <span className="text-lg font-bold text-purple-400">
-                  {users.filter(u => !u.isLeader && u.teamSize >= 100).length}
+                <span className="text-sm text-white/70">Revenue</span>
+                <span className="text-lg font-bold text-amber-400">
+                  ₹{(totalContributions / 1000).toFixed(0)}K
                 </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-3 mt-6">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-6 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold rounded-xl shadow-lg shadow-amber-500/30 flex items-center gap-2"
-          >
-            <Crown className="w-5 h-5" />
-            Manage Leaders
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 flex items-center gap-2"
-          >
-            <Users className="w-5 h-5" />
-            Manage Members
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-green-500/30 flex items-center gap-2"
-          >
-            <Activity className="w-5 h-5" />
-            View Audit Logs
-          </motion.button>
+        {/* Quick Navigation */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+          <Link to="/admin/users" className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all group">
+            <Users className="w-6 h-6 text-blue-400 mb-2 group-hover:scale-110 transition-transform" />
+            <p className="text-sm font-medium">Users</p>
+            <p className="text-xs text-white/50">{totalMembers} total</p>
+          </Link>
+          <Link to="/admin/withdrawals" className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all group">
+            <Wallet className="w-6 h-6 text-green-400 mb-2 group-hover:scale-110 transition-transform" />
+            <p className="text-sm font-medium">Withdrawals</p>
+            <p className="text-xs text-white/50">{pendingWithdrawals} pending</p>
+          </Link>
+          <Link to="/admin/gold-showroom" className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all group">
+            <ShoppingBag className="w-6 h-6 text-amber-400 mb-2 group-hover:scale-110 transition-transform" />
+            <p className="text-sm font-medium">Gold Showroom</p>
+            <p className="text-xs text-white/50">{totalGoldLeads} leads</p>
+          </Link>
+          <Link to="/admin/settings" className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all group">
+            <Settings className="w-6 h-6 text-purple-400 mb-2 group-hover:scale-110 transition-transform" />
+            <p className="text-sm font-medium">Settings</p>
+            <p className="text-xs text-white/50">Configure</p>
+          </Link>
         </div>
       </motion.div>
 
