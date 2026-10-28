@@ -47,7 +47,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const mobileNavItems = navItems.slice(0, 5);
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-50 via-white to-amber-50'} flex`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-50 via-white to-amber-50'}`}>
       {/* Mobile overlay */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -61,8 +61,8 @@ export default function Layout({ children }: { children: ReactNode }) {
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 h-screen overflow-hidden ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-r transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} shadow-xl`}>
+      {/* Sidebar - Fixed position */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 h-screen overflow-hidden ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-r transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} shadow-xl`}>
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className={`p-4 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -152,8 +152,8 @@ export default function Layout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      {/* Main Content - With left margin for sidebar */}
+      <div className="lg:ml-72 min-h-screen flex flex-col">
         {/* Top Bar */}
         <header className={`sticky top-0 z-30 ${darkMode ? 'bg-gray-800/90 border-gray-700' : 'bg-white/90 border-gray-200'} backdrop-blur-xl border-b px-4 lg:px-8 py-4 shadow-sm`}>
           <div className="flex items-center justify-between">

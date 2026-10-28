@@ -29,7 +29,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Mobile overlay */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -43,8 +43,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 h-screen overflow-hidden bg-gradient-to-b from-slate-900 via-purple-950 to-slate-900 border-r border-amber-500/10 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+      {/* Sidebar - Fixed position */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 h-screen overflow-hidden bg-gradient-to-b from-slate-900 via-purple-950 to-slate-900 border-r border-amber-500/10 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-4 border-b border-amber-500/10">
@@ -110,8 +110,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      {/* Main Content - With left margin for sidebar */}
+      <div className="lg:ml-72 min-h-screen flex flex-col">
         {/* Top Bar */}
         <header className="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-xl border-b border-amber-500/10 px-4 lg:px-8 py-4">
           <div className="flex items-center justify-between">

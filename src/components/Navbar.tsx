@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Menu, X, ChevronDown } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 interface NavbarProps {
   onJoinClick: () => void;
@@ -11,14 +12,24 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const isDashboard = location.pathname.startsWith('/dashboard') || 
+  const { user } = useAuth();
+  
+  // Hide navbar if user is logged in OR on dashboard/admin routes
+  const isProtectedRoute = location.pathname.startsWith('/dashboard') || 
+    location.pathname.startsWith('/individual-dashboard') ||
     location.pathname.startsWith('/referrals') || 
     location.pathname.startsWith('/commissions') ||
     location.pathname.startsWith('/wallet') ||
     location.pathname.startsWith('/contributions') ||
     location.pathname.startsWith('/gold-showroom') ||
     location.pathname.startsWith('/profile') ||
-    location.pathname.startsWith('/admin');
+    location.pathname.startsWith('/admin') ||
+    location.pathname.startsWith('/team') ||
+    location.pathname.startsWith('/income') ||
+    location.pathname.startsWith('/orders') ||
+    location.pathname.startsWith('/referral') ||
+    location.pathname.startsWith('/notifications') ||
+    location.pathname.startsWith('/support');
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -26,7 +37,8 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  if (isDashboard) return null;
+  // Hide navbar if logged in or on protected routes
+  if (user || isProtectedRoute) return null;
 
   const navLinks = [
     { label: 'Home', path: '/' },
