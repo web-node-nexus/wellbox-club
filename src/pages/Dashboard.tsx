@@ -1,6 +1,6 @@
 import { useAuth } from '../context/AuthContext';
-import { motion } from 'framer-motion';
-import { Crown, Copy, Share2, CheckCircle, Wallet, Lock, Unlock, Calendar, TrendingUp, DollarSign, Users, Gift, ArrowUpRight, ArrowDownRight, Target, Zap, Award, Eye, Bell } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Crown, Copy, Share2, CheckCircle, Wallet, Lock, Unlock, Calendar, TrendingUp, DollarSign, Users, Gift, ArrowUpRight, ArrowDownRight, Target, Zap, Award, Eye, Bell, Plus, Minus, Gem, IndianRupee, X } from 'lucide-react';
 import { walletTransactions, contributions, getCommissionWalletBalance, getContributionWalletBalance, users } from '../data/mockData';
 import { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
@@ -29,6 +29,10 @@ export default function Dashboard() {
   const { showToast } = useToast();
   const [copied, setCopied] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showInvestModal, setShowInvestModal] = useState(false);
+  const [investAmount, setInvestAmount] = useState('');
+  const [investError, setInvestError] = useState('');
+  
   if (!user) return null;
 
   const commissionBalance = getCommissionWalletBalance(user.id);
@@ -42,6 +46,44 @@ export default function Dashboard() {
   const leaderIncome = myTransactions.filter(t => t.type === 'leader_payout').reduce((s, t) => s + t.amount, 0);
   const goldBonus = myTransactions.filter(t => t.type === 'gold_order_commission').reduce((s, t) => s + t.amount, 0);
   const totalEarnings = l1Income + l2Income + leaderIncome + goldBonus;
+
+  // Monthly investment from localStorage
+  const [monthlyInvestments, setMonthlyInvestments] = useState(() => {
+    const stored = localStorage.getItem(`investments_${user.id}`);
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(`investments_${user.id}`, JSON.stringify(monthlyInvestments));
+  }, [monthlyInvestments, user.id]);
+
+  const totalInvested = monthlyInvestments.reduce((sum: number, inv: any) => sum + inv.amount, 0);
+
+  const handleInvest = () => {
+    const amount = Number(investAmount);
+    if (amount < 1000) {
+      setInvestError('Minimum investment is ₹1,000 per month');
+      return;
+    }
+    if (amount > 100000) {
+      setInvestError('Maximum investment is ₹1,00,000 per month');
+      return;
+    }
+
+    const newInvestment = {
+      id: Date.now().toString(),
+      amount: amount,
+      date: new Date().toISOString().split('T')[0],
+      lockedUntil: new Date(Date.now() + 11 * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      status: 'locked' as const,
+    };
+
+    setMonthlyInvestments([...monthlyInvestments, newInvestment]);
+    showToast('success', `₹${amount.toLocaleString()} invested successfully! Locked for 11 months.`, 'Investment Successful');
+    setShowInvestModal(false);
+    setInvestAmount('');
+    setInvestError('');
+  };
 
   const copyReferral = () => {
     navigator.clipboard.writeText(`${window.location.origin}/register/${user.referralCode}`);
@@ -72,7 +114,6 @@ export default function Dashboard() {
     { month: 'Apr', members: 25 }, { month: 'May', members: 32 }, { month: 'Jun', members: teamMembers },
   ];
 
-  // Next leader payout countdown
   const getNextPayoutDate = () => {
     const now = new Date();
     let year = now.getFullYear();
@@ -88,7 +129,6 @@ export default function Dashboard() {
   const nextPayout = getNextPayoutDate();
   const daysUntilPayout = Math.ceil((nextPayout.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
 
-  // Notifications
   const notifications = [
     { id: 1, type: 'commission', title: 'Commission Credited', message: '₹500 Level 1 commission received', time: '2 hours ago', icon: DollarSign, color: 'text-green-400' },
     { id: 2, type: 'team', title: 'New Team Member', message: 'Priya Sharma joined your team', time: '5 hours ago', icon: Users, color: 'text-blue-400' },
@@ -145,7 +185,7 @@ export default function Dashboard() {
               {notifications.map(notif => (
                 <div key={notif.id} className="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
                   <div className="flex items-start gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100`}>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100">
                       <notif.icon className={`w-5 h-5 ${notif.color}`} />
                     </div>
                     <div className="flex-1">
@@ -161,9 +201,49 @@ export default function Dashboard() {
         )}
       </motion.div>
 
+      {/* Monthly Investment Section */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl p-6 text-white shadow-2xl">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <IndianRupee className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold">Monthly Investment</h3>
+              <p className="text-sm text-white/70">Build your gold savings</p>
+            </div>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowInvestModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl backdrop-blur transition-colors font-medium"
+          >
+            <Plus className="w-5 h-5" />
+            Invest Now
+          </motion.button>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white/10 rounded-xl p-4">
+            <p className="text-sm text-white/70">Total Invested</p>
+            <p className="text-2xl font-bold mt-1">₹{totalInvested.toLocaleString()}</p>
+          </div>
+          <div className="bg-white/10 rounded-xl p-4">
+            <p className="text-sm text-white/70">Monthly Investments</p>
+            <p className="text-2xl font-bold mt-1">{monthlyInvestments.length}</p>
+          </div>
+        </div>
+        <div className="mt-4 p-3 bg-white/10 rounded-xl">
+          <p className="text-xs text-white/70">
+            <Lock className="w-3 h-3 inline mr-1" />
+            Investment locked for <strong>11 months</strong>. Can be used to <strong>order gold</strong> after lock period.
+          </p>
+        </div>
+      </motion.div>
+
       {/* Leader Badge / Progress */}
       {!user.isLeader ? (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 text-white shadow-xl">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 text-white shadow-xl">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
               <Target className="w-7 h-7" />
@@ -181,7 +261,7 @@ export default function Dashboard() {
           </div>
         </motion.div>
       ) : (
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 rounded-2xl p-6 text-purple-900 shadow-2xl">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }} className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 rounded-2xl p-6 text-purple-900 shadow-2xl">
           <div className="flex items-center gap-4">
             <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 3, repeat: Infinity }} className="w-20 h-20 bg-white/30 rounded-full flex items-center justify-center shadow-xl">
               <Crown className="w-10 h-10" />
@@ -194,17 +274,17 @@ export default function Dashboard() {
         </motion.div>
       )}
 
-      {/* Stat Cards */}
+      {/* Stat Cards - Commission Income */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {[
-          { label: 'Own Contribution', value: contributionBalance, icon: DollarSign, color: 'from-blue-500 to-cyan-600', link: '/contributions' },
           { label: 'Level 1 Income', value: l1Income, icon: Users, color: 'from-green-500 to-emerald-600', link: '/income/level1' },
           { label: 'Level 2 Income', value: l2Income, icon: TrendingUp, color: 'from-purple-500 to-violet-600', link: '/income/level2' },
           { label: 'Leader Income', value: leaderIncome, icon: Crown, color: 'from-amber-500 to-orange-600', link: user.isLeader ? '/income/leader' : '#' },
           { label: 'Gold Order Bonus', value: goldBonus, icon: Gift, color: 'from-pink-500 to-rose-600', link: '/gold-showroom' },
           { label: 'Total Earnings', value: totalEarnings, icon: Zap, color: 'from-teal-500 to-cyan-600', link: '/commissions' },
+          { label: 'Monthly Investment', value: totalInvested, icon: IndianRupee, color: 'from-blue-500 to-indigo-600', link: '/contributions' },
         ].map((stat, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.05 }}>
+          <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.05 }}>
             <Link to={stat.link} className="block bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-xl hover:border-amber-300 transition-all group">
               <div className={`w-12 h-12 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
                 <stat.icon className="w-6 h-6 text-white" />
@@ -218,8 +298,9 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Wallet Cards */}
+      {/* Wallet Cards - Commission vs Investment */}
       <div className="grid md:grid-cols-2 gap-6">
+        {/* Commission Wallet - Withdrawable */}
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} className="bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600 rounded-3xl p-6 text-white shadow-2xl">
           <div className="flex items-center justify-between mb-4">
             <Wallet className="w-10 h-10" />
@@ -228,6 +309,14 @@ export default function Dashboard() {
           <p className="text-sm text-green-100 font-medium">Commission Wallet</p>
           <p className="text-4xl font-bold mt-2">₹{commissionBalance.toLocaleString()}</p>
           <p className="text-sm text-green-200 mt-2">💰 Withdrawable anytime</p>
+          <div className="mt-3 p-3 bg-white/10 rounded-xl">
+            <p className="text-xs text-green-100">
+              ✓ Level 1 & Level 2 income<br />
+              ✓ Leader payouts<br />
+              ✓ Gold order bonuses<br />
+              ✓ Withdraw anytime to bank
+            </p>
+          </div>
           <Link to="/wallet">
             <button className="mt-4 w-full py-3 bg-white/20 hover:bg-white/30 rounded-xl font-semibold transition-colors backdrop-blur">
               Withdraw Now →
@@ -235,25 +324,29 @@ export default function Dashboard() {
           </Link>
         </motion.div>
 
+        {/* Investment Wallet - Locked for Gold Orders */}
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} className="bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-3xl p-6 text-white shadow-2xl">
           <div className="flex items-center justify-between mb-4">
             <Lock className="w-10 h-10" />
             <Lock className="w-6 h-6 text-blue-200" />
           </div>
-          <p className="text-sm text-blue-100 font-medium">Contribution Wallet</p>
-          <p className="text-4xl font-bold mt-2">₹{contributionBalance.toLocaleString()}</p>
-          <p className="text-sm text-blue-200 mt-2">🔒 Locked for 12 months</p>
-          {myContributions.length > 0 && myContributions[0].status === 'unlocked' ? (
-            <div className="flex gap-2 mt-4">
-              <button className="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-xl font-semibold transition-colors backdrop-blur">Withdraw</button>
-              <button className="flex-1 py-3 bg-amber-500 hover:bg-amber-600 rounded-xl font-semibold transition-colors">Buy Gold</button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 mt-4 p-3 bg-white/10 rounded-xl">
-              <Calendar className="w-5 h-5" />
-              <span className="text-sm">Unlocks in {Math.max(0, Math.ceil((new Date(myContributions[0]?.lockedUntil || Date.now()).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days</span>
-            </div>
-          )}
+          <p className="text-sm text-blue-100 font-medium">Investment Wallet</p>
+          <p className="text-4xl font-bold mt-2">₹{totalInvested.toLocaleString()}</p>
+          <p className="text-sm text-blue-200 mt-2">🔒 Locked for 11 months</p>
+          <div className="mt-3 p-3 bg-white/10 rounded-xl">
+            <p className="text-xs text-blue-100">
+              ✓ Monthly investments (min ₹1,000)<br />
+              ✓ Locked for 11 months<br />
+              ✓ Can order gold after lock period<br />
+              ✗ Cannot withdraw as cash
+            </p>
+          </div>
+          <Link to="/gold-showroom">
+            <button className="mt-4 w-full py-3 bg-amber-500 hover:bg-amber-600 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
+              <Gem className="w-5 h-5" />
+              Order Gold
+            </button>
+          </Link>
         </motion.div>
       </div>
 
@@ -365,6 +458,96 @@ export default function Dashboard() {
           ))}
         </div>
       </motion.div>
+
+      {/* Investment Modal */}
+      <AnimatePresence>
+        {showInvestModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+            onClick={() => setShowInvestModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-gray-900">Monthly Investment</h3>
+                <button onClick={() => setShowInvestModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                  <p className="text-sm text-blue-800">
+                    <strong>Important:</strong> Investment is locked for 11 months. After lock period, you can order gold from showroom. Cash withdrawal is not available for investments.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Investment Amount (₹) *</label>
+                  <input
+                    type="number"
+                    value={investAmount}
+                    onChange={e => { setInvestAmount(e.target.value); setInvestError(''); }}
+                    min={1000}
+                    max={100000}
+                    placeholder="Minimum ₹1,000"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                  />
+                  {investError && <p className="text-sm text-red-600 mt-1">{investError}</p>}
+                  <div className="flex gap-2 mt-2">
+                    {[1000, 3000, 5000, 10000].map(val => (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => { setInvestAmount(String(val)); setInvestError(''); }}
+                        className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-medium transition-colors"
+                      >
+                        ₹{val.toLocaleString()}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-xl">
+                  <p className="text-xs text-gray-600">
+                    <Lock className="w-3 h-3 inline mr-1" />
+                    Lock Period: <strong>11 months</strong><br />
+                    <Gem className="w-3 h-3 inline mr-1" />
+                    After lock: Can order gold from showroom<br />
+                    <IndianRupee className="w-3 h-3 inline mr-1" />
+                    Minimum: ₹1,000 per month
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowInvestModal(false)}
+                    className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleInvest}
+                    className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold rounded-xl shadow-lg"
+                  >
+                    Invest Now
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
