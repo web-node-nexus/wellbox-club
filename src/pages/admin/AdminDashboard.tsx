@@ -1,27 +1,30 @@
 import { motion } from 'framer-motion';
-import { Users, Crown, Coins, DollarSign, Wallet, ShoppingBag, TrendingUp, Activity, Settings } from 'lucide-react';
+import { Users, Crown, Coins, DollarSign, Wallet, ShoppingBag, TrendingUp, Activity, Bell, ArrowUpRight, ArrowDownRight, Eye, Settings, AlertTriangle, CheckCircle, Clock, Zap, Target, Gift } from 'lucide-react';
+import { users, contributions, walletTransactions, withdrawals, goldLeads, goldOrders } from '../../data/mockData';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { users, contributions, walletTransactions, withdrawals, goldLeads } from '../../data/mockData';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
 export default function AdminDashboard() {
+  const [selectedPeriod, setSelectedPeriod] = useState('month');
+  
   const totalMembers = users.length;
   const totalLeaders = users.filter(u => u.isLeader).length;
   const totalContributions = contributions.reduce((sum, c) => sum + c.amount, 0);
   const totalCommissions = walletTransactions.filter(t => t.type.includes('commission') || t.type === 'leader_payout').reduce((sum, t) => sum + t.amount, 0);
   const pendingWithdrawals = withdrawals.filter(w => w.status === 'pending').length;
   const totalGoldLeads = goldLeads.length;
+  const totalGoldOrders = goldOrders.length;
 
   const stats = [
-    { label: 'Total Members', value: totalMembers, icon: Users, color: 'from-blue-500 to-cyan-600', change: '+12%' },
-    { label: 'Active Leaders', value: totalLeaders, icon: Crown, color: 'from-amber-500 to-orange-600', change: '+8%' },
-    { label: 'Total Contributions', value: `₹${(totalContributions / 1000).toFixed(0)}K`, icon: Coins, color: 'from-green-500 to-emerald-600', change: '+15%' },
-    { label: 'Commissions Paid', value: `₹${(totalCommissions / 1000).toFixed(0)}K`, icon: DollarSign, color: 'from-purple-500 to-pink-600', change: '+22%' },
-    { label: 'Pending Withdrawals', value: pendingWithdrawals, icon: Wallet, color: 'from-red-500 to-rose-600', change: '-5%' },
-    { label: 'Gold Leads', value: totalGoldLeads, icon: ShoppingBag, color: 'from-indigo-500 to-violet-600', change: '+18%' },
+    { label: 'Total Members', value: totalMembers, icon: Users, color: 'from-blue-500 to-cyan-600', change: '+12%', trend: 'up' },
+    { label: 'Active Leaders', value: totalLeaders, icon: Crown, color: 'from-amber-500 to-orange-600', change: '+8%', trend: 'up' },
+    { label: 'Total Contributions', value: `₹${(totalContributions / 1000).toFixed(0)}K`, icon: Coins, color: 'from-green-500 to-emerald-600', change: '+15%', trend: 'up' },
+    { label: 'Commissions Paid', value: `₹${(totalCommissions / 1000).toFixed(0)}K`, icon: DollarSign, color: 'from-purple-500 to-pink-600', change: '+22%', trend: 'up' },
+    { label: 'Pending Withdrawals', value: pendingWithdrawals, icon: Wallet, color: 'from-red-500 to-rose-600', change: '-5%', trend: 'down' },
+    { label: 'Gold Orders', value: totalGoldOrders, icon: ShoppingBag, color: 'from-indigo-500 to-violet-600', change: '+18%', trend: 'up' },
   ];
 
-  // Chart data
   const monthlyData = [
     { month: 'Jan', members: 120, contributions: 45000, commissions: 12000 },
     { month: 'Feb', members: 180, contributions: 62000, commissions: 18500 },
@@ -38,11 +41,42 @@ export default function AdminDashboard() {
     { name: 'Gold Orders', value: 10, color: '#8b5cf6' },
   ];
 
+  const recentActivities = [
+    { id: 1, action: 'New member registered', user: 'Deepak Verma', time: '2 hours ago', icon: Users, color: 'bg-blue-500' },
+    { id: 2, action: 'Withdrawal approved', user: 'Rajesh Kumar', time: '5 hours ago', icon: CheckCircle, color: 'bg-green-500' },
+    { id: 3, action: 'Leader payout processed', user: 'Priya Sharma', time: '1 day ago', icon: Crown, color: 'bg-amber-500' },
+    { id: 4, action: 'Gold order completed', user: 'Amit Patel', time: '2 days ago', icon: ShoppingBag, color: 'bg-purple-500' },
+    { id: 5, action: 'New gold design added', user: 'Admin', time: '3 days ago', icon: Gift, color: 'bg-pink-500' },
+  ];
+
+  const topPerformers = users
+    .filter(u => u.teamSize > 0)
+    .sort((a, b) => b.teamSize - a.teamSize)
+    .slice(0, 5);
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-white/50 mt-1">Platform overview and key metrics</p>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <p className="text-white/50 mt-1">Platform overview and key metrics</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <select
+            value={selectedPeriod}
+            onChange={e => setSelectedPeriod(e.target.value)}
+            className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-amber-500/50"
+          >
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+          </select>
+          <button className="p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors relative">
+            <Bell className="w-5 h-5" />
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center">3</span>
+          </button>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -53,13 +87,16 @@ export default function AdminDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-5 hover:border-amber-500/20 transition-all"
+            className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-5 hover:border-amber-500/20 transition-all group"
           >
             <div className="flex items-center justify-between mb-3">
-              <div className={`w-10 h-10 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center`}>
-                <stat.icon className="w-5 h-5 text-white" />
+              <div className={`w-12 h-12 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                <stat.icon className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xs font-medium text-green-400">{stat.change}</span>
+              <div className={`flex items-center gap-1 text-xs font-medium ${stat.trend === 'up' ? 'text-green-400' : 'text-red-400'}`}>
+                {stat.trend === 'up' ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                {stat.change}
+              </div>
             </div>
             <p className="text-2xl font-bold">{typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}</p>
             <p className="text-xs text-white/50 mt-1">{stat.label}</p>
@@ -67,127 +104,29 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Leader & Member Management - Highlighted */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-amber-500/10 backdrop-blur border-2 border-amber-500/30 rounded-2xl p-6 shadow-2xl"
-      >
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-xl">
-            <Crown className="w-7 h-7 text-purple-900" />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold">Leader & Member Management</h3>
-            <p className="text-white/60">Admin controls for team hierarchy</p>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-4">
-          {/* Leader Rules */}
-          <div className="bg-white/5 rounded-xl p-5 border border-amber-500/20">
-            <div className="flex items-center gap-3 mb-3">
-              <Crown className="w-6 h-6 text-amber-400" />
-              <h4 className="font-bold text-amber-400">Leader Rules</h4>
-            </div>
-            <ul className="space-y-2 text-sm text-white/70">
-              <li className="flex items-start gap-2">
-                <span className="text-amber-400 font-bold">•</span>
-                <span>100 members required to become Leader</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-amber-400 font-bold">•</span>
-                <span>10+ direct members for income</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-amber-400 font-bold">•</span>
-                <span>5% monthly team income</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-amber-400 font-bold">•</span>
-                <span>Payout on 3rd of every month</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Admin Actions */}
-          <div className="bg-white/5 rounded-xl p-5 border border-purple-500/20">
-            <div className="flex items-center gap-3 mb-3">
-              <Activity className="w-6 h-6 text-purple-400" />
-              <h4 className="font-bold text-purple-400">Quick Actions</h4>
-            </div>
-            <ul className="space-y-2 text-sm text-white/70">
-              <li className="flex items-start gap-2">
-                <span className="text-purple-400 font-bold">•</span>
-                <span>Manage users & leaders</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-purple-400 font-bold">•</span>
-                <span>Approve withdrawals</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-purple-400 font-bold">•</span>
-                <span>Configure settings</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-purple-400 font-bold">•</span>
-                <span>View audit logs</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="bg-white/5 rounded-xl p-5 border border-green-500/20">
-            <div className="flex items-center gap-3 mb-3">
-              <TrendingUp className="w-6 h-6 text-green-400" />
-              <h4 className="font-bold text-green-400">Platform Health</h4>
-            </div>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-white/70">Growth Rate</span>
-                <span className="text-lg font-bold text-green-400">+12%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-white/70">Active Users</span>
-                <span className="text-lg font-bold text-blue-400">
-                  {users.filter(u => u.teamSize > 0).length}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-white/70">Revenue</span>
-                <span className="text-lg font-bold text-amber-400">
-                  ₹{(totalContributions / 1000).toFixed(0)}K
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Navigation */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
-          <Link to="/admin/users" className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all group">
-            <Users className="w-6 h-6 text-blue-400 mb-2 group-hover:scale-110 transition-transform" />
-            <p className="text-sm font-medium">Users</p>
-            <p className="text-xs text-white/50">{totalMembers} total</p>
-          </Link>
-          <Link to="/admin/withdrawals" className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all group">
-            <Wallet className="w-6 h-6 text-green-400 mb-2 group-hover:scale-110 transition-transform" />
-            <p className="text-sm font-medium">Withdrawals</p>
-            <p className="text-xs text-white/50">{pendingWithdrawals} pending</p>
-          </Link>
-          <Link to="/admin/gold-showroom" className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all group">
-            <ShoppingBag className="w-6 h-6 text-amber-400 mb-2 group-hover:scale-110 transition-transform" />
-            <p className="text-sm font-medium">Gold Showroom</p>
-            <p className="text-xs text-white/50">{totalGoldLeads} leads</p>
-          </Link>
-          <Link to="/admin/settings" className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all group">
-            <Settings className="w-6 h-6 text-purple-400 mb-2 group-hover:scale-110 transition-transform" />
-            <p className="text-sm font-medium">Settings</p>
-            <p className="text-xs text-white/50">Configure</p>
-          </Link>
-        </div>
-      </motion.div>
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Link to="/admin/users" className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-2xl p-4 hover:border-blue-500/40 transition-all group">
+          <Users className="w-8 h-8 text-blue-400 mb-2 group-hover:scale-110 transition-transform" />
+          <p className="font-semibold text-sm">Manage Users</p>
+          <p className="text-xs text-white/50 mt-1">{totalMembers} total</p>
+        </Link>
+        <Link to="/admin/withdrawals" className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-4 hover:border-green-500/40 transition-all group">
+          <Wallet className="w-8 h-8 text-green-400 mb-2 group-hover:scale-110 transition-transform" />
+          <p className="font-semibold text-sm">Withdrawals</p>
+          <p className="text-xs text-white/50 mt-1">{pendingWithdrawals} pending</p>
+        </Link>
+        <Link to="/admin/gold-showroom" className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-2xl p-4 hover:border-amber-500/40 transition-all group">
+          <ShoppingBag className="w-8 h-8 text-amber-400 mb-2 group-hover:scale-110 transition-transform" />
+          <p className="font-semibold text-sm">Gold Showroom</p>
+          <p className="text-xs text-white/50 mt-1">{totalGoldLeads} leads</p>
+        </Link>
+        <Link to="/admin/settings" className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-4 hover:border-purple-500/40 transition-all group">
+          <Settings className="w-8 h-8 text-purple-400 mb-2 group-hover:scale-110 transition-transform" />
+          <p className="font-semibold text-sm">Settings</p>
+          <p className="text-xs text-white/50 mt-1">Configure</p>
+        </Link>
+      </div>
 
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-6">
@@ -253,30 +192,84 @@ export default function AdminDashboard() {
         </motion.div>
       </div>
 
-      {/* Recent Activity */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold">Recent Activity</h3>
-          <Activity className="w-5 h-5 text-amber-400" />
-        </div>
-        <div className="space-y-3">
-          {[
-            { action: 'New member registered', user: 'Deepak Verma', time: '2 hours ago', color: 'bg-blue-500' },
-            { action: 'Withdrawal approved', user: 'Rajesh Kumar', time: '5 hours ago', color: 'bg-green-500' },
-            { action: 'Leader payout processed', user: 'Priya Sharma', time: '1 day ago', color: 'bg-amber-500' },
-            { action: 'Gold order completed', user: 'Amit Patel', time: '2 days ago', color: 'bg-purple-500' },
-          ].map((activity, i) => (
-            <div key={i} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
-              <div className={`w-2 h-2 ${activity.color} rounded-full`} />
-              <div className="flex-1">
-                <p className="text-sm">{activity.action}</p>
-                <p className="text-xs text-white/50">{activity.user}</p>
+      {/* Recent Activity & Top Performers */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Recent Activity */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold">Recent Activity</h3>
+            <Activity className="w-5 h-5 text-amber-400" />
+          </div>
+          <div className="space-y-3">
+            {recentActivities.map((activity) => (
+              <div key={activity.id} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                <div className={`w-10 h-10 ${activity.color} rounded-xl flex items-center justify-center`}>
+                  <activity.icon className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{activity.action}</p>
+                  <p className="text-xs text-white/50">{activity.user}</p>
+                </div>
+                <span className="text-xs text-white/40">{activity.time}</span>
               </div>
-              <span className="text-xs text-white/40">{activity.time}</span>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Top Performers */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold">Top Performers</h3>
+            <Crown className="w-5 h-5 text-amber-400" />
+          </div>
+          <div className="space-y-3">
+            {topPerformers.map((user, i) => (
+              <div key={user.id} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-purple-900 font-bold text-sm">
+                  {i + 1}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{user.name}</p>
+                  <p className="text-xs text-white/50">{user.teamSize} team members</p>
+                </div>
+                {user.isLeader && (
+                  <span className="px-2 py-1 bg-amber-500/20 text-amber-400 text-xs font-medium rounded-full flex items-center gap-1">
+                    <Crown className="w-3 h-3" /> Leader
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Pending Actions */}
+      {pendingWithdrawals > 0 && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-2xl p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <AlertTriangle className="w-6 h-6 text-amber-400" />
+            <h3 className="font-semibold text-lg">Pending Actions</h3>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-4">
+            <div className="bg-white/5 rounded-xl p-4">
+              <p className="text-2xl font-bold text-amber-400">{pendingWithdrawals}</p>
+              <p className="text-xs text-white/60 mt-1">Pending Withdrawals</p>
             </div>
-          ))}
-        </div>
-      </motion.div>
+            <div className="bg-white/5 rounded-xl p-4">
+              <p className="text-2xl font-bold text-blue-400">{users.filter(u => !u.isLeader && u.teamSize >= 100).length}</p>
+              <p className="text-xs text-white/60 mt-1">Ready for Leader Promotion</p>
+            </div>
+            <div className="bg-white/5 rounded-xl p-4">
+              <p className="text-2xl font-bold text-green-400">{goldLeads.filter(l => l.status === 'new').length}</p>
+              <p className="text-xs text-white/60 mt-1">New Gold Leads</p>
+            </div>
+          </div>
+          <Link to="/admin/withdrawals" className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 rounded-xl text-sm font-medium transition-colors">
+            <Eye className="w-4 h-4" />
+            View All Pending Actions
+          </Link>
+        </motion.div>
+      )}
     </div>
   );
 }
