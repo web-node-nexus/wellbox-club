@@ -14,22 +14,26 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
   const location = useLocation();
   const { user } = useAuth();
   
-  // Hide navbar if user is logged in OR on dashboard/admin routes
-  const isProtectedRoute = location.pathname.startsWith('/dashboard') || 
-    location.pathname.startsWith('/individual-dashboard') ||
-    location.pathname.startsWith('/referrals') || 
-    location.pathname.startsWith('/commissions') ||
-    location.pathname.startsWith('/wallet') ||
-    location.pathname.startsWith('/contributions') ||
-    location.pathname.startsWith('/gold-showroom') ||
-    location.pathname.startsWith('/profile') ||
-    location.pathname.startsWith('/admin') ||
-    location.pathname.startsWith('/team') ||
-    location.pathname.startsWith('/income') ||
-    location.pathname.startsWith('/orders') ||
-    location.pathname.startsWith('/referral') ||
-    location.pathname.startsWith('/notifications') ||
-    location.pathname.startsWith('/support');
+  // Check if current route is a protected dashboard route (exact match)
+  const protectedRoutes = [
+    '/dashboard',
+    '/individual-dashboard',
+    '/referrals',
+    '/commissions',
+    '/wallet',
+    '/contributions',
+    '/gold-showroom',
+    '/profile',
+    '/team',
+    '/orders',
+    '/referral',
+    '/notifications',
+    '/support',
+  ];
+
+  const isProtectedRoute = protectedRoutes.includes(location.pathname) ||
+    location.pathname.startsWith('/income/') ||
+    location.pathname.startsWith('/admin');
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -37,8 +41,8 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Hide navbar if logged in or on protected routes
-  if (user || isProtectedRoute) return null;
+  // Hide navbar ONLY if user is logged in (not based on route)
+  if (user) return null;
 
   const navLinks = [
     { label: 'Home', path: '/' },
