@@ -24,20 +24,28 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
     <div className="min-h-screen bg-[#0f0520] text-white">
       {/* Hero */}
       <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0 premium-bg" />
+        <div className="absolute inset-0">
+          {/* Real Gold Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-[#1a0a2e] to-amber-950/40" />
+          <div className="absolute bottom-0 right-0 w-1/2 h-full opacity-20 mix-blend-overlay">
+            <img src="https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1200&q=80" alt="Gold Coins" className="w-full h-full object-cover" />
+          </div>
+        </div>
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(20)].map((_, i) => (
+          {/* More Gold Coins & Jewellery */}
+          {[...Array(30)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute text-3xl"
+              className="absolute text-5xl"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
               }}
               animate={{
-                y: [0, -80, 0],
+                y: [0, -120, 0],
                 rotate: [0, 360],
-                opacity: [0.1, 0.5, 0.1],
+                opacity: [0.2, 0.8, 0.2],
+                scale: [1, 1.5, 1],
               }}
               transition={{
                 duration: 6 + Math.random() * 4,
@@ -45,7 +53,7 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
                 delay: Math.random() * 2,
               }}
             >
-              {['💰', '💎', '👑', '💵', '🪙'][i % 5]}
+              {['💰', '💎', '👑', '💵', '🪙', '💍', '📿', '🏆'][i % 8]}
             </motion.div>
           ))}
         </div>

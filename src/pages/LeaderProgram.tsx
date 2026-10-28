@@ -7,28 +7,36 @@ export default function LeaderProgram({ onJoinClick }: PageProps) {
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
       <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0 premium-bg" />
+        <div className="absolute inset-0">
+          {/* Real Gold Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-[#1a0a2e] to-amber-950/40" />
+          <div className="absolute top-0 right-0 w-full h-full opacity-15 mix-blend-overlay">
+            <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80" alt="Gold Jewellery" className="w-full h-full object-cover" />
+          </div>
+        </div>
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(15)].map((_, i) => (
+          {/* Gold Coins & Crowns */}
+          {[...Array(25)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute text-4xl"
+              className="absolute text-5xl"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
               }}
               animate={{
-                y: [0, -60, 0],
+                y: [0, -100, 0],
                 rotate: [0, 360],
-                opacity: [0.2, 0.7, 0.2],
+                opacity: [0.3, 0.9, 0.3],
+                scale: [1, 1.4, 1],
               }}
               transition={{
-                duration: 7 + Math.random() * 3,
+                duration: 6 + Math.random() * 4,
                 repeat: Infinity,
                 delay: Math.random() * 2,
               }}
             >
-              👑
+              {['👑', '💰', '🏆', '💎', '🪙'][i % 5]}
             </motion.div>
           ))}
         </div>

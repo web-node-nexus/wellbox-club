@@ -6,7 +6,7 @@ import GoldSection from '../components/GoldSection';
 export default function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
   const faqs = [
-    { q: 'What is Jwellbox Club?', a: 'Jwellbox Club is India\'s premium gold investment and referral platform where members contribute monthly, earn commissions by building teams, and access gold directly from manufacturers at wholesale prices.' },
+    { q: 'What is Jewellbox Club?', a: 'Jwellbox Club is India\'s premium gold investment and referral platform where members contribute monthly, earn commissions by building teams, and access gold directly from manufacturers at wholesale prices.' },
     { q: 'How much do I need to invest?', a: 'You can start with a minimum monthly contribution of ₹1,000. There is no joining fee. Your contribution is locked for 12 months after which you can withdraw or convert to gold.' },
     { q: 'How does the referral commission work?', a: 'You earn 10% commission on your direct referral\'s contribution (Level 1) and 5% on their referral\'s contribution (Level 2). All commissions are credited to your withdrawable wallet instantly.' },
     { q: 'When can I withdraw my commission?', a: 'Commission wallet balance can be withdrawn anytime! Submit a withdrawal request and it gets processed within 24-48 hours directly to your bank account.' },
@@ -24,27 +24,36 @@ export default function FAQ() {
     <div className="min-h-screen bg-[#0f0520] text-white">
       {/* Hero */}
       <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0 premium-bg" />
+        <div className="absolute inset-0">
+          {/* Real Gold Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-[#1a0a2e] to-amber-950/40" />
+          <div className="absolute bottom-0 left-0 w-1/2 h-full opacity-20 mix-blend-overlay">
+            <img src="https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1200&q=80" alt="Gold Coins" className="w-full h-full object-cover" />
+          </div>
+        </div>
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(12)].map((_, i) => (
+          {/* Gold Coins & Jewellery */}
+          {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute text-3xl"
+              className="absolute text-4xl"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
               }}
               animate={{
-                y: [0, -50, 0],
-                opacity: [0.2, 0.5, 0.2],
+                y: [0, -80, 0],
+                rotate: [0, 360],
+                opacity: [0.3, 0.8, 0.3],
+                scale: [1, 1.3, 1],
               }}
               transition={{
-                duration: 5 + Math.random() * 3,
+                duration: 6 + Math.random() * 4,
                 repeat: Infinity,
                 delay: Math.random() * 2,
               }}
             >
-              ❓
+              {['💰', '💎', '👑', '✨', '🪙', '💍'][i % 6]}
             </motion.div>
           ))}
         </div>

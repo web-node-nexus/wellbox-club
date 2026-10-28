@@ -63,7 +63,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               </motion.div>
               <div>
                 <h1 className={`text-2xl font-bold font-[var(--font-heading)] ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                  Jwellbox
+                  Jewellbox
                 </h1>
                 <p className={`text-xs ${darkMode ? 'text-amber-400' : 'text-amber-600'} -mt-1 tracking-wider font-semibold`}>MEMBER DASHBOARD</p>
               </div>

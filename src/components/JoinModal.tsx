@@ -98,7 +98,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                   <Crown className="w-5 h-5 text-purple-900" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold font-[var(--font-heading)] text-white">Join Jwellbox Club</h2>
+                  <h2 className="text-xl font-bold font-[var(--font-heading)] text-white">Join Jewellbox Club</h2>
                   <p className="text-xs text-amber-300/70">Start your gold journey today</p>
                 </div>
               </div>

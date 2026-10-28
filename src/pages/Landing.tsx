@@ -110,7 +110,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   const testimonials = [
-    { name: 'Rajesh Kumar', city: 'Jaipur', text: 'Jwellbox Club ne meri zindagi badal di! 6 months mein 50 members ki team banayi aur ab leader hoon. Monthly income ₹45,000+ hai!', rating: 5, earning: '₹45,000/mo' },
+    { name: 'Rajesh Kumar', city: 'Jaipur', text: 'Jewellbox Club ne meri zindagi badal di! 6 months mein 50 members ki team banayi aur ab leader hoon. Monthly income ₹45,000+ hai!', rating: 5, earning: '₹45,000/mo' },
     { name: 'Priya Sharma', city: 'Delhi', text: 'Digital gold showroom se directly manufacturer se gold mila - 30% sasta! Aur referral se extra income. Win-win situation!', rating: 5, earning: '₹28,000/mo' },
     { name: 'Amit Patel', city: 'Mumbai', text: 'Best platform for digital gold investment. Monthly contribution lock karke 12 months baad gold le sakti hoon. Commission bhi milta hai!', rating: 5, earning: '₹62,000/mo' },
   ];
@@ -122,37 +122,49 @@ export default function Landing({ onJoinClick }: LandingProps) {
 
   return (
     <div className="min-h-screen bg-[#0f0520] text-white overflow-hidden">
-      {/* ============ HERO SECTION - GOLD HUB ============ */}
+      {/* ============ HERO SECTION - DIGITAL GOLD SHOWROOM ============ */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Premium Gold Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-[#1a0a2e] to-amber-950/30" />
+        {/* Premium Gold Background with Real Gold Images */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-[#1a0a2e] to-amber-950/40" />
+          {/* Real Gold Coins Image */}
+          <div className="absolute top-0 right-0 w-1/2 h-full opacity-30 mix-blend-overlay">
+            <img src="https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1200&q=80" alt="Gold Coins" className="w-full h-full object-cover" />
+          </div>
+          {/* Real Jewellery Image */}
+          <div className="absolute bottom-0 left-0 w-1/2 h-full opacity-20 mix-blend-overlay">
+            <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80" alt="Gold Jewellery" className="w-full h-full object-cover" />
+          </div>
+        </div>
         
-        {/* Animated Gold Particles */}
+        {/* Animated Gold Particles - More Coins */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Gold Coins */}
-          <GoldCoin delay={0} x={10} y={20} size={80} />
-          <GoldCoin delay={1} x={85} y={30} size={60} />
-          <GoldCoin delay={2} x={20} y={70} size={70} />
-          <GoldCoin delay={3} x={75} y={60} size={50} />
-          <GoldCoin delay={4} x={50} y={15} size={90} />
-          <GoldCoin delay={5} x={30} y={80} size={65} />
-          <GoldCoin delay={6} x={90} y={50} size={75} />
+          {/* Gold Coins - More Realistic */}
+          <GoldCoin delay={0} x={5} y={15} size={100} />
+          <GoldCoin delay={0.5} x={90} y={25} size={80} />
+          <GoldCoin delay={1} x={15} y={75} size={90} />
+          <GoldCoin delay={1.5} x={80} y={65} size={70} />
+          <GoldCoin delay={2} x={50} y={10} size={110} />
+          <GoldCoin delay={2.5} x={25} y={85} size={85} />
+          <GoldCoin delay={3} x={95} y={45} size={95} />
+          <GoldCoin delay={3.5} x={10} y={50} size={75} />
+          <GoldCoin delay={4} x={70} y={80} size={100} />
           
-          {/* Floating Jewellery */}
-          <FloatingJewellery emoji="💎" delay={0} x={15} y={25} />
-          <FloatingJewellery emoji="💍" delay={1} x={80} y={20} />
-          <FloatingJewellery emoji="👑" delay={2} x={25} y={75} />
-          <FloatingJewellery emoji="✨" delay={3} x={70} y={70} />
-          <FloatingJewellery emoji="🪙" delay={4} x={45} y={10} />
-          <FloatingJewellery emoji="📿" delay={5} x={60} y={85} />
-          <FloatingJewellery emoji="💰" delay={6} x={5} y={50} />
-          <FloatingJewellery emoji="🏆" delay={7} x={95} y={40} />
+          {/* Floating Jewellery Emojis */}
+          <FloatingJewellery emoji="💎" delay={0} x={20} y={30} />
+          <FloatingJewellery emoji="💍" delay={0.5} x={85} y={20} />
+          <FloatingJewellery emoji="👑" delay={1} x={30} y={80} />
+          <FloatingJewellery emoji="✨" delay={1.5} x={75} y={75} />
+          <FloatingJewellery emoji="🪙" delay={2} x={50} y={15} />
+          <FloatingJewellery emoji="📿" delay={2.5} x={65} y={90} />
+          <FloatingJewellery emoji="💰" delay={3} x={10} y={55} />
+          <FloatingJewellery emoji="🏆" delay={3.5} x={95} y={40} />
         </div>
 
-        {/* Gold Glow Orbs */}
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-amber-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-yellow-500/10 rounded-full blur-3xl" />
+        {/* Gold Glow Orbs - Enhanced */}
+        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-amber-500/25 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-[700px] h-[700px] bg-purple-500/15 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-yellow-500/15 rounded-full blur-3xl" />
 
         {/* Hero Content */}
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-24 pb-16">
@@ -192,7 +204,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 className="block text-white"
                 style={{ textShadow: '0 0 40px rgba(255, 215, 0, 0.3)' }}
               >
-                Buy Gold
+                Digital Gold
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
@@ -201,15 +213,15 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 className="block gradient-text"
                 style={{ textShadow: '0 0 60px rgba(255, 215, 0, 0.5)' }}
               >
-                Digitally
+                Showroom
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
-                className="block text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl mt-4"
+                className="block text-amber-400 text-3xl sm:text-4xl md:text-5xl lg:text-6xl mt-4 font-bold"
               >
-                Earn & Grow Together
+                No Middlemen. Direct from Manufacturer.
               </motion.span>
             </h1>
             
@@ -220,9 +232,9 @@ export default function Landing({ onJoinClick }: LandingProps) {
               transition={{ delay: 0.9 }}
               className="text-xl sm:text-2xl lg:text-3xl text-white/80 max-w-4xl mx-auto mb-12 leading-relaxed font-medium"
             >
-              Direct from manufacturer. <span className="text-amber-400 font-bold">30% cheaper than market.</span>
+              Buy 22K & 24K Gold at <span className="text-amber-400 font-bold">30% cheaper than market price.</span>
               <br />
-              <span className="text-2xl sm:text-3xl">BIS Hallmarked • 850+ Designs • Instant Delivery</span>
+              <span className="text-2xl sm:text-3xl">BIS Hallmarked • 850+ Designs • Earn While You Save</span>
             </motion.p>
 
             {/* CTA Buttons */}

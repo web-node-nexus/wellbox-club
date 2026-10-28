@@ -54,7 +54,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white">Admin Panel</h1>
-                <p className="text-xs text-amber-400/70">Jwellbox Club</p>
+                <p className="text-xs text-amber-400/70">Jewellbox Club</p>
               </div>
             </Link>
           </div>

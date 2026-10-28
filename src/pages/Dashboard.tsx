@@ -50,7 +50,7 @@ export default function Dashboard() {
   };
 
   const shareWhatsApp = () => {
-    const text = `Join Jwellbox Club and start earning with gold! Use my referral code: ${user.referralCode}`;
+    const text = `Join Jewellbox Club and start earning with gold! Use my referral code: ${user.referralCode}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 

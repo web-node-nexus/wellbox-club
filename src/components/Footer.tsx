@@ -23,7 +23,7 @@ export default function Footer() {
               </div>
               <div>
                 <h3 className="text-xl font-bold font-[var(--font-heading)]">
-                  <span className="gradient-text">Jwellbox</span> Club
+                  <span className="gradient-text">Jewellbox</span> Club
                 </h3>
               </div>
             </Link>

@@ -27,29 +27,35 @@ export default function About({ onJoinClick }: PageProps) {
       {/* Hero */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0">
+          {/* Real Gold Background Images */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-950 via-[#1a0a2e] to-amber-950/40" />
+          <div className="absolute top-0 right-0 w-1/2 h-full opacity-20 mix-blend-overlay">
+            <img src="https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1200&q=80" alt="Gold" className="w-full h-full object-cover" />
+          </div>
           <div className="absolute top-20 left-10 w-72 h-72 bg-amber-500/20 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
-          {/* Floating elements */}
-          {[...Array(15)].map((_, i) => (
+          {/* Floating Gold Coins & Jewellery */}
+          {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute text-3xl"
+              className="absolute text-4xl"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
               }}
               animate={{
-                y: [0, -60, 0],
+                y: [0, -80, 0],
                 rotate: [0, 360],
-                opacity: [0.2, 0.6, 0.2],
+                opacity: [0.3, 0.8, 0.3],
+                scale: [1, 1.3, 1],
               }}
               transition={{
-                duration: 7 + Math.random() * 3,
+                duration: 6 + Math.random() * 4,
                 repeat: Infinity,
                 delay: Math.random() * 2,
               }}
             >
-              {['💎', '👑', '✨', '🪙', '💰'][i % 5]}
+              {['💎', '👑', '✨', '🪙', '💰', '💍', '📿'][i % 7]}
             </motion.div>
           ))}
         </div>
@@ -66,7 +72,7 @@ export default function About({ onJoinClick }: PageProps) {
               <Crown className="w-6 h-6 text-amber-400" />
             </motion.div>
             <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6 text-shadow-gold">
-              About <span className="gradient-text">Jwellbox Club</span>
+              About <span className="gradient-text">Jewellbox Club</span>
             </h1>
             <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
               Born from a simple idea — make gold affordable, accessible, and rewarding for every Indian family. We connect you directly with manufacturers, cutting out middlemen and passing the savings to you.

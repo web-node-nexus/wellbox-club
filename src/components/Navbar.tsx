@@ -63,7 +63,7 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
               </motion.div>
               <div className="hidden sm:block">
                 <h1 className="text-xl lg:text-2xl font-bold font-[var(--font-heading)]">
-                  <span className="gradient-text">Jwellbox</span>
+                  <span className="gradient-text">Jewellbox</span>
                   <span className="text-white ml-1">Club</span>
                 </h1>
                 <p className="text-[10px] text-amber-300/70 -mt-1 tracking-wider">GOLD • GROW • GLORY</p>

@@ -6,7 +6,7 @@ export default function Notifications() {
     { id: 1, type: 'commission', title: 'Commission Credited', message: '₹500 Level 1 commission from Priya Sharma', time: '2 hours ago', icon: DollarSign, color: 'text-green-400' },
     { id: 2, type: 'leader', title: 'Leader Payout', message: 'Monthly leader payout of ₹1,800 credited', time: '3 days ago', icon: Crown, color: 'text-amber-400' },
     { id: 3, type: 'gold', title: 'Gold Order Bonus', message: '₹450 commission from gold order', time: '1 week ago', icon: Gift, color: 'text-purple-400' },
-    { id: 4, type: 'info', title: 'Welcome to Jwellbox', message: 'Your account has been created successfully', time: '2 weeks ago', icon: Info, color: 'text-blue-400' },
+    { id: 4, type: 'info', title: 'Welcome to Jewellbox', message: 'Your account has been created successfully', time: '2 weeks ago', icon: Info, color: 'text-blue-400' },
   ];
 
   return (

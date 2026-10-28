@@ -43,7 +43,7 @@ export default function Login() {
             </div>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="text-gray-500 mt-1">Sign in to your Jwellbox Club account</p>
+          <p className="text-gray-500 mt-1">Sign in to your Jewellbox Club account</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
