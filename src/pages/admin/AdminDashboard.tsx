@@ -66,6 +66,130 @@ export default function AdminDashboard() {
         ))}
       </div>
 
+      {/* Leader & Member Management - Highlighted */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-amber-500/10 backdrop-blur border-2 border-amber-500/30 rounded-2xl p-6 shadow-2xl"
+      >
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-xl">
+            <Crown className="w-7 h-7 text-purple-900" />
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold">Leader & Member Management</h3>
+            <p className="text-white/60">Admin controls for team hierarchy</p>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4">
+          {/* Leader Rules */}
+          <div className="bg-white/5 rounded-xl p-5 border border-amber-500/20">
+            <div className="flex items-center gap-3 mb-3">
+              <Crown className="w-6 h-6 text-amber-400" />
+              <h4 className="font-bold text-amber-400">Leader Rules</h4>
+            </div>
+            <ul className="space-y-2 text-sm text-white/70">
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400 font-bold">•</span>
+                <span>100 members required to become Leader</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400 font-bold">•</span>
+                <span>10+ direct members for income</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400 font-bold">•</span>
+                <span>5% monthly team income</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400 font-bold">•</span>
+                <span>Payout on 3rd of every month</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Admin Actions */}
+          <div className="bg-white/5 rounded-xl p-5 border border-purple-500/20">
+            <div className="flex items-center gap-3 mb-3">
+              <Activity className="w-6 h-6 text-purple-400" />
+              <h4 className="font-bold text-purple-400">Admin Actions</h4>
+            </div>
+            <ul className="space-y-2 text-sm text-white/70">
+              <li className="flex items-start gap-2">
+                <span className="text-purple-400 font-bold">•</span>
+                <span>Promote members to Leader</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-purple-400 font-bold">•</span>
+                <span>View all member details</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-purple-400 font-bold">•</span>
+                <span>Approve withdrawals</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-purple-400 font-bold">•</span>
+                <span>Manage gold showroom</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="bg-white/5 rounded-xl p-5 border border-green-500/20">
+            <div className="flex items-center gap-3 mb-3">
+              <TrendingUp className="w-6 h-6 text-green-400" />
+              <h4 className="font-bold text-green-400">Current Status</h4>
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-white/70">Total Members</span>
+                <span className="text-lg font-bold text-green-400">{totalMembers}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-white/70">Active Leaders</span>
+                <span className="text-lg font-bold text-amber-400">{totalLeaders}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-white/70">Pending Promotions</span>
+                <span className="text-lg font-bold text-purple-400">
+                  {users.filter(u => !u.isLeader && u.teamSize >= 100).length}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-3 mt-6">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-6 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold rounded-xl shadow-lg shadow-amber-500/30 flex items-center gap-2"
+          >
+            <Crown className="w-5 h-5" />
+            Manage Leaders
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 flex items-center gap-2"
+          >
+            <Users className="w-5 h-5" />
+            Manage Members
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-green-500/30 flex items-center gap-2"
+          >
+            <Activity className="w-5 h-5" />
+            View Audit Logs
+          </motion.button>
+        </div>
+      </motion.div>
+
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Growth Chart */}

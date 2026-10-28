@@ -540,6 +540,310 @@ export default function Landing({ onJoinClick }: LandingProps) {
         </div>
       </section>
 
+      {/* ============ LEADER PROGRAM - HOW TO BECOME LEADER ============ */}
+      <section className="relative py-24 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0f0520] via-purple-950/60 to-[#0f0520]" />
+        
+        {/* Floating Gold Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute text-5xl"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -100, 0],
+                rotate: [0, 360],
+                opacity: [0.3, 0.8, 0.3],
+              }}
+              transition={{
+                duration: 7 + Math.random() * 4,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            >
+              {['👑', '💰', '🏆', '💎', '🪙'][i % 5]}
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ type: 'spring', delay: 0.2 }}
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-500/30 to-yellow-500/30 border-3 border-amber-500/50 rounded-full mb-8 backdrop-blur-xl shadow-2xl shadow-amber-500/30"
+            >
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              >
+                <Crown className="w-8 h-8 text-amber-400" />
+              </motion.div>
+              <span className="text-2xl font-bold text-amber-300">Leader Program</span>
+              <motion.div
+                animate={{ rotate: [0, -360] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              >
+                <Crown className="w-7 h-7 text-amber-400" />
+              </motion.div>
+            </motion.div>
+            
+            <h2 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6" style={{ textShadow: '0 0 60px rgba(255, 215, 0, 0.4)' }}>
+              <span className="text-white">Become a</span> <span className="gradient-text">Leader</span>
+            </h2>
+            <p className="text-2xl text-white/80 max-w-3xl mx-auto font-medium">
+              Build your team, unlock premium benefits, and earn monthly leader payouts!
+            </p>
+          </motion.div>
+
+          {/* Leader Journey - Step by Step */}
+          <div className="grid lg:grid-cols-3 gap-8 mb-16">
+            {/* Step 1: Join as Member */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border-2 border-white/10 hover:border-amber-500/30 transition-all group hover:scale-105"
+            >
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <Users className="w-10 h-10 text-white" />
+              </div>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-5xl font-bold text-white/10">01</span>
+                <span className="px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-sm font-bold text-blue-400">START HERE</span>
+              </div>
+              <h3 className="text-2xl font-bold mb-3">Join as Member</h3>
+              <p className="text-white/70 leading-relaxed mb-4">
+                Register with your mobile number. Get your unique referral code. Start building your team!
+              </p>
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+                <p className="text-sm text-blue-300 font-semibold">
+                  ✅ No joining fee<br />
+                  ✅ Instant referral code<br />
+                  ✅ Start earning immediately
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Step 2: Build Team to 100 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border-2 border-amber-500/30 hover:border-amber-500/50 transition-all group hover:scale-105 shadow-2xl shadow-amber-500/10"
+            >
+              <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <TrendingUp className="w-10 h-10 text-white" />
+              </div>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-5xl font-bold text-amber-400/20">02</span>
+                <span className="px-3 py-1 bg-amber-500/20 border border-amber-500/30 rounded-full text-sm font-bold text-amber-400">KEY STEP</span>
+              </div>
+              <h3 className="text-2xl font-bold mb-3 text-amber-400">Add 100 Members</h3>
+              <p className="text-white/70 leading-relaxed mb-4">
+                Build your team to <span className="text-amber-400 font-bold text-xl">100 members</span> (direct + indirect). Once you reach 100, you automatically become a Leader!
+              </p>
+              <div className="bg-amber-500/10 border-2 border-amber-500/30 rounded-xl p-4">
+                <p className="text-sm text-amber-300 font-bold mb-2">🎯 IMPORTANT:</p>
+                <p className="text-sm text-amber-200">
+                  You CANNOT become a Leader directly. You must build your team to 100 members first. This ensures only dedicated leaders earn premium benefits!
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Step 3: Earn Leader Income */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border-2 border-purple-500/30 hover:border-purple-500/50 transition-all group hover:scale-105"
+            >
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <Crown className="w-10 h-10 text-white" />
+              </div>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-5xl font-bold text-purple-400/20">03</span>
+                <span className="px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full text-sm font-bold text-purple-400">REWARD</span>
+              </div>
+              <h3 className="text-2xl font-bold mb-3 text-purple-400">Earn Leader Income</h3>
+              <p className="text-white/70 leading-relaxed mb-4">
+                Once you're a Leader with <span className="text-purple-400 font-bold">10+ direct members</span>, you start earning 5% monthly payout on your team's total income!
+              </p>
+              <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4">
+                <p className="text-sm text-purple-300 font-semibold">
+                  💰 5% monthly team income<br />
+                  💰 Credited on 3rd of every month<br />
+                  💰 Premium leader benefits
+                </p>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Leader Income Rules - Highlighted */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-amber-500/10 backdrop-blur-xl rounded-3xl p-8 lg:p-10 border-2 border-amber-500/30 shadow-2xl"
+          >
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-xl">
+                <Crown className="w-8 h-8 text-purple-900" />
+              </div>
+              <div>
+                <h3 className="text-3xl font-bold">Leader Income Rules</h3>
+                <p className="text-white/60">Clear path to premium earnings</p>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Rule 1 */}
+              <div className="bg-white/5 rounded-2xl p-6 border border-amber-500/20">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">🎯</span>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold mb-2 text-amber-400">100 Members Required</h4>
+                    <p className="text-white/70">
+                      You must have <span className="text-amber-400 font-bold text-lg">100 total members</span> (direct + indirect) in your team to become a Leader. No shortcuts!
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Rule 2 */}
+              <div className="bg-white/5 rounded-2xl p-6 border border-purple-500/20">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">💰</span>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold mb-2 text-purple-400">10 Direct Members for Income</h4>
+                    <p className="text-white/70">
+                      Leader income starts only when you have <span className="text-purple-400 font-bold text-lg">10+ direct members</span> under you. Build your direct team first!
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Rule 3 */}
+              <div className="bg-white/5 rounded-2xl p-6 border border-green-500/20">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">📅</span>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold mb-2 text-green-400">Monthly Payout on 3rd</h4>
+                    <p className="text-white/70">
+                      Leader payout is calculated and credited on the <span className="text-green-400 font-bold">3rd of every month</span> at 10:00 AM automatically.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Rule 4 */}
+              <div className="bg-white/5 rounded-2xl p-6 border border-blue-500/20">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">🛡️</span>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold mb-2 text-blue-400">Admin Managed</h4>
+                    <p className="text-white/70">
+                      All leader promotions and payouts are managed by <span className="text-blue-400 font-bold">Admin Panel</span>. Transparent and secure system!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Visual Progress Bar */}
+            <div className="mt-8 bg-white/5 rounded-2xl p-6 border border-white/10">
+              <h4 className="text-xl font-bold mb-4 text-center">Your Journey to Leader</h4>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-32 text-sm font-semibold text-white/70">Start (0 members)</div>
+                  <div className="flex-1 bg-white/10 rounded-full h-4 overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: '10%' }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1, delay: 0.5 }}
+                      className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
+                    />
+                  </div>
+                  <span className="text-sm font-bold text-blue-400">Member</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-32 text-sm font-semibold text-white/70">10 members</div>
+                  <div className="flex-1 bg-white/10 rounded-full h-4 overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: '30%' }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1, delay: 0.7 }}
+                      className="h-full bg-gradient-to-r from-purple-500 to-purple-600 rounded-full"
+                    />
+                  </div>
+                  <span className="text-sm font-bold text-purple-400">Income Starts</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-32 text-sm font-semibold text-white/70">100 members</div>
+                  <div className="flex-1 bg-white/10 rounded-full h-4 overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: '100%' }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.5, delay: 0.9 }}
+                      className="h-full bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full shadow-lg shadow-amber-500/50"
+                    />
+                  </div>
+                  <span className="text-sm font-bold text-amber-400">👑 LEADER</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <motion.button
+              whileHover={{ scale: 1.05, y: -5 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onJoinClick}
+              className="px-12 py-6 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-bold text-xl rounded-2xl shadow-2xl shadow-amber-500/50 hover:shadow-amber-500/70 transition-all relative overflow-hidden group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <Crown className="w-7 h-7 inline mr-3 relative" />
+              <span className="relative">Start Your Leader Journey Now</span>
+            </motion.button>
+            <p className="text-white/60 mt-4 text-lg">
+              Join today and start building your team to become a Leader!
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ============ HOW IT WORKS ============ */}
       <section className="py-24 lg:py-32 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0f0520] via-purple-950/50 to-[#0f0520]" />
