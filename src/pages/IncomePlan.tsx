@@ -2,9 +2,11 @@ import { motion } from 'framer-motion';
 import { Users, TrendingUp, Crown, Gem, Calculator, Sparkles, CheckCircle, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import GoldBackground from '../components/GoldBackground';
+import { useLanguage } from '../context/LanguageContext';
 interface PageProps { onJoinClick: () => void; }
 
 export default function IncomePlan({ onJoinClick }: PageProps) {
+  const { translate } = useLanguage();
   const [members, setMembers] = useState(30);
   const [contribution, setContribution] = useState(3000);
 
@@ -15,10 +17,10 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
   const total = l1 + l2 + leader + goldBonus;
 
   const commissions = [
-    { title: 'Level 1 Commission', rate: '10%', desc: 'Earn 10% of every direct referral\'s monthly contribution. If your referral contributes ₹3,000, you earn ₹300 instantly!', color: 'from-green-500 to-emerald-600', example: '20 direct refs × ₹3,000 × 10% = ₹6,000/month', emoji: '👥', benefits: ['Instant credit', 'No cap on earnings', 'Lifetime commissions'] },
-    { title: 'Level 2 Commission', rate: '5%', desc: 'Earn 5% on contributions made by people your referrals bring in. Multi-level earning with no limits!', color: 'from-blue-500 to-indigo-600', example: '10 L2 members × ₹3,000 × 5% = ₹1,500/month', emoji: '📈', benefits: ['Passive income', 'Network effect', 'Unlimited levels'] },
-    { title: 'Leader Income', rate: '5%', desc: 'Once you reach 100 team members, earn 5% monthly on your entire team\'s total contribution. Credited on 3rd of every month!', color: 'from-amber-500 to-orange-600', example: '100 members × ₹3,000 × 5% = ₹15,000/month', emoji: '👑', benefits: ['Monthly payout', 'Auto-qualification', 'Premium benefits'] },
-    { title: 'Gold Order Bonus', rate: '4%', desc: 'When your team member purchases gold from showroom, earn 4% of order value. High-value orders = high commissions!', color: 'from-purple-500 to-pink-600', example: '10 gold orders × ₹50,000 × 4% = ₹20,000', emoji: '💎', benefits: ['High-value orders', 'Instant credit', 'No limits'] },
+    { title: translate('incomePlanPage.commissions.level1.title'), rate: '10%', desc: translate('incomePlanPage.commissions.level1.desc'), color: 'from-green-500 to-emerald-600', example: translate('incomePlanPage.commissions.level1.example'), emoji: '👥', benefits: [translate('incomePlanPage.commissions.level1.benefit1'), translate('incomePlanPage.commissions.level1.benefit2'), translate('incomePlanPage.commissions.level1.benefit3')] },
+    { title: translate('incomePlanPage.commissions.level2.title'), rate: '5%', desc: translate('incomePlanPage.commissions.level2.desc'), color: 'from-blue-500 to-indigo-600', example: translate('incomePlanPage.commissions.level2.example'), emoji: '📈', benefits: [translate('incomePlanPage.commissions.level2.benefit1'), translate('incomePlanPage.commissions.level2.benefit2'), translate('incomePlanPage.commissions.level2.benefit3')] },
+    { title: translate('incomePlanPage.commissions.leader.title'), rate: '5%', desc: translate('incomePlanPage.commissions.leader.desc'), color: 'from-amber-500 to-orange-600', example: translate('incomePlanPage.commissions.leader.example'), emoji: '👑', benefits: [translate('incomePlanPage.commissions.leader.benefit1'), translate('incomePlanPage.commissions.leader.benefit2'), translate('incomePlanPage.commissions.leader.benefit3')] },
+    { title: translate('incomePlanPage.commissions.goldBonus.title'), rate: '4%', desc: translate('incomePlanPage.commissions.goldBonus.desc'), color: 'from-purple-500 to-pink-600', example: translate('incomePlanPage.commissions.goldBonus.example'), emoji: '💎', benefits: [translate('incomePlanPage.commissions.goldBonus.benefit1'), translate('incomePlanPage.commissions.goldBonus.benefit2'), translate('incomePlanPage.commissions.goldBonus.benefit3')] },
   ];
 
   return (
@@ -41,11 +43,11 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
             </motion.div>
             
             <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
-              <span className="text-white">Income </span>
-              <span className="gold-text-shimmer">Plan</span>
+              <span className="text-white">{translate('incomePlanPage.hero.title1')} </span>
+              <span className="gold-text-shimmer">{translate('incomePlanPage.hero.title2')}</span>
             </h1>
             <p className="text-xl text-white/70 max-w-2xl mx-auto">
-              4 powerful ways to earn. Build your team, grow your income, achieve financial freedom!
+              {translate('incomePlanPage.hero.subtitle')}
             </p>
           </motion.div>
         </div>

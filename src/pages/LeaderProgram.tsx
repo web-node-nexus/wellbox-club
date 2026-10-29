@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion';
 import { Crown, Target, DollarSign, Award, Users, CheckCircle, Sparkles } from 'lucide-react';
 import GoldBackground from '../components/GoldBackground';
+import { useLanguage } from '../context/LanguageContext';
 interface PageProps { onJoinClick: () => void; }
 
 export default function LeaderProgram({ onJoinClick }: PageProps) {
+  const { translate } = useLanguage();
+  
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
       <section className="relative pt-32 pb-20 overflow-hidden luxury-bg">
@@ -18,11 +21,11 @@ export default function LeaderProgram({ onJoinClick }: PageProps) {
               <Crown className="w-20 h-20 text-purple-900" />
             </motion.div>
             <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
-              <span className="text-white">Leader </span>
-              <span className="gold-text-shimmer">Program</span>
+              <span className="text-white">{translate('leaderProgramPage.hero.title1')} </span>
+              <span className="gold-text-shimmer">{translate('leaderProgramPage.hero.title2')}</span>
             </h1>
             <p className="text-xl text-white/70 max-w-2xl mx-auto">
-              Build a team of 100+ members and unlock premium Leader benefits. Monthly payouts, exclusive perks, and recognition await!
+              {translate('leaderProgramPage.hero.subtitle')}
             </p>
           </motion.div>
         </div>
@@ -32,14 +35,14 @@ export default function LeaderProgram({ onJoinClick }: PageProps) {
         <div className="grid md:grid-cols-2 gap-8">
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
             <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-6">
-              What Makes a <span className="gold-text-shimmer">Leader</span>?
+              {translate('leaderProgramPage.whatMakes.title1')} <span className="gold-text-shimmer">{translate('leaderProgramPage.whatMakes.title2')}</span>?
             </h2>
             <div className="space-y-6">
               {[
-                { icon: Target, title: '100 Members Milestone', desc: 'Build your direct + indirect team to 100 members. Auto-promotion triggers instantly!', emoji: '🎯' },
-                { icon: DollarSign, title: '5% Monthly Payout', desc: 'Earn 5% of your entire team\'s monthly contribution income. Credited on 3rd of every month.', emoji: '💰' },
-                { icon: Award, title: 'Manual Promotion', desc: 'Admin can also manually promote deserving members to Leader status before 100 members.', emoji: '🏆' },
-                { icon: Users, title: 'Team Management', desc: 'Access advanced team analytics, performance tracking, and leadership tools.', emoji: '👥' },
+                { icon: Target, title: translate('leaderProgramPage.whatMakes.item1.title'), desc: translate('leaderProgramPage.whatMakes.item1.desc'), emoji: '🎯' },
+                { icon: DollarSign, title: translate('leaderProgramPage.whatMakes.item2.title'), desc: translate('leaderProgramPage.whatMakes.item2.desc'), emoji: '💰' },
+                { icon: Award, title: translate('leaderProgramPage.whatMakes.item3.title'), desc: translate('leaderProgramPage.whatMakes.item3.desc'), emoji: '🏆' },
+                { icon: Users, title: translate('leaderProgramPage.whatMakes.item4.title'), desc: translate('leaderProgramPage.whatMakes.item4.desc'), emoji: '👥' },
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -63,17 +66,17 @@ export default function LeaderProgram({ onJoinClick }: PageProps) {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="card-inner-glow rounded-3xl p-8 border-2 border-amber-500/30">
-            <h3 className="text-3xl font-bold mb-6 text-center gold-text-shimmer">Leader Benefits</h3>
+            <h3 className="text-3xl font-bold mb-6 text-center gold-text-shimmer">{translate('leaderProgramPage.benefits.title')}</h3>
             <div className="space-y-3">
               {[
-                '5% monthly team income payout',
-                'Priority customer support',
-                'Exclusive leader training sessions',
-                'Leadership certificate & badge',
-                'Access to leader-only events',
-                'Higher gold order commissions',
-                'Featured in success stories',
-                'Dedicated account manager',
+                translate('leaderProgramPage.benefits.item1'),
+                translate('leaderProgramPage.benefits.item2'),
+                translate('leaderProgramPage.benefits.item3'),
+                translate('leaderProgramPage.benefits.item4'),
+                translate('leaderProgramPage.benefits.item5'),
+                translate('leaderProgramPage.benefits.item6'),
+                translate('leaderProgramPage.benefits.item7'),
+                translate('leaderProgramPage.benefits.item8'),
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -91,7 +94,7 @@ export default function LeaderProgram({ onJoinClick }: PageProps) {
             <div className="mt-6 p-4 bg-amber-500/10 rounded-xl border-2 border-amber-500/30">
               <p className="text-sm text-amber-300">
                 <Sparkles className="w-4 h-4 inline mr-1" />
-                Leader payout is calculated and credited automatically on the <strong>3rd of every month at 10:00 AM</strong> via scheduled cron job.
+                {translate('leaderProgramPage.benefits.note')}
               </p>
             </div>
           </motion.div>
@@ -107,7 +110,7 @@ export default function LeaderProgram({ onJoinClick }: PageProps) {
             onClick={onJoinClick}
             className="btn-gold-premium px-12 py-6 text-2xl rounded-2xl"
           >
-            Apply for Leader Program 👑
+            {translate('leaderProgramPage.cta.button')} 👑
           </motion.button>
         </div>
       </section>

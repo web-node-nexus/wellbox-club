@@ -154,6 +154,124 @@ export const translations = {
     },
   },
 
+  // How It Works Page (Dedicated Page)
+  howItWorksPage: {
+    hero: {
+      title1: { en: 'How It', hi: 'कैसे' },
+      title2: { en: 'Works', hi: 'काम करता है' },
+      subtitle: { en: '5 simple steps to start your gold investment journey', hi: 'सोने की यात्रा शुरू करने के 5 आसान कदम' },
+    },
+    steps: {
+      step1: {
+        title: { en: 'Sign Up & Get Your Code', hi: 'साइन अप करें और अपना कोड प्राप्त करें' },
+        desc: { en: 'Register as a member with your mobile number. Get your unique referral code instantly. Share it with friends and family to start building your team.', hi: 'अपने मोबाइल नंबर से सदस्य के रूप में पंजीकरण करें। तुरंत अपना अनूठा रेफरल कोड प्राप्त करें। अपनी टीम बनाना शुरू करने के लिए इसे दोस्तों और परिवार के साथ साझा करें।' },
+      },
+      step2: {
+        title: { en: 'Make Monthly Contributions', hi: 'मासिक योगदान करें' },
+        desc: { en: 'Start saving for gold with monthly contributions from ₹1,000. Your money is securely locked for 12 months — building your gold fund while you earn.', hi: '₹1,000 से मासिक योगदान के साथ सोने के लिए बचत शुरू करें। आपका पैसा 12 महीने के लिए सुरक्षित रूप से लॉक हो जाता है — कमाई करते हुए आपका सोना कोष बनाता है।' },
+      },
+      step3: {
+        title: { en: 'Earn Commissions', hi: 'कमीशन कमाएं' },
+        desc: { en: 'Earn 10% on direct referrals (Level 1) and 5% on their referrals (Level 2). Commissions are credited instantly to your withdrawable wallet.', hi: 'प्रत्यक्ष रेफरल (लेवल 1) पर 10% और उनके रेफरल (लेवल 2) पर 5% कमाएं। कमीशन तुरंत आपके निकालने योग्य वॉलेट में जमा हो जाते हैं।' },
+      },
+      step4: {
+        title: { en: 'Access Gold Showroom', hi: 'गोल्ड शोरूम तक पहुंचें' },
+        desc: { en: 'Browse 850+ gold designs at manufacturer prices. Express interest, get a call, and purchase BIS hallmarked gold. Plus earn 4% commission on referred orders!', hi: 'निर्माता कीमतों पर 850+ सोने के डिजाइन ब्राउज़ करें। रुचि व्यक्त करें, कॉल प्राप्त करें, और BIS हॉलमार्क्ड सोना खरीदें। साथ ही रेफर किए गए ऑर्डर पर 4% कमीशन कमाएं!' },
+      },
+      step5: {
+        title: { en: 'Withdraw or Convert', hi: 'निकालें या परिवर्तित करें' },
+        desc: { en: 'Withdraw commissions anytime. After 12 months, unlock your contribution — withdraw to bank OR convert to gold purchase. Complete flexibility!', hi: 'कभी भी कमीशन निकालें। 12 महीने बाद, अपना योगदान अनलॉक करें — बैंक में निकालें या सोने की खरीद में परिवर्तित करें। पूरी लचीलापन!' },
+      },
+    },
+  },
+
+  // Income Plan Page (Dedicated Page)
+  incomePlanPage: {
+    hero: {
+      title1: { en: 'Income', hi: 'आय' },
+      title2: { en: 'Plan', hi: 'योजना' },
+      subtitle: { en: '4 powerful ways to earn. Build your team, grow your income, achieve financial freedom!', hi: 'कमाने के 4 शक्तिशाली तरीके। अपनी टीम बनाएं, अपनी आय बढ़ाएं, वित्तीय स्वतंत्रता प्राप्त करें!' },
+    },
+    commissions: {
+      level1: {
+        title: { en: 'Level 1 Commission', hi: 'लेवल 1 कमीशन' },
+        desc: { en: 'Earn 10% of every direct referral\'s monthly contribution. If your referral contributes ₹3,000, you earn ₹300 instantly!', hi: 'हर प्रत्यक्ष रेफरल के मासिक योगदान का 10% कमाएं। यदि आपका रेफरल ₹3,000 का योगदान करता है, तो आप तुरंत ₹300 कमाते हैं!' },
+        example: { en: '20 direct refs × ₹3,000 × 10% = ₹6,000/month', hi: '20 प्रत्यक्ष रेफरल × ₹3,000 × 10% = ₹6,000/माह' },
+        benefit1: { en: 'Instant credit', hi: 'तत्काल क्रेडिट' },
+        benefit2: { en: 'No cap on earnings', hi: 'कमाई पर कोई सीमा नहीं' },
+        benefit3: { en: 'Lifetime commissions', hi: 'आजीवन कमीशन' },
+      },
+      level2: {
+        title: { en: 'Level 2 Commission', hi: 'लेवल 2 कमीशन' },
+        desc: { en: 'Earn 5% on contributions made by people your referrals bring in. Multi-level earning with no limits!', hi: 'आपके रेफरल द्वारा लाए गए लोगों के योगदान पर 5% कमाएं। कोई सीमा नहीं के साथ बहु-स्तरीय कमाई!' },
+        example: { en: '10 L2 members × ₹3,000 × 5% = ₹1,500/month', hi: '10 L2 सदस्य × ₹3,000 × 5% = ₹1,500/माह' },
+        benefit1: { en: 'Passive income', hi: 'निष्क्रिय आय' },
+        benefit2: { en: 'Network effect', hi: 'नेटवर्क प्रभाव' },
+        benefit3: { en: 'Unlimited levels', hi: 'असीमित स्तर' },
+      },
+      leader: {
+        title: { en: 'Leader Income', hi: 'लीडर आय' },
+        desc: { en: 'Once you reach 100 team members, earn 5% monthly on your entire team\'s total contribution. Credited on 3rd of every month!', hi: 'एक बार जब आप 100 टीम सदस्यों तक पहुंच जाते हैं, तो अपनी पूरी टीम के कुल योगदान पर 5% मासिक कमाएं। हर महीने की 3 तारीख को जमा!' },
+        example: { en: '100 members × ₹3,000 × 5% = ₹15,000/month', hi: '100 सदस्य × ₹3,000 × 5% = ₹15,000/माह' },
+        benefit1: { en: 'Monthly payout', hi: 'मासिक भुगतान' },
+        benefit2: { en: 'Auto-qualification', hi: 'स्वचालित योग्यता' },
+        benefit3: { en: 'Premium benefits', hi: 'प्रीमियम लाभ' },
+      },
+      goldBonus: {
+        title: { en: 'Gold Order Bonus', hi: 'गोल्ड ऑर्डर बोनस' },
+        desc: { en: 'When your team member purchases gold from showroom, earn 4% of order value. High-value orders = high commissions!', hi: 'जब आपका टीम सदस्य शोरूम से सोना खरीदता है, तो ऑर्डर मूल्य का 4% कमाएं। उच्च मूल्य वाले ऑर्डर = उच्च कमीशन!' },
+        example: { en: '10 gold orders × ₹50,000 × 4% = ₹20,000', hi: '10 गोल्ड ऑर्डर × ₹50,000 × 4% = ₹20,000' },
+        benefit1: { en: 'High-value orders', hi: 'उच्च मूल्य वाले ऑर्डर' },
+        benefit2: { en: 'Instant credit', hi: 'तत्काल क्रेडिट' },
+        benefit3: { en: 'No limits', hi: 'कोई सीमा नहीं' },
+      },
+    },
+  },
+
+  // Leader Program Page (Dedicated Page)
+  leaderProgramPage: {
+    hero: {
+      title1: { en: 'Leader', hi: 'लीडर' },
+      title2: { en: 'Program', hi: 'प्रोग्राम' },
+      subtitle: { en: 'Build a team of 100+ members and unlock premium Leader benefits. Monthly payouts, exclusive perks, and recognition await!', hi: '100+ सदस्यों की टीम बनाएं और प्रीमियम लीडर लाभ अनलॉक करें। मासिक भुगतान, विशेष लाभ और मान्यता आपका इंतजार कर रहे हैं!' },
+    },
+    whatMakes: {
+      title1: { en: 'What Makes a', hi: 'क्या बनाता है एक' },
+      title2: { en: 'Leader', hi: 'लीडर' },
+      item1: {
+        title: { en: '100 Members Milestone', hi: '100 सदस्य मील का पत्थर' },
+        desc: { en: 'Build your direct + indirect team to 100 members. Auto-promotion triggers instantly!', hi: 'अपनी प्रत्यक्ष + अप्रत्यक्ष टीम को 100 सदस्यों तक बनाएं। स्वचालित पदोन्नति तुरंत ट्रिगर होती है!' },
+      },
+      item2: {
+        title: { en: '5% Monthly Payout', hi: '5% मासिक भुगतान' },
+        desc: { en: 'Earn 5% of your entire team\'s monthly contribution income. Credited on 3rd of every month.', hi: 'अपनी पूरी टीम की मासिक योगदान आय का 5% कमाएं। हर महीने की 3 तारीख को जमा।' },
+      },
+      item3: {
+        title: { en: 'Manual Promotion', hi: 'मैन्युअल पदोन्नति' },
+        desc: { en: 'Admin can also manually promote deserving members to Leader status before 100 members.', hi: 'व्यवस्थापक 100 सदस्यों से पहले योग्य सदस्यों को मैन्युअल रूप से लीडर स्थिति में पदोन्नत भी कर सकता है।' },
+      },
+      item4: {
+        title: { en: 'Team Management', hi: 'टीम प्रबंधन' },
+        desc: { en: 'Access advanced team analytics, performance tracking, and leadership tools.', hi: 'उन्नत टीम एनालिटिक्स, प्रदर्शन ट्रैकिंग और नेतृत्व उपकरणों तक पहुंच।' },
+      },
+    },
+    benefits: {
+      title: { en: 'Leader Benefits', hi: 'लीडर लाभ' },
+      item1: { en: '5% monthly team income payout', hi: '5% मासिक टीम आय भुगतान' },
+      item2: { en: 'Priority customer support', hi: 'प्राथमिकता ग्राहक सहायता' },
+      item3: { en: 'Exclusive leader training sessions', hi: 'विशेष लीडर प्रशिक्षण सत्र' },
+      item4: { en: 'Leadership certificate & badge', hi: 'नेतृत्व प्रमाणपत्र और बैज' },
+      item5: { en: 'Access to leader-only events', hi: 'केवल लीडर के लिए इवेंट्स तक पहुंच' },
+      item6: { en: 'Higher gold order commissions', hi: 'उच्च गोल्ड ऑर्डर कमीशन' },
+      item7: { en: 'Featured in success stories', hi: 'सफलता की कहानियों में विशेष' },
+      item8: { en: 'Dedicated account manager', hi: 'समर्पित खाता प्रबंधक' },
+      note: { en: 'Leader payout is calculated and credited automatically on the 3rd of every month at 10:00 AM via scheduled cron job.', hi: 'लीडर भुगतान की गणना की जाती है और शेड्यूल किए गए क्रॉन जॉब के माध्यम से हर महीने की 3 तारीख को सुबह 10:00 बजे स्वचालित रूप से जमा किया जाता है।' },
+    },
+    cta: {
+      button: { en: 'Apply for Leader Program', hi: 'लीडर प्रोग्राम के लिए आवेदन करें' },
+    },
+  },
+
   // Landing Page - Member vs Leader Section
   memberVsLeader: {
     title: { en: 'Member vs Leader', hi: 'सदस्य बनाम लीडर' },
@@ -472,6 +590,73 @@ export const translations = {
   },
 
 
+
+  // About Page
+  about: {
+    hero: {
+      badge: { en: 'Our Story', hi: 'हमारी कहानी' },
+      title1: { en: 'About', hi: 'हमारे बारे में' },
+      subtitle: { en: 'Born from a simple idea — make gold affordable, accessible, and rewarding for every Indian family. We connect you directly with manufacturers, cutting out middlemen and passing the savings to you.', hi: 'एक साधारण विचार से जन्मा — हर भारतीय परिवार के लिए सोने को सस्ता, सुलभ और लाभदायक बनाना। हम आपको सीधे निर्माताओं से जोड़ते हैं, बिचौलियों को हटाते हैं और बचत आपको देते हैं।' },
+    },
+    stats: {
+      trust: { en: 'Trust', hi: 'विश्वास' },
+      cities: { en: 'Cities', hi: 'शहर' },
+      goldSold: { en: 'Gold Sold', hi: 'बिका सोना' },
+      leaders: { en: 'Leaders', hi: 'लीडर्स' },
+    },
+    mission: {
+      title1: { en: 'Our', hi: 'हमारा' },
+      title2: { en: 'Mission', hi: 'लक्ष्य' },
+      desc1: { en: 'Jewellbox Club was founded with a vision to democratize gold ownership in India. We believe every family deserves access to pure gold at fair prices, and every individual deserves the opportunity to build wealth through community.', hi: 'Jewellbox Club की स्थापना भारत में सोने के स्वामित्व को लोकतांत्रिक बनाने के दृष्टिकोण से की गई थी। हम मानते हैं कि हर परिवार को उचित मूल्यों पर शुद्ध सोने तक पहुंच का अधिकार है, और हर व्यक्ति को समुदाय के माध्यम से संपत्ति बनाने का अवसर मिलना चाहिए।' },
+      desc2: { en: 'Our platform combines the timeless value of gold with modern technology — creating a unique ecosystem where saving, earning, and growing happen together.', hi: 'हमारा प्लेटफॉर्म सोने के कालातीत मूल्य को आधुनिक तकनीक के साथ जोड़ता है — एक अनूठा पारिस्थितिकी तंत्र बनाता है जहां बचत, कमाई और विकास एक साथ होते हैं।' },
+      badge1: { en: 'BIS Hallmarked', hi: 'BIS हॉलमार्क्ड' },
+      badge2: { en: 'Direct from Manufacturer', hi: 'सीधे निर्माता से' },
+      badge3: { en: '100% Transparent', hi: '100% पारदर्शी' },
+      badge4: { en: 'Secure Platform', hi: 'सुरक्षित प्लेटफॉर्म' },
+      quote: { en: '"We don\'t just sell gold, we fulfill dreams."', hi: '"हम सिर्फ सोना नहीं बेचते, हम सपने पूरे करते हैं।"' },
+    },
+    values: {
+      title1: { en: 'Our', hi: 'हमारे' },
+      title2: { en: 'Values', hi: 'मूल्य' },
+      subtitle: { en: 'What drives us every day', hi: 'हमें हर दिन क्या प्रेरित करता है' },
+      transparency: {
+        title: { en: 'Transparency', hi: 'पारदर्शिता' },
+        desc: { en: 'Every rupee tracked in immutable ledger. No hidden charges, no surprises. Complete visibility into your earnings and investments.', hi: 'हर रुपया अपरिवर्तनीय खाते में ट्रैक किया जाता है। कोई छिपे शुल्क नहीं, कोई आश्चर्य नहीं। आपकी कमाई और निवेश में पूरी दृश्यता।' },
+      },
+      community: {
+        title: { en: 'Community', hi: 'समुदाय' },
+        desc: { en: 'We grow together. Every member\'s success is our success. Together, we build a stronger India through collective prosperity.', hi: 'हम एक साथ बढ़ते हैं। हर सदस्य की सफलता हमारी सफलता है। एक साथ, हम सामूहिक समृद्धि के माध्यम से एक मजबूत भारत का निर्माण करते हैं।' },
+      },
+      quality: {
+        title: { en: 'Quality', hi: 'गुणवत्ता' },
+        desc: { en: 'Only BIS hallmarked gold. Direct from certified manufacturers. Purity guaranteed with every purchase. Your trust is our priority.', hi: 'केवल BIS हॉलमार्क्ड सोना। प्रमाणित निर्माताओं से सीधे। हर खरीद के साथ शुद्धता की गारंटी। आपका विश्वास हमारी प्राथमिकता है।' },
+      },
+    },
+    journey: {
+      title1: { en: 'Our', hi: 'हमारी' },
+      title2: { en: 'Journey', hi: 'यात्रा' },
+      subtitle: { en: 'From idea to impact', hi: 'विचार से प्रभाव तक' },
+      milestone: { en: 'MILESTONE', hi: 'उपलब्धि' },
+      '2023': {
+        title: { en: 'The Beginning', hi: 'शुरुआत' },
+        desc: { en: 'Started with a vision to make gold accessible to every Indian family', hi: 'हर भारतीय परिवार के लिए सोने को सुलभ बनाने के दृष्टिकोण से शुरू किया' },
+      },
+      '2024': {
+        title: { en: 'Rapid Growth', hi: 'तेज वृद्धि' },
+        desc: { en: 'Crossed 10,000+ members across 200+ cities in India', hi: 'भारत के 200+ शहरों में 10,000+ सदस्यों को पार किया' },
+      },
+      '2025': {
+        title: { en: 'Future Ready', hi: 'भविष्य के लिए तैयार' },
+        desc: { en: 'Expanding to more cities and launching new features', hi: 'अधिक शहरों में विस्तार और नई सुविधाओं की शुरुआत' },
+      },
+    },
+    cta: {
+      title1: { en: 'Ready to Start Your', hi: 'अपनी शुरू करने के लिए तैयार हैं' },
+      title2: { en: 'Gold Journey', hi: 'सोने की यात्रा' },
+      subtitle: { en: 'Join thousands of members already building wealth with Jewellbox Club', hi: 'Jewellbox Club के साथ पहले से संपत्ति बना रहे हजारों सदस्यों से जुड़ें' },
+      button: { en: 'Join Our Community', hi: 'हमारे समुदाय से जुड़ें' },
+    },
+  },
 
   // Footer
   footer: {

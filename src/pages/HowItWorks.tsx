@@ -2,15 +2,18 @@ import { motion } from 'framer-motion';
 import { Users, TrendingUp, Gem, Wallet, Shield, ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import GoldBackground from '../components/GoldBackground';
+import { useLanguage } from '../context/LanguageContext';
 interface PageProps { onJoinClick: () => void; }
 
 export default function HowItWorks({ onJoinClick }: PageProps) {
+  const { translate } = useLanguage();
+  
   const steps = [
-    { icon: Users, title: 'Sign Up & Get Your Code', desc: 'Register as a member with your mobile number. Get your unique referral code instantly. Share it with friends and family to start building your team.', color: 'from-blue-500 to-indigo-600', emoji: '👥' },
-    { icon: Wallet, title: 'Make Monthly Contributions', desc: 'Start saving for gold with monthly contributions from ₹1,000. Your money is securely locked for 12 months — building your gold fund while you earn.', color: 'from-green-500 to-emerald-600', emoji: '💰' },
-    { icon: TrendingUp, title: 'Earn Commissions', desc: 'Earn 10% on direct referrals (Level 1) and 5% on their referrals (Level 2). Commissions are credited instantly to your withdrawable wallet.', color: 'from-amber-500 to-orange-600', emoji: '📈' },
-    { icon: Gem, title: 'Access Gold Showroom', desc: 'Browse 850+ gold designs at manufacturer prices. Express interest, get a call, and purchase BIS hallmarked gold. Plus earn 4% commission on referred orders!', color: 'from-purple-500 to-pink-600', emoji: '💎' },
-    { icon: Shield, title: 'Withdraw or Convert', desc: 'Withdraw commissions anytime. After 12 months, unlock your contribution — withdraw to bank OR convert to gold purchase. Complete flexibility!', color: 'from-teal-500 to-cyan-600', emoji: '🔐' },
+    { icon: Users, title: translate('howItWorksPage.steps.step1.title'), desc: translate('howItWorksPage.steps.step1.desc'), color: 'from-blue-500 to-indigo-600', emoji: '👥' },
+    { icon: Wallet, title: translate('howItWorksPage.steps.step2.title'), desc: translate('howItWorksPage.steps.step2.desc'), color: 'from-green-500 to-emerald-600', emoji: '💰' },
+    { icon: TrendingUp, title: translate('howItWorksPage.steps.step3.title'), desc: translate('howItWorksPage.steps.step3.desc'), color: 'from-amber-500 to-orange-600', emoji: '📈' },
+    { icon: Gem, title: translate('howItWorksPage.steps.step4.title'), desc: translate('howItWorksPage.steps.step4.desc'), color: 'from-purple-500 to-pink-600', emoji: '💎' },
+    { icon: Shield, title: translate('howItWorksPage.steps.step5.title'), desc: translate('howItWorksPage.steps.step5.desc'), color: 'from-teal-500 to-cyan-600', emoji: '🔐' },
   ];
 
   return (
@@ -33,11 +36,11 @@ export default function HowItWorks({ onJoinClick }: PageProps) {
             </motion.div>
             
             <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
-              <span className="text-white">How It </span>
-              <span className="gold-text-shimmer">Works</span>
+              <span className="text-white">{translate('howItWorksPage.hero.title1')} </span>
+              <span className="gold-text-shimmer">{translate('howItWorksPage.hero.title2')}</span>
             </h1>
             <p className="text-xl text-white/70 max-w-2xl mx-auto">
-              5 simple steps to start your gold investment journey. Bas itna karna hai! 🚀
+              {translate('howItWorksPage.hero.subtitle')} 🚀
             </p>
           </motion.div>
         </div>

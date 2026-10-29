@@ -3,9 +3,11 @@ import { Gem, Phone, MessageCircle, Scale, Award, Filter, Sparkles } from 'lucid
 import { useState, useEffect } from 'react';
 import GoldBackground from '../components/GoldBackground';
 import { designImages } from '../data/goldImages';
+import { useLanguage } from '../context/LanguageContext';
 interface PageProps { onJoinClick: () => void; }
 
 export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
+  const { translate } = useLanguage();
   const [category, setCategory] = useState('all');
   
   // Default designs with real images
@@ -68,15 +70,15 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
             </motion.div>
             
             <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
-              <span className="text-white">Gold </span>
-              <span className="gold-text-shimmer">Showroom</span>
+              <span className="text-white">{translate('goldShowroomPage.hero.title1')} </span>
+              <span className="gold-text-shimmer">{translate('goldShowroomPage.hero.title2')}</span>
             </h1>
             <p className="text-xl text-white/70 max-w-2xl mx-auto mb-6">
-              Get gold at very cheap price - directly from the manufacturer! No middlemen, no markup, just pure gold at wholesale rates.
+              {translate('goldShowroomPage.hero.subtitle')}
             </p>
             <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-500/10 border-2 border-amber-500/30 rounded-full backdrop-blur-xl">
               <Award className="w-6 h-6 text-amber-400" />
-              <span className="text-amber-300 font-bold text-lg">BIS Hallmarked • 100% Certified</span>
+              <span className="text-amber-300 font-bold text-lg">{translate('goldShowroomPage.hero.badge')}</span>
             </div>
           </motion.div>
         </div>
@@ -87,7 +89,7 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12">
           <div className="flex items-center gap-4 mb-6">
             <Filter className="w-6 h-6 text-amber-400" />
-            <h2 className="text-2xl font-bold">Filter by Category</h2>
+            <h2 className="text-2xl font-bold">{translate('goldShowroomPage.filter.title')}</h2>
           </div>
           <div className="flex flex-wrap gap-3">
             {categories.map(cat => (
@@ -102,7 +104,7 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
                     : 'card-inner-glow hover:border-amber-500/30'
                 }`}
               >
-                {cat === 'all' ? '✨ All Designs' : cat}
+                {cat === 'all' ? `✨ ${translate('goldShowroomPage.filter.allDesigns')}` : cat}
               </motion.button>
             ))}
           </div>
@@ -169,10 +171,10 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
           className="mt-16 card-inner-glow rounded-3xl p-10 text-center border-2 border-amber-500/30"
         >
           <h3 className="text-4xl font-bold font-[var(--font-heading)] mb-4">
-            Interested in a <span className="gold-text-shimmer">Design</span>?
+            {translate('goldShowroomPage.contact.title1')} <span className="gold-text-shimmer">{translate('goldShowroomPage.contact.title2')}</span>?
           </h3>
           <p className="text-lg text-white/70 mb-8 max-w-2xl mx-auto">
-            Contact us directly for pricing, customization, or to place an order. We're here to help you find the perfect piece!
+            {translate('goldShowroomPage.contact.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <motion.a
@@ -182,7 +184,7 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
               className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transition-shadow flex items-center justify-center gap-3"
             >
               <Phone className="w-6 h-6" />
-              Call Now
+              {translate('goldShowroomPage.contact.callNow')}
             </motion.a>
             <motion.a
               whileHover={{ scale: 1.05, y: -3 }}
@@ -193,7 +195,7 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
               className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-shadow flex items-center justify-center gap-3"
             >
               <MessageCircle className="w-6 h-6" />
-              WhatsApp Us
+              {translate('goldShowroomPage.contact.whatsappUs')}
             </motion.a>
           </div>
         </motion.div>

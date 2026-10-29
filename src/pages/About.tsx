@@ -1,26 +1,29 @@
 import { motion } from 'framer-motion';
 import { Crown, Heart, Target, Award, Users, Shield, Sparkles, CheckCircle, TrendingUp, Gem } from 'lucide-react';
 import GoldBackground from '../components/GoldBackground';
+import { useLanguage } from '../context/LanguageContext';
 interface PageProps { onJoinClick: () => void; }
 
 export default function About({ onJoinClick }: PageProps) {
+  const { translate } = useLanguage();
+  
   const stats = [
-    { icon: Heart, label: 'Trust', value: '12,000+', color: 'from-pink-500 to-rose-600', emoji: '❤️' },
-    { icon: Target, label: 'Cities', value: '200+', color: 'from-blue-500 to-indigo-600', emoji: '🎯' },
-    { icon: Award, label: 'Gold Sold', value: '₹5Cr+', color: 'from-amber-500 to-orange-600', emoji: '🏆' },
-    { icon: Users, label: 'Leaders', value: '500+', color: 'from-purple-500 to-violet-600', emoji: '👑' },
+    { icon: Heart, label: translate('about.stats.trust'), value: '12,000+', color: 'from-pink-500 to-rose-600', emoji: '❤️' },
+    { icon: Target, label: translate('about.stats.cities'), value: '200+', color: 'from-blue-500 to-indigo-600', emoji: '🎯' },
+    { icon: Award, label: translate('about.stats.goldSold'), value: '₹5Cr+', color: 'from-amber-500 to-orange-600', emoji: '🏆' },
+    { icon: Users, label: translate('about.stats.leaders'), value: '500+', color: 'from-purple-500 to-violet-600', emoji: '👑' },
   ];
 
   const values = [
-    { icon: Shield, title: 'Transparency', desc: 'Every rupee tracked in immutable ledger. No hidden charges, no surprises. Complete visibility into your earnings and investments.', emoji: '🛡️' },
-    { icon: Heart, title: 'Community', desc: 'We grow together. Every member\'s success is our success. Ek saath, sab saath! Building a stronger India through collective prosperity.', emoji: '❤️' },
-    { icon: Award, title: 'Quality', desc: 'Only BIS hallmarked gold. Direct from certified manufacturers. Purity guaranteed with every purchase. Your trust is our priority.', emoji: '🏆' },
+    { icon: Shield, title: translate('about.values.transparency.title'), desc: translate('about.values.transparency.desc'), emoji: '🛡️' },
+    { icon: Heart, title: translate('about.values.community.title'), desc: translate('about.values.community.desc'), emoji: '❤️' },
+    { icon: Award, title: translate('about.values.quality.title'), desc: translate('about.values.quality.desc'), emoji: '🏆' },
   ];
 
   const timeline = [
-    { year: '2023', title: 'The Beginning', desc: 'Started with a vision to make gold accessible to every Indian family', emoji: '🚀' },
-    { year: '2024', title: 'Rapid Growth', desc: 'Crossed 10,000+ members across 200+ cities in India', emoji: '📈' },
-    { year: '2025', title: 'Future Ready', desc: 'Expanding to more cities and launching new features', emoji: '✨' },
+    { year: '2023', title: translate('about.timeline.2023.title'), desc: translate('about.timeline.2023.desc'), emoji: '🚀' },
+    { year: '2024', title: translate('about.timeline.2024.title'), desc: translate('about.timeline.2024.desc'), emoji: '📈' },
+    { year: '2025', title: translate('about.timeline.2025.title'), desc: translate('about.timeline.2025.desc'), emoji: '✨' },
   ];
 
   return (
@@ -49,17 +52,17 @@ export default function About({ onJoinClick }: PageProps) {
               className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-2 border-amber-500/40 rounded-full mb-8 backdrop-blur-xl"
             >
               <Sparkles className="w-5 h-5 text-amber-400" />
-              <span className="text-lg font-bold text-amber-300">Our Story</span>
+              <span className="text-lg font-bold text-amber-300">{translate('about.hero.badge')}</span>
               <Sparkles className="w-5 h-5 text-amber-400" />
             </motion.div>
             
             <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
-              <span className="text-white">About </span>
+              <span className="text-white">{translate('about.hero.title1')} </span>
               <span className="gold-text-shimmer">Jewellbox Club</span>
             </h1>
             
             <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
-              Born from a simple idea — make gold affordable, accessible, and rewarding for every Indian family. We connect you directly with manufacturers, cutting out middlemen and passing the savings to you.
+              {translate('about.hero.subtitle')}
             </p>
           </motion.div>
         </div>
@@ -99,17 +102,17 @@ export default function About({ onJoinClick }: PageProps) {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
             <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-6">
-              Our <span className="gold-text-shimmer">Mission</span>
+              {translate('about.mission.title1')} <span className="gold-text-shimmer">{translate('about.mission.title2')}</span>
             </h2>
             <p className="text-white/80 leading-relaxed mb-6 text-lg">
-              Jewellbox Club was founded with a vision to democratize gold ownership in India. We believe every family deserves access to pure gold at fair prices, and every individual deserves the opportunity to build wealth through community.
+              {translate('about.mission.desc1')}
             </p>
             <p className="text-white/80 leading-relaxed mb-6 text-lg">
-              Our platform combines the timeless value of gold with modern technology — creating a unique ecosystem where saving, earning, and growing happen together.
+              {translate('about.mission.desc2')}
             </p>
             
             <div className="flex flex-wrap gap-3 mt-8">
-              {['BIS Hallmarked', 'Direct from Manufacturer', '100% Transparent', 'Secure Platform'].map((badge, i) => (
+              {[translate('about.mission.badge1'), translate('about.mission.badge2'), translate('about.mission.badge3'), translate('about.mission.badge4')].map((badge, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -131,7 +134,7 @@ export default function About({ onJoinClick }: PageProps) {
               viewport={{ once: true }}
               className="text-amber-400 italic font-[var(--font-heading)] text-2xl mt-8 gold-text-shimmer"
             >
-              "Hum sirf gold nahi bechte, hum sapne poore karte hain." 💛
+              {translate('about.mission.quote')} 💛
             </motion.p>
           </motion.div>
           
@@ -159,9 +162,9 @@ export default function About({ onJoinClick }: PageProps) {
       <section className="py-20 max-w-6xl mx-auto px-4">
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
           <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-4">
-            Our <span className="gold-text-shimmer">Values</span>
+            {translate('about.values.title1')} <span className="gold-text-shimmer">{translate('about.values.title2')}</span>
           </h2>
-          <p className="text-white/60 text-lg">What drives us every day</p>
+          <p className="text-white/60 text-lg">{translate('about.values.subtitle')}</p>
         </motion.div>
         
         <div className="grid md:grid-cols-3 gap-8">
@@ -195,9 +198,9 @@ export default function About({ onJoinClick }: PageProps) {
       <section className="py-20 max-w-5xl mx-auto px-4">
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
           <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-4">
-            Our <span className="gold-text-shimmer">Journey</span>
+            {translate('about.journey.title1')} <span className="gold-text-shimmer">{translate('about.journey.title2')}</span>
           </h2>
-          <p className="text-white/60 text-lg">From idea to impact</p>
+          <p className="text-white/60 text-lg">{translate('about.journey.subtitle')}</p>
         </motion.div>
         
         <div className="space-y-8">
@@ -220,7 +223,7 @@ export default function About({ onJoinClick }: PageProps) {
               <div className="flex-1 card-inner-glow rounded-3xl p-8">
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-4xl font-bold gold-text-shimmer">{item.year}</span>
-                  <span className="gold-badge text-xs">MILESTONE</span>
+                  <span className="gold-badge text-xs">{translate('about.journey.milestone')}</span>
                 </div>
                 <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
                 <p className="text-white/70 text-lg">{item.desc}</p>
@@ -241,16 +244,16 @@ export default function About({ onJoinClick }: PageProps) {
             className="card-inner-glow rounded-3xl p-12"
           >
             <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-6">
-              Ready to Start Your <span className="gold-text-shimmer">Gold Journey</span>?
+              {translate('about.cta.title1')} <span className="gold-text-shimmer">{translate('about.cta.title2')}</span>?
             </h2>
-            <p className="text-white/70 text-xl mb-10">Join thousands of members already building wealth with Jewellbox Club</p>
+            <p className="text-white/70 text-xl mb-10">{translate('about.cta.subtitle')}</p>
             <motion.button
               whileHover={{ scale: 1.05, y: -5 }}
               whileTap={{ scale: 0.95 }}
               onClick={onJoinClick}
               className="btn-gold-premium px-12 py-6 text-2xl rounded-2xl"
             >
-              Join Our Community ✨
+              {translate('about.cta.button')} ✨
             </motion.button>
           </motion.div>
         </div>
