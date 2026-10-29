@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import { ToastProvider } from './context/ToastContext';
+import { LanguageProvider } from './context/LanguageContext';
 import Layout from './components/Layout';
 import AdminLayout from './components/AdminLayout';
 import Navbar from './components/Navbar';
@@ -156,13 +157,15 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <AppProvider>
-          <ToastProvider>
-            <AppRoutes />
-          </ToastProvider>
-        </AppProvider>
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <AppProvider>
+            <ToastProvider>
+              <AppRoutes />
+            </ToastProvider>
+          </AppProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </BrowserRouter>
   );
 }

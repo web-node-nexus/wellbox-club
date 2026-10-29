@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Menu, X, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import LanguageSwitcher from './LanguageSwitcher';
 
 interface NavbarProps {
   onJoinClick: () => void;
@@ -13,6 +15,7 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
+  const { translate } = useLanguage();
   
   // Check if current route is a protected dashboard route (exact match)
   const protectedRoutes = [
@@ -45,14 +48,14 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
   if (user) return null;
 
   const navLinks = [
-    { label: 'Home', path: '/' },
-    { label: 'How it Works', path: '/how-it-works' },
-    { label: 'Income Plan', path: '/income-plan' },
-    { label: 'Gold Showroom', path: '/gold-showroom-public' },
-    { label: 'Leaders', path: '/leader-program' },
-    { label: 'About', path: '/about' },
-    { label: 'FAQ', path: '/faq' },
-    { label: 'Contact', path: '/contact' },
+    { label: translate('navbar.home'), path: '/' },
+    { label: translate('navbar.howItWorks'), path: '/how-it-works' },
+    { label: translate('navbar.incomePlan'), path: '/income-plan' },
+    { label: translate('navbar.goldShowroom'), path: '/gold-showroom-public' },
+    { label: translate('navbar.leaders'), path: '/leader-program' },
+    { label: translate('navbar.about'), path: '/about' },
+    { label: translate('navbar.faq'), path: '/faq' },
+    { label: translate('navbar.contact'), path: '/contact' },
   ];
 
   return (
@@ -105,8 +108,9 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
 
             {/* CTA Buttons */}
             <div className="hidden lg:flex items-center gap-3">
+              <LanguageSwitcher />
               <Link to="/login" className="px-4 py-2 text-sm font-medium text-amber-300 hover:text-amber-200 transition-colors">
-                Sign In
+                {translate('common.signIn')}
               </Link>
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -114,7 +118,7 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
                 onClick={onJoinClick}
                 className="px-6 py-2.5 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-semibold text-sm rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-shadow"
               >
-                Join Now ✨
+                {translate('common.joinNow')}
               </motion.button>
             </div>
 
@@ -168,14 +172,15 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
                   </motion.div>
                 ))}
                 <div className="pt-4 space-y-3">
+                  <LanguageSwitcher />
                   <Link to="/login" onClick={() => setMobileOpen(false)} className="block w-full text-center px-4 py-3 border border-amber-500/30 text-amber-300 rounded-xl font-medium">
-                    Sign In
+                    {translate('common.signIn')}
                   </Link>
                   <button
                     onClick={() => { setMobileOpen(false); onJoinClick(); }}
                     className="block w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 rounded-xl font-semibold text-center"
                   >
-                    Join Now ✨
+                    {translate('common.joinNow')}
                   </button>
                 </div>
               </div>

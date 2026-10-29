@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom';
 import { Crown, Users, TrendingUp, Gem, Shield, Star, ChevronDown, Sparkles, ArrowRight, CheckCircle, Lock, Unlock, Phone, MessageCircle, Award, Zap, Heart, Target, Scale, Play, TrendingDown, ShoppingCart, Eye, DollarSign } from 'lucide-react';
 import { designImages } from '../data/goldImages';
+import { useLanguage } from '../context/LanguageContext';
 
 interface LandingProps {
   onJoinClick: () => void;
@@ -109,6 +110,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const { translate } = useLanguage();
 
   const testimonials = [
     { name: 'Rajesh Kumar', city: 'Jaipur', text: 'Jewellbox Club ne meri zindagi badal di! 6 months mein 50 members ki team banayi aur ab leader hoon. Monthly income ₹45,000+ hai!', rating: 5, earning: '₹45,000/mo' },
@@ -187,7 +189,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
               >
                 <Sparkles className="w-6 h-6 text-amber-400" />
               </motion.div>
-              <span className="text-lg font-bold text-amber-300">India's #1 Digital Gold Platform</span>
+              <span className="text-lg font-bold text-amber-300">{translate('landing.tagline')}</span>
               <motion.div
                 animate={{ rotate: [0, -360] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
@@ -205,7 +207,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 className="block text-white"
                 style={{ textShadow: '0 0 40px rgba(255, 215, 0, 0.3)' }}
               >
-                Digital Gold
+                {translate('landing.heroTitle1')}
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
@@ -214,7 +216,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 className="block gradient-text"
                 style={{ textShadow: '0 0 60px rgba(255, 215, 0, 0.5)' }}
               >
-                Showroom
+                {translate('landing.heroTitle2')}
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
@@ -222,7 +224,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 transition={{ delay: 0.7 }}
                 className="block text-amber-400 text-3xl sm:text-4xl md:text-5xl lg:text-6xl mt-4 font-bold"
               >
-                No Middlemen. Direct from Manufacturer.
+                {translate('landing.heroTitle3')}
               </motion.span>
             </h1>
             
@@ -233,7 +235,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
               transition={{ delay: 0.9 }}
               className="text-xl sm:text-2xl lg:text-3xl text-white/80 max-w-4xl mx-auto mb-12 leading-relaxed font-medium"
             >
-              Buy 22K & 24K Gold at <span className="text-amber-400 font-bold">30% cheaper than market price.</span>
+              {translate('landing.heroSubtitle')}
               <br />
               <span className="text-2xl sm:text-3xl">BIS Hallmarked • 850+ Designs • Earn While You Save</span>
             </motion.p>
@@ -253,7 +255,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 <ShoppingCart className="w-7 h-7" />
-                <span className="relative">Buy Gold Now</span>
+                <span className="relative">{translate('landing.exploreShowroom')}</span>
                 <ArrowRight className="w-7 h-7 relative" />
               </motion.button>
               
@@ -265,7 +267,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 <Crown className="w-7 h-7 text-amber-400 relative" />
-                <span className="relative">Become a Leader</span>
+                <span className="relative">{translate('navbar.becomeLeader')}</span>
               </motion.button>
             </motion.div>
           </motion.div>
@@ -279,19 +281,19 @@ export default function Landing({ onJoinClick }: LandingProps) {
           >
             <div className="bg-white/5 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 hover:border-amber-500/40 transition-all hover:scale-105">
               <AnimatedCounter target={12500} suffix="+" />
-              <p className="text-sm text-white/60 mt-2 font-medium">Happy Members</p>
+              <p className="text-sm text-white/60 mt-2 font-medium">{translate('landing.activeMembers')}</p>
             </div>
             <div className="bg-white/5 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 hover:border-amber-500/40 transition-all hover:scale-105">
               <AnimatedCounter target={850} suffix="+" />
-              <p className="text-sm text-white/60 mt-2 font-medium">Gold Designs</p>
+              <p className="text-sm text-white/60 mt-2 font-medium">{translate('landing.goldDesigns')}</p>
             </div>
             <div className="bg-white/5 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 hover:border-amber-500/40 transition-all hover:scale-105">
               <AnimatedCounter target={2} prefix="₹" suffix="Cr+" />
-              <p className="text-sm text-white/60 mt-2 font-medium">Gold Sold</p>
+              <p className="text-sm text-white/60 mt-2 font-medium">{translate('landing.commissionPaid')}</p>
             </div>
             <div className="bg-white/5 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 hover:border-amber-500/40 transition-all hover:scale-105">
               <AnimatedCounter target={500} suffix="+" />
-              <p className="text-sm text-white/60 mt-2 font-medium">Active Leaders</p>
+              <p className="text-sm text-white/60 mt-2 font-medium">{translate('landing.activeMembers')}</p>
             </div>
           </motion.div>
         </motion.div>
