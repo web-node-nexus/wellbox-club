@@ -101,7 +101,7 @@ function AppRoutes() {
       <Navbar onJoinClick={() => openJoin('member')} />
       <Routes>
         {/* Public Pages */}
-        <Route path="/" element={<PublicPageWrapper><Landing onJoinClick={() => openJoin('member')} /></PublicPageWrapper>} />
+        <Route path="/" element={<PublicPageWrapper><Landing onJoinClick={openJoin} /></PublicPageWrapper>} />
         <Route path="/about" element={<PublicPageWrapper><About onJoinClick={() => openJoin('member')} /></PublicPageWrapper>} />
         <Route path="/how-it-works" element={<PublicPageWrapper><HowItWorks onJoinClick={() => openJoin('member')} /></PublicPageWrapper>} />
         <Route path="/income-plan" element={<PublicPageWrapper><IncomePlan onJoinClick={() => openJoin('member')} /></PublicPageWrapper>} />

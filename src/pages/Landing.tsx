@@ -6,7 +6,7 @@ import { designImages } from '../data/goldImages';
 import { useLanguage } from '../context/LanguageContext';
 
 interface LandingProps {
-  onJoinClick: () => void;
+  onJoinClick: (tab?: 'member' | 'leader') => void;
 }
 
 // 3D Gold Coin Component
@@ -114,7 +114,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
 
   const testimonials = [
     { name: 'Rajesh Kumar', city: 'Jaipur', text: 'Jewellbox Club ne meri zindagi badal di! 6 months mein 50 members ki team banayi aur ab leader hoon. Monthly income ₹45,000+ hai!', rating: 5, earning: '₹45,000/mo' },
-    { name: 'Priya Sharma', city: 'Delhi', text: 'Digital gold showroom se directly manufacturer se gold mila - 30% sasta! Aur referral se extra income. Win-win situation!', rating: 5, earning: '₹28,000/mo' },
+    { name: 'Priya Sharma', city: 'Delhi', text: 'Digital gold showroom se directly manufacturer se gold mila - bahut kam price mein! Aur referral se extra income. Win-win situation!', rating: 5, earning: '₹28,000/mo' },
     { name: 'Amit Patel', city: 'Mumbai', text: 'Best platform for digital gold investment. Monthly contribution lock karke 12 months baad gold le sakti hoon. Commission bhi milta hai!', rating: 5, earning: '₹62,000/mo' },
   ];
 
@@ -250,19 +250,19 @@ export default function Landing({ onJoinClick }: LandingProps) {
               <motion.button
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={onJoinClick}
+                onClick={() => onJoinClick('member')}
                 className="w-full sm:w-auto px-12 py-6 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-bold text-xl rounded-2xl shadow-2xl shadow-amber-500/50 hover:shadow-amber-500/70 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 <ShoppingCart className="w-7 h-7" />
-                <span className="relative">{translate('landing.exploreShowroom')}</span>
+                <span className="relative">{translate('navbar.becomeMember')}</span>
                 <ArrowRight className="w-7 h-7 relative" />
               </motion.button>
               
               <motion.button
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => onJoinClick()}
+                onClick={() => onJoinClick('leader')}
                 className="w-full sm:w-auto px-12 py-6 bg-white/10 border-2 border-amber-400/50 text-white font-bold text-xl rounded-2xl hover:bg-amber-500/10 hover:border-amber-400 transition-all flex items-center justify-center gap-3 backdrop-blur-xl relative overflow-hidden group"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
@@ -383,7 +383,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
             <p className="text-2xl text-white/80 max-w-3xl mx-auto mb-8 font-medium">
               Directly from manufacturer. <span className="text-amber-400 font-bold">No middlemen. No markup.</span>
               <br />
-              <span className="text-3xl font-bold text-amber-400">Save 30% on every purchase!</span>
+              <span className="text-3xl font-bold text-amber-400">Get Gold at Very Less Price!</span>
             </p>
             
             {/* Trust Badges */}
@@ -392,7 +392,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 { icon: CheckCircle, text: 'BIS Hallmarked', color: 'text-green-400' },
                 { icon: CheckCircle, text: '850+ Designs', color: 'text-blue-400' },
                 { icon: CheckCircle, text: '22K & 24K Gold', color: 'text-amber-400' },
-                { icon: CheckCircle, text: '30% Cheaper', color: 'text-purple-400' },
+                { icon: CheckCircle, text: 'Very Less Price', color: 'text-purple-400' },
                 { icon: CheckCircle, text: 'Instant Delivery', color: 'text-pink-400' },
               ].map((badge, i) => (
                 <motion.div
@@ -833,7 +833,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
             <motion.button
               whileHover={{ scale: 1.05, y: -5 }}
               whileTap={{ scale: 0.95 }}
-              onClick={onJoinClick}
+              onClick={() => onJoinClick('leader')}
               className="px-12 py-6 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-bold text-xl rounded-2xl shadow-2xl shadow-amber-500/50 hover:shadow-amber-500/70 transition-all relative overflow-hidden group"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
@@ -1105,7 +1105,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={onJoinClick}
+                  onClick={() => onJoinClick('member')}
                   className="w-full sm:w-auto px-12 py-6 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold text-xl rounded-2xl shadow-2xl shadow-amber-500/50 hover:shadow-amber-500/70 transition-shadow relative overflow-hidden group"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
