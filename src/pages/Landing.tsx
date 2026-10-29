@@ -189,7 +189,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
               >
                 <Sparkles className="w-6 h-6 text-amber-400" />
               </motion.div>
-              <span className="text-lg font-bold text-amber-300">{translate('landing.tagline')}</span>
+              <span className="text-lg font-bold text-amber-300">{translate('hero.tagline')}</span>
               <motion.div
                 animate={{ rotate: [0, -360] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
@@ -207,7 +207,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 className="block text-white"
                 style={{ textShadow: '0 0 40px rgba(255, 215, 0, 0.3)' }}
               >
-                {translate('landing.heroTitle1')}
+                {translate('hero.title1')}
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
@@ -216,7 +216,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 className="block gradient-text"
                 style={{ textShadow: '0 0 60px rgba(255, 215, 0, 0.5)' }}
               >
-                {translate('landing.heroTitle2')}
+                {translate('hero.title2')}
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, y: 20 }}
@@ -224,7 +224,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 transition={{ delay: 0.7 }}
                 className="block text-amber-400 text-3xl sm:text-4xl md:text-5xl lg:text-6xl mt-4 font-bold"
               >
-                {translate('landing.heroTitle3')}
+                {translate('hero.title3')}
               </motion.span>
             </h1>
             
@@ -235,9 +235,9 @@ export default function Landing({ onJoinClick }: LandingProps) {
               transition={{ delay: 0.9 }}
               className="text-xl sm:text-2xl lg:text-3xl text-white/80 max-w-4xl mx-auto mb-12 leading-relaxed font-medium"
             >
-              {translate('landing.heroSubtitle')}
+              {translate('hero.subtitle')} <span className="text-amber-400 font-bold">{translate('hero.subtitleHighlight')}</span>
               <br />
-              <span className="text-2xl sm:text-3xl">BIS Hallmarked • 850+ Designs • Earn While You Save</span>
+              <span className="text-2xl sm:text-3xl">{translate('hero.subtitle2')}</span>
             </motion.p>
 
             {/* CTA Buttons */}

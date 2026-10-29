@@ -7,6 +7,7 @@ export const translations = {
     signOut: { en: 'Sign Out', hi: 'साइन आउट' },
     dashboard: { en: 'Dashboard', hi: 'डैशबोर्ड' },
     welcome: { en: 'Welcome', hi: 'स्वागत है' },
+    welcomeBack: { en: 'Welcome back', hi: 'वापसी पर स्वागत है' },
     loading: { en: 'Loading...', hi: 'लोड हो रहा है...' },
     save: { en: 'Save', hi: 'सेव करें' },
     cancel: { en: 'Cancel', hi: 'रद्द करें' },
@@ -39,6 +40,16 @@ export const translations = {
     error: { en: 'Error', hi: 'त्रुटि' },
     copied: { en: 'Copied!', hi: 'कॉपी हो गया!' },
     copy: { en: 'Copy', hi: 'कॉपी' },
+    share: { en: 'Share', hi: 'शेयर करें' },
+    learnMore: { en: 'Learn More', hi: 'और जानें' },
+    getStarted: { en: 'Get Started', hi: 'शुरू करें' },
+    contactUs: { en: 'Contact Us', hi: 'संपर्क करें' },
+    aboutUs: { en: 'About Us', hi: 'हमारे बारे में' },
+    features: { en: 'Features', hi: 'विशेषताएं' },
+    pricing: { en: 'Pricing', hi: 'मूल्य' },
+    faq: { en: 'FAQ', hi: 'सामान्य प्रश्न' },
+    terms: { en: 'Terms & Conditions', hi: 'नियम और शर्तें' },
+    privacy: { en: 'Privacy Policy', hi: 'गोपनीयता नीति' },
   },
 
   // Navbar
@@ -53,6 +64,143 @@ export const translations = {
     contact: { en: 'Contact', hi: 'संपर्क' },
     becomeMember: { en: 'Become a Member', hi: 'सदस्य बनें' },
     becomeLeader: { en: 'Become a Leader', hi: 'लीडर बनें' },
+    whyBuyGold: { en: 'Why Buy Gold', hi: 'सोना क्यों खरीदें' },
+    terms: { en: 'Terms', hi: 'नियम' },
+    privacy: { en: 'Privacy', hi: 'गोपनीयता' },
+    refundPolicy: { en: 'Refund Policy', hi: 'रिफंड नीति' },
+  },
+
+  // Landing Page - Hero Section
+  hero: {
+    tagline: { en: "India's #1 Digital Gold Platform", hi: 'भारत का #1 डिजिटल गोल्ड प्लेटफॉर्म' },
+    title1: { en: 'Digital Gold', hi: 'डिजिटल गोल्ड' },
+    title2: { en: 'Showroom', hi: 'शोरूम' },
+    title3: { en: 'No Middlemen. Direct from Manufacturer.', hi: 'कोई बिचौलिया नहीं। सीधे निर्माता से।' },
+    subtitle: { en: 'Buy 22K & 24K Gold at', hi: '22K और 24K सोना खरीदें' },
+    subtitleHighlight: { en: 'Very Less Price!', hi: 'बहुत कम कीमत पर!' },
+    subtitle2: { en: 'BIS Hallmarked • 850+ Designs • Instant Delivery', hi: 'BIS हॉलमार्क्ड • 850+ डिज़ाइन • तुरंत डिलीवरी' },
+    buyGoldNow: { en: 'Buy Gold Now', hi: 'अभी सोना खरीदें' },
+    exploreShowroom: { en: 'Explore Full Showroom', hi: 'पूरा शोरूम देखें' },
+    stats: {
+      activeMembers: { en: 'Active Members', hi: 'सक्रिय सदस्य' },
+      goldDesigns: { en: 'Gold Designs', hi: 'गोल्ड डिज़ाइन' },
+      goldSold: { en: 'Gold Sold', hi: 'बिका सोना' },
+      activeLeaders: { en: 'Active Leaders', hi: 'सक्रिय लीडर' },
+    },
+  },
+
+  // Landing Page - Gold Showroom Section
+  showroom: {
+    title: { en: 'Digital Gold Showroom', hi: 'डिजिटल गोल्ड शोरूम' },
+    heading: { en: 'Buy Gold at', hi: 'सोना खरीदें' },
+    headingHighlight: { en: 'Wholesale Prices', hi: 'थोक मूल्य पर' },
+    subtitle: { en: 'Directly from manufacturer. No middlemen. No markup.', hi: 'सीधे निर्माता से। कोई बिचौलिया नहीं। कोई मार्कअप नहीं।' },
+    saveHighlight: { en: 'Save Big on Every Purchase!', hi: 'हर खरीद पर बड़ी बचत!' },
+    badges: {
+      bis: { en: 'BIS Hallmarked', hi: 'BIS हॉलमार्क्ड' },
+      designs: { en: '850+ Designs', hi: '850+ डिज़ाइन' },
+      purity: { en: '22K & 24K Gold', hi: '22K और 24K गोल्ड' },
+      cheaper: { en: 'Very Less Price', hi: 'बहुत कम कीमत' },
+      delivery: { en: 'Instant Delivery', hi: 'तुरंत डिलीवरी' },
+    },
+    viewDetails: { en: 'View Details', hi: 'विवरण देखें' },
+    buyNow: { en: 'Buy Now', hi: 'अभी खरीदें' },
+    whatsappUs: { en: 'WhatsApp Us', hi: 'व्हाट्सएप करें' },
+    proTip: { en: 'Pro Tip:', hi: 'प्रो टिप:' },
+    proTipText: { en: 'Join as a member and earn 4% commission on every gold order you refer!', hi: 'सदस्य बनें और हर गोल्ड ऑर्डर पर 4% कमीशन कमाएं!' },
+  },
+
+  // Landing Page - How It Works Section
+  howItWorks: {
+    title: { en: 'How It Works', hi: 'कैसे काम करता है' },
+    subtitle: { en: '3 simple steps to start your gold journey', hi: 'सोने की यात्रा शुरू करने के 3 आसान कदम' },
+    steps: {
+      step1: {
+        title: { en: 'Join & Contribute', hi: 'जुड़ें और योगदान करें' },
+        desc: { en: 'Sign up with a referral code, make your first monthly contribution starting from ₹1,000. Your gold savings begin!', hi: 'रेफरल कोड से साइन अप करें, ₹1,000 से अपनी पहली मासिक योगदान करें। आपकी सोने की बचत शुरू!' },
+      },
+      step2: {
+        title: { en: 'Build Your Team', hi: 'अपनी टीम बनाएं' },
+        desc: { en: 'Share your unique referral code. Earn 10% on Level 1 and 5% on Level 2 contributions. Team grows, income grows!', hi: 'अपना अनूठा रेफरल कोड साझा करें। लेवल 1 पर 10% और लेवल 2 पर 5% कमाएं। टीम बढ़ती है, आय बढ़ती है!' },
+      },
+      step3: {
+        title: { en: 'Earn & Own Gold', hi: 'कमाएं और सोना अपना बनाएं' },
+        desc: { en: 'Withdraw commissions anytime. After 12 months, convert contributions to gold or withdraw. Access showroom at factory prices!', hi: 'कभी भी कमीशन निकालें। 12 महीने बाद, योगदान को सोने में बदलें या निकालें। फैक्टरी कीमतों पर शोरूम तक पहुंच!' },
+      },
+    },
+  },
+
+  // Landing Page - Income Plan Section
+  incomePlan: {
+    title: { en: 'Income Plan', hi: 'आय योजना' },
+    subtitle: { en: '4 ways to earn - the more you build, the more you make!', hi: 'कमाने के 4 तरीके - जितना ज्यादा बनाएंगे, उतना ज्यादा कमाएंगे!' },
+    commissions: {
+      level1: { en: 'Level 1', hi: 'लेवल 1' },
+      level1Desc: { en: 'Direct referral contribution', hi: 'प्रत्यक्ष रेफरल योगदान' },
+      level2: { en: 'Level 2', hi: 'लेवल 2' },
+      level2Desc: { en: "Referral's referral contribution", hi: 'रेफरल के रेफरल का योगदान' },
+      leader: { en: 'Leader Income', hi: 'लीडर आय' },
+      leaderDesc: { en: 'Monthly on team total income', hi: 'टीम की कुल आय पर मासिक' },
+      goldBonus: { en: 'Gold Bonus', hi: 'गोल्ड बोनस' },
+      goldBonusDesc: { en: 'On referred gold orders', hi: 'रेफर किए गए गोल्ड ऑर्डर पर' },
+    },
+    calculator: {
+      title: { en: 'Income Calculator', hi: 'आय कैलकुलेटर' },
+      subtitle: { en: 'Estimate your potential monthly earnings', hi: 'अपनी संभावित मासिक आय का अनुमान लगाएं' },
+      teamMembers: { en: 'Number of Team Members', hi: 'टीम सदस्यों की संख्या' },
+      monthlyContribution: { en: 'Monthly Contribution (₹)', hi: 'मासिक योगदान (₹)' },
+      estimatedIncome: { en: 'Estimated Monthly Income', hi: 'अनुमानित मासिक आय' },
+      totalMonthly: { en: 'Total Monthly', hi: 'कुल मासिक' },
+    },
+  },
+
+  // Landing Page - Member vs Leader Section
+  memberVsLeader: {
+    title: { en: 'Member vs Leader', hi: 'सदस्य बनाम लीडर' },
+    subtitle: { en: 'Choose your path to gold prosperity', hi: 'सोने की समृद्धि का अपना रास्ता चुनें' },
+    member: {
+      title: { en: 'Member', hi: 'सदस्य' },
+      subtitle: { en: 'Start your gold journey', hi: 'अपनी सोने की यात्रा शुरू करें' },
+      features: {
+        monthlySavings: { en: 'Monthly gold savings plan', hi: 'मासिक सोना बचत योजना' },
+        level1Commission: { en: '10% Level 1 commission', hi: '10% लेवल 1 कमीशन' },
+        level2Commission: { en: '5% Level 2 commission', hi: '5% लेवल 2 कमीशन' },
+        goldBonus: { en: '4% gold order bonus', hi: '4% गोल्ड ऑर्डर बोनस' },
+        withdrawAnytime: { en: 'Withdraw commissions anytime', hi: 'कभी भी कमीशन निकालें' },
+        accessShowroom: { en: 'Access to gold showroom', hi: 'गोल्ड शोरूम तक पहुंच' },
+        contributionLock: { en: '12-month contribution lock', hi: '12-महीने का योगदान लॉक' },
+      },
+      button: { en: 'Join as Member', hi: 'सदस्य के रूप में जुड़ें' },
+    },
+    leader: {
+      title: { en: 'Leader', hi: 'लीडर' },
+      subtitle: { en: '100+ team members • Premium benefits', hi: '100+ टीम सदस्य • प्रीमियम लाभ' },
+      mostPopular: { en: 'MOST POPULAR', hi: 'सबसे लोकप्रिय' },
+      features: {
+        everythingInMember: { en: 'Everything in Member plan', hi: 'सदस्य योजना की सब कुछ' },
+        additionalPayout: { en: 'Additional 5% monthly leader payout', hi: 'अतिरिक्त 5% मासिक लीडर भुगतान' },
+        autoPromotion: { en: 'Auto-promotion at 100 members', hi: '100 सदस्यों पर स्वचालित पदोन्नति' },
+        prioritySupport: { en: 'Priority support & training', hi: 'प्राथमिकता समर्थन और प्रशिक्षण' },
+        exclusiveEvents: { en: 'Exclusive leader events', hi: 'विशेष लीडर इवेंट्स' },
+        higherCommissions: { en: 'Higher gold order commissions', hi: 'उच्च गोल्ड ऑर्डर कमीशन' },
+        recognition: { en: 'Recognition & certificates', hi: 'मान्यता और प्रमाणपत्र' },
+      },
+      button: { en: 'Apply as Leader', hi: 'लीडर के रूप में आवेदन करें' },
+    },
+  },
+
+  // Landing Page - Testimonials Section
+  testimonials: {
+    title: { en: 'Success Stories', hi: 'सफलता की कहानियां' },
+    subtitle: { en: 'Real members, real earnings, real gold!', hi: 'असली सदस्य, असली कमाई, असली सोना!' },
+  },
+
+  // Landing Page - Final CTA Section
+  finalCTA: {
+    title1: { en: 'Ready to Start Your', hi: 'अपनी शुरू करने के लिए तैयार हैं' },
+    title2: { en: 'Gold Journey?', hi: 'सोने की यात्रा?' },
+    subtitle: { en: 'Join 12,000+ members already building wealth. Ab der kis baat ki? 🚀', hi: 'पहले से संपत्ति बना रहे 12,000+ सदस्यों से जुड़ें। अब देर किस बात की? 🚀' },
+    joinFree: { en: "Join Now - It's Free ✨", hi: 'अभी जुड़ें - यह मुफ़्त है ✨' },
   },
 
   // Landing Page
@@ -241,28 +389,7 @@ export const translations = {
     investmentHistory: { en: 'Investment History', hi: 'निवेश इतिहास' },
   },
 
-  // Gold Showroom
-  showroom: {
-    title: { en: 'Gold Showroom', hi: 'गोल्ड शोरूम' },
-    subtitle: { en: 'Browse premium gold designs at manufacturer prices', hi: 'निर्माता मूल्यों पर प्रीमियम गोल्ड डिज़ाइन ब्राउज़ करें' },
-    cheapPrice: { en: 'Get gold at very cheap price - directly from the manufacturer!', hi: 'बहुत सस्ते मूल्य पर सोना प्राप्त करें - सीधे निर्माता से!' },
-    noMiddlemen: { en: 'No middlemen. Best quality. BIS Hallmarked.', hi: 'कोई बिचौलिया नहीं। सर्वोत्तम गुणवत्ता। BIS हॉलमार्क्ड।' },
-    filterCategory: { en: 'Filter by Category', hi: 'श्रेणी के अनुसार फ़िल्टर करें' },
-    allDesigns: { en: 'All Designs', hi: 'सभी डिज़ाइन' },
-    interested: { en: "I'm Interested", hi: 'मुझे रुचि है' },
-    viewDetails: { en: 'View Details', hi: 'विवरण देखें' },
-    buyNow: { en: 'Buy Now', hi: 'अभी खरीदें' },
-    callNow: { en: 'Call Now', hi: 'अभी कॉल करें' },
-    weight: { en: 'Weight', hi: 'वजन' },
-    grams: { en: 'grams', hi: 'ग्राम' },
-    purity: { en: 'Purity', hi: 'शुद्धता' },
-    makingCharges: { en: 'Making Charges', hi: 'मेकिंग चार्ज' },
-    category: { en: 'Category', hi: 'श्रेणी' },
-    description: { en: 'Description', hi: 'विवरण' },
-    priceOnRequest: { en: '💡 Price available on request. Contact us for the best manufacturer price!', hi: '💡 मूल्य अनुरोध पर उपलब्ध। सर्वोत्तम निर्माता मूल्य के लिए हमसे संपर्क करें!' },
-    interestedDesign: { en: 'Interested in a Design?', hi: 'किसी डिज़ाइन में रुचि है?' },
-    contactDirectly: { en: 'Contact us directly for pricing, customization, or to place an order.', hi: 'मूल्य, कस्टमाइज़ेशन, या ऑर्डर देने के लिए सीधे हमसे संपर्क करें।' },
-  },
+
 
   // Footer
   footer: {
