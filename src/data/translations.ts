@@ -195,6 +195,88 @@ export const translations = {
     subtitle: { en: 'Real members, real earnings, real gold!', hi: 'असली सदस्य, असली कमाई, असली सोना!' },
   },
 
+  // Landing Page - Leader Program Section
+  leaderProgram: {
+    title: { en: 'Leader Program', hi: 'लीडर प्रोग्राम' },
+    heading1: { en: 'Become a', hi: 'बनें एक' },
+    heading2: { en: 'Leader', hi: 'लीडर' },
+    subtitle: { en: 'Build your team, unlock premium benefits, and earn monthly leader payouts!', hi: 'अपनी टीम बनाएं, प्रीमियम लाभ अनलॉक करें, और मासिक लीडर भुगतान कमाएं!' },
+    steps: {
+      step1: {
+        badge: { en: 'START HERE', hi: 'यहां से शुरू करें' },
+        title: { en: 'Join as Member', hi: 'सदस्य के रूप में जुड़ें' },
+        desc: { en: 'Register with your mobile number. Get your unique referral code. Start building your team!', hi: 'अपने मोबाइल नंबर से रजिस्टर करें। अपना अनूठा रेफरल कोड प्राप्त करें। अपनी टीम बनाना शुरू करें!' },
+        benefits: {
+          noFee: { en: 'No joining fee', hi: 'कोई जुड़ाई शुल्क नहीं' },
+          instantCode: { en: 'Instant referral code', hi: 'तत्काल रेफरल कोड' },
+          startEarning: { en: 'Start earning immediately', hi: 'तुरंत कमाना शुरू करें' },
+        },
+      },
+      step2: {
+        badge: { en: 'KEY STEP', hi: 'महत्वपूर्ण कदम' },
+        title: { en: 'Add 100 Members', hi: '100 सदस्य जोड़ें' },
+        desc: { en: 'Build your team to', hi: 'अपनी टीम बनाएं' },
+        descHighlight: { en: '100 members', hi: '100 सदस्य' },
+        desc2: { en: '(direct + indirect). Once you reach 100, you automatically become a Leader!', hi: '(प्रत्यक्ष + अप्रत्यक्ष)। एक बार जब आप 100 तक पहुंच जाते हैं, तो आप स्वचालित रूप से लीडर बन जाते हैं!' },
+        important: { en: '🎯 IMPORTANT:', hi: '🎯 महत्वपूर्ण:' },
+        importantText: { en: 'You CANNOT become a Leader directly. You must build your team to 100 members first. This ensures only dedicated leaders earn premium benefits!', hi: 'आप सीधे लीडर नहीं बन सकते। आपको पहले अपनी टीम को 100 सदस्यों तक बनाना होगा। यह सुनिश्चित करता है कि केवल समर्पित लीडर प्रीमियम लाभ कमाते हैं!' },
+      },
+      step3: {
+        badge: { en: 'REWARD', hi: 'पुरस्कार' },
+        title: { en: 'Earn Leader Income', hi: 'लीडर आय कमाएं' },
+        desc: { en: 'Once you\'re a Leader with', hi: 'एक बार जब आप लीडर बन जाते हैं' },
+        descHighlight: { en: '10+ direct members', hi: '10+ प्रत्यक्ष सदस्य' },
+        desc2: { en: ', you start earning 5% monthly payout on your team\'s total income!', hi: ', तो आप अपनी टीम की कुल आय पर 5% मासिक भुगतान कमाना शुरू करते हैं!' },
+        benefits: {
+          monthlyPayout: { en: '5% monthly team income', hi: '5% मासिक टीम आय' },
+          credited3rd: { en: 'Credited on 3rd of every month', hi: 'हर महीने की 3 तारीख को जमा' },
+          premiumBenefits: { en: 'Premium leader benefits', hi: 'प्रीमियम लीडर लाभ' },
+        },
+      },
+    },
+    rules: {
+      title: { en: 'Leader Income Rules', hi: 'लीडर आय नियम' },
+      subtitle: { en: 'Clear path to premium earnings', hi: 'प्रीमियम कमाई का स्पष्ट पथ' },
+      rule1: {
+        title: { en: '100 Members Required', hi: '100 सदस्य आवश्यक' },
+        desc: { en: 'You must have', hi: 'आपके पास होना चाहिए' },
+        descHighlight: { en: '100 total members', hi: '100 कुल सदस्य' },
+        desc2: { en: '(direct + indirect) in your team to become a Leader. No shortcuts!', hi: '(प्रत्यक्ष + अप्रत्यक्ष) आपकी टीम में लीडर बनने के लिए। कोई शॉर्टकट नहीं!' },
+      },
+      rule2: {
+        title: { en: '10 Direct Members for Income', hi: 'आय के लिए 10 प्रत्यक्ष सदस्य' },
+        desc: { en: 'Leader income starts only when you have', hi: 'लीडर आय तभी शुरू होती है जब आपके पास हो' },
+        descHighlight: { en: '10+ direct members', hi: '10+ प्रत्यक्ष सदस्य' },
+        desc2: { en: 'under you. Build your direct team first!', hi: 'आपके अधीन। पहले अपनी प्रत्यक्ष टीम बनाएं!' },
+      },
+      rule3: {
+        title: { en: 'Monthly Payout on 3rd', hi: '3 तारीख को मासिक भुगतान' },
+        desc: { en: 'Leader payout is calculated and credited on the', hi: 'लीडर भुगतान की गणना और जमा की जाती है' },
+        descHighlight: { en: '3rd of every month', hi: 'हर महीने की 3 तारीख को' },
+        desc2: { en: 'at 10:00 AM automatically.', hi: 'सुबह 10:00 बजे स्वचालित रूप से।' },
+      },
+      rule4: {
+        title: { en: 'Admin Managed', hi: 'एडमिन प्रबंधित' },
+        desc: { en: 'All leader promotions and payouts are managed by', hi: 'सभी लीडर पदोन्नति और भुगतान प्रबंधित किए जाते हैं' },
+        descHighlight: { en: 'Admin Panel', hi: 'एडमिन पैनल' },
+        desc2: { en: '. Transparent and secure system!', hi: '। पारदर्शी और सुरक्षित प्रणाली!' },
+      },
+    },
+    journey: {
+      title: { en: 'Your Journey to Leader', hi: 'लीडर तक आपकी यात्रा' },
+      start: { en: 'Start (0 members)', hi: 'शुरू (0 सदस्य)' },
+      member: { en: 'Member', hi: 'सदस्य' },
+      tenMembers: { en: '10 members', hi: '10 सदस्य' },
+      incomeStarts: { en: 'Income Starts', hi: 'आय शुरू' },
+      hundredMembers: { en: '100 members', hi: '100 सदस्य' },
+      leader: { en: '👑 LEADER', hi: '👑 लीडर' },
+    },
+    cta: {
+      text: { en: 'Start Your Leader Journey Now', hi: 'अपनी लीडर यात्रा अभी शुरू करें' },
+      subtitle: { en: 'Join today and start building your team to become a Leader!', hi: 'आज जुड़ें और लीडर बनने के लिए अपनी टीम बनाना शुरू करें!' },
+    },
+  },
+
   // Landing Page - Final CTA Section
   finalCTA: {
     title1: { en: 'Ready to Start Your', hi: 'अपनी शुरू करने के लिए तैयार हैं' },

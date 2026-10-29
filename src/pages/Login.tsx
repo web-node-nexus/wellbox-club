@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'framer-motion';
 import { Crown, Phone, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
@@ -11,6 +12,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const { translate } = useLanguage();
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -42,8 +44,8 @@ export default function Login() {
               <Crown className="w-7 h-7 text-white" />
             </div>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="text-gray-500 mt-1">Sign in to your Jewellbox Club account</p>
+          <h1 className="text-2xl font-bold text-gray-900">{translate('login.welcomeBack')}</h1>
+          <p className="text-gray-500 mt-1">{translate('login.signInAccount')}</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
@@ -56,7 +58,7 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Mobile Number</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{translate('login.mobileNumber')}</label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <span className="absolute left-10 top-1/2 -translate-y-1/2 text-sm text-gray-500">+91</span>
@@ -64,7 +66,7 @@ export default function Login() {
                   type="tel"
                   value={mobile}
                   onChange={e => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  placeholder="Enter your mobile number"
+                  placeholder={translate('login.enterMobile')}
                   className="w-full pl-20 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                   required
                 />
@@ -72,14 +74,14 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{translate('login.password')}</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder={translate('login.enterPassword')}
                   className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                   required
                 />
@@ -94,24 +96,24 @@ export default function Login() {
               disabled={loading}
               className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg shadow-amber-200 disabled:opacity-50"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? translate('login.signingIn') : translate('common.signIn')}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-amber-600 font-medium hover:text-amber-700">Join Now</Link>
+              {translate('login.dontHaveAccount')}{' '}
+              <Link to="/register" className="text-amber-600 font-medium hover:text-amber-700">{translate('common.joinNow')}</Link>
             </p>
           </div>
 
           <div className="mt-6 p-4 bg-amber-50 rounded-xl border border-amber-100">
-            <p className="text-xs font-medium text-amber-700 mb-2">Demo Accounts:</p>
+            <p className="text-xs font-medium text-amber-700 mb-2">{translate('login.demoAccounts')}</p>
             <div className="space-y-1 text-xs text-amber-600">
-              <p>• Mobile: 9876543210 | Password: admin123 (Admin)</p>
-              <p>• Mobile: 9876543211 | Password: raj123 (Leader)</p>
-              <p>• Mobile: 9876543212 | Password: pri123 (Member)</p>
-              <p>• Mobile: 9876543213 | Password: amit123 (Individual Buyer)</p>
+              <p>• Mobile: 9876543210 | Password: admin123 ({translate('admin.adminPanel')})</p>
+              <p>• Mobile: 9876543211 | Password: raj123 ({translate('navbar.leaders')})</p>
+              <p>• Mobile: 9876543212 | Password: pri123 ({translate('navbar.becomeMember')})</p>
+              <p>• Mobile: 9876543213 | Password: amit123 ({translate('joinModal.registerAsBuyer')})</p>
             </div>
           </div>
         </div>

@@ -281,19 +281,19 @@ export default function Landing({ onJoinClick }: LandingProps) {
           >
             <div className="bg-white/5 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 hover:border-amber-500/40 transition-all hover:scale-105">
               <AnimatedCounter target={12500} suffix="+" />
-              <p className="text-sm text-white/60 mt-2 font-medium">{translate('landing.activeMembers')}</p>
+              <p className="text-sm text-white/60 mt-2 font-medium">{translate('hero.stats.activeMembers')}</p>
             </div>
             <div className="bg-white/5 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 hover:border-amber-500/40 transition-all hover:scale-105">
               <AnimatedCounter target={850} suffix="+" />
-              <p className="text-sm text-white/60 mt-2 font-medium">{translate('landing.goldDesigns')}</p>
+              <p className="text-sm text-white/60 mt-2 font-medium">{translate('hero.stats.goldDesigns')}</p>
             </div>
             <div className="bg-white/5 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 hover:border-amber-500/40 transition-all hover:scale-105">
               <AnimatedCounter target={2} prefix="₹" suffix="Cr+" />
-              <p className="text-sm text-white/60 mt-2 font-medium">{translate('landing.commissionPaid')}</p>
+              <p className="text-sm text-white/60 mt-2 font-medium">{translate('hero.stats.goldSold')}</p>
             </div>
             <div className="bg-white/5 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 hover:border-amber-500/40 transition-all hover:scale-105">
               <AnimatedCounter target={500} suffix="+" />
-              <p className="text-sm text-white/60 mt-2 font-medium">{translate('landing.activeMembers')}</p>
+              <p className="text-sm text-white/60 mt-2 font-medium">{translate('hero.stats.activeLeaders')}</p>
             </div>
           </motion.div>
         </motion.div>
@@ -365,7 +365,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
               >
                 <Gem className="w-8 h-8 text-amber-400" />
               </motion.div>
-              <span className="text-2xl font-bold text-amber-300">Digital Gold Showroom</span>
+              <span className="text-2xl font-bold text-amber-300">{translate('showroom.title')}</span>
               <motion.div
                 animate={{ rotate: [0, -360] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -375,25 +375,25 @@ export default function Landing({ onJoinClick }: LandingProps) {
             </motion.div>
             
             <h2 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6" style={{ textShadow: '0 0 60px rgba(255, 215, 0, 0.4)' }}>
-              <span className="text-white">Buy Gold at</span>
+              <span className="text-white">{translate('showroom.heading')}</span>
               <br />
-              <span className="gradient-text">Wholesale Prices</span>
+              <span className="gradient-text">{translate('showroom.headingHighlight')}</span>
             </h2>
             
             <p className="text-2xl text-white/80 max-w-3xl mx-auto mb-8 font-medium">
-              Directly from manufacturer. <span className="text-amber-400 font-bold">No middlemen. No markup.</span>
+              {translate('showroom.subtitle')}
               <br />
-              <span className="text-3xl font-bold text-amber-400">Get Gold at Very Less Price!</span>
+              <span className="text-3xl font-bold text-amber-400">{translate('showroom.saveHighlight')}</span>
             </p>
             
             {/* Trust Badges */}
             <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
               {[
-                { icon: CheckCircle, text: 'BIS Hallmarked', color: 'text-green-400' },
-                { icon: CheckCircle, text: '850+ Designs', color: 'text-blue-400' },
-                { icon: CheckCircle, text: '22K & 24K Gold', color: 'text-amber-400' },
-                { icon: CheckCircle, text: 'Very Less Price', color: 'text-purple-400' },
-                { icon: CheckCircle, text: 'Instant Delivery', color: 'text-pink-400' },
+                { icon: CheckCircle, text: translate('showroom.badges.bis'), color: 'text-green-400' },
+                { icon: CheckCircle, text: translate('showroom.badges.designs'), color: 'text-blue-400' },
+                { icon: CheckCircle, text: translate('showroom.badges.purity'), color: 'text-amber-400' },
+                { icon: CheckCircle, text: translate('showroom.badges.cheaper'), color: 'text-purple-400' },
+                { icon: CheckCircle, text: translate('showroom.badges.delivery'), color: 'text-pink-400' },
               ].map((badge, i) => (
                 <motion.div
                   key={i}
@@ -452,14 +452,14 @@ export default function Landing({ onJoinClick }: LandingProps) {
                       whileTap={{ scale: 0.9 }}
                       className="flex-1 py-2.5 bg-white/20 backdrop-blur-xl rounded-xl text-xs font-bold flex items-center justify-center gap-1 hover:bg-white/30 transition-colors"
                     >
-                      <Eye className="w-4 h-4" /> View
+                      <Eye className="w-4 h-4" /> {translate('showroom.viewDetails')}
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 rounded-xl text-xs font-bold flex items-center justify-center gap-1"
                     >
-                      <ShoppingCart className="w-4 h-4" /> Buy
+                      <ShoppingCart className="w-4 h-4" /> {translate('showroom.buyNow')}
                     </motion.button>
                   </div>
                   
@@ -490,7 +490,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                     className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 text-sm font-bold rounded-xl shadow-lg hover:shadow-xl hover:shadow-amber-500/30 transition-all relative overflow-hidden group/btn"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
-                    <span className="relative">Buy Now →</span>
+                    <span className="relative">{translate('showroom.buyNow')} →</span>
                   </motion.button>
                 </div>
               </motion.div>
@@ -513,7 +513,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                   <Gem className="w-7 h-7 relative" />
-                  <span className="relative">Explore Full Showroom</span>
+                  <span className="relative">{translate('showroom.exploreShowroom')}</span>
                   <ArrowRight className="w-7 h-7 relative" />
                 </motion.button>
               </Link>
@@ -526,7 +526,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                   <MessageCircle className="w-7 h-7 relative" />
-                  <span className="relative">WhatsApp Us</span>
+                  <span className="relative">{translate('showroom.whatsappUs')}</span>
                 </motion.button>
               </a>
             </div>
@@ -537,7 +537,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
               viewport={{ once: true }}
               className="text-white/60 mt-8 text-lg"
             >
-              💡 <span className="text-amber-400 font-bold">Pro Tip:</span> Join as a member and earn 4% commission on every gold order you refer!
+              💡 <span className="text-amber-400 font-bold">{translate('showroom.proTip')}</span> {translate('showroom.proTipText')}
             </motion.p>
           </motion.div>
         </div>
@@ -594,7 +594,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
               >
                 <Crown className="w-8 h-8 text-amber-400" />
               </motion.div>
-              <span className="text-2xl font-bold text-amber-300">Leader Program</span>
+              <span className="text-2xl font-bold text-amber-300">{translate('leaderProgram.title')}</span>
               <motion.div
                 animate={{ rotate: [0, -360] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -604,10 +604,10 @@ export default function Landing({ onJoinClick }: LandingProps) {
             </motion.div>
             
             <h2 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6" style={{ textShadow: '0 0 60px rgba(255, 215, 0, 0.4)' }}>
-              <span className="text-white">Become a</span> <span className="gradient-text">Leader</span>
+              <span className="text-white">{translate('leaderProgram.heading1')}</span> <span className="gradient-text">{translate('leaderProgram.heading2')}</span>
             </h2>
             <p className="text-2xl text-white/80 max-w-3xl mx-auto font-medium">
-              Build your team, unlock premium benefits, and earn monthly leader payouts!
+              {translate('leaderProgram.subtitle')}
             </p>
           </motion.div>
 
@@ -626,17 +626,17 @@ export default function Landing({ onJoinClick }: LandingProps) {
               </div>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-5xl font-bold text-white/10">01</span>
-                <span className="px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-sm font-bold text-blue-400">START HERE</span>
+                <span className="px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-sm font-bold text-blue-400">{translate('leaderProgram.steps.step1.badge')}</span>
               </div>
-              <h3 className="text-2xl font-bold mb-3">Join as Member</h3>
+              <h3 className="text-2xl font-bold mb-3">{translate('leaderProgram.steps.step1.title')}</h3>
               <p className="text-white/70 leading-relaxed mb-4">
-                Register with your mobile number. Get your unique referral code. Start building your team!
+                {translate('leaderProgram.steps.step1.desc')}
               </p>
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
                 <p className="text-sm text-blue-300 font-semibold">
-                  ✅ No joining fee<br />
-                  ✅ Instant referral code<br />
-                  ✅ Start earning immediately
+                  ✅ {translate('leaderProgram.steps.step1.benefits.noFee')}<br />
+                  ✅ {translate('leaderProgram.steps.step1.benefits.instantCode')}<br />
+                  ✅ {translate('leaderProgram.steps.step1.benefits.startEarning')}
                 </p>
               </div>
             </motion.div>
@@ -654,16 +654,16 @@ export default function Landing({ onJoinClick }: LandingProps) {
               </div>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-5xl font-bold text-amber-400/20">02</span>
-                <span className="px-3 py-1 bg-amber-500/20 border border-amber-500/30 rounded-full text-sm font-bold text-amber-400">KEY STEP</span>
+                <span className="px-3 py-1 bg-amber-500/20 border border-amber-500/30 rounded-full text-sm font-bold text-amber-400">{translate('leaderProgram.steps.step2.badge')}</span>
               </div>
-              <h3 className="text-2xl font-bold mb-3 text-amber-400">Add 100 Members</h3>
+              <h3 className="text-2xl font-bold mb-3 text-amber-400">{translate('leaderProgram.steps.step2.title')}</h3>
               <p className="text-white/70 leading-relaxed mb-4">
-                Build your team to <span className="text-amber-400 font-bold text-xl">100 members</span> (direct + indirect). Once you reach 100, you automatically become a Leader!
+                {translate('leaderProgram.steps.step2.desc')} <span className="text-amber-400 font-bold text-xl">{translate('leaderProgram.steps.step2.descHighlight')}</span> {translate('leaderProgram.steps.step2.desc2')}
               </p>
               <div className="bg-amber-500/10 border-2 border-amber-500/30 rounded-xl p-4">
-                <p className="text-sm text-amber-300 font-bold mb-2">🎯 IMPORTANT:</p>
+                <p className="text-sm text-amber-300 font-bold mb-2">{translate('leaderProgram.steps.step2.important')}</p>
                 <p className="text-sm text-amber-200">
-                  You CANNOT become a Leader directly. You must build your team to 100 members first. This ensures only dedicated leaders earn premium benefits!
+                  {translate('leaderProgram.steps.step2.importantText')}
                 </p>
               </div>
             </motion.div>
@@ -681,17 +681,17 @@ export default function Landing({ onJoinClick }: LandingProps) {
               </div>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-5xl font-bold text-purple-400/20">03</span>
-                <span className="px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full text-sm font-bold text-purple-400">REWARD</span>
+                <span className="px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full text-sm font-bold text-purple-400">{translate('leaderProgram.steps.step3.badge')}</span>
               </div>
-              <h3 className="text-2xl font-bold mb-3 text-purple-400">Earn Leader Income</h3>
+              <h3 className="text-2xl font-bold mb-3 text-purple-400">{translate('leaderProgram.steps.step3.title')}</h3>
               <p className="text-white/70 leading-relaxed mb-4">
-                Once you're a Leader with <span className="text-purple-400 font-bold">10+ direct members</span>, you start earning 5% monthly payout on your team's total income!
+                {translate('leaderProgram.steps.step3.desc')} <span className="text-purple-400 font-bold">{translate('leaderProgram.steps.step3.descHighlight')}</span>{translate('leaderProgram.steps.step3.desc2')}
               </p>
               <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4">
                 <p className="text-sm text-purple-300 font-semibold">
-                  💰 5% monthly team income<br />
-                  💰 Credited on 3rd of every month<br />
-                  💰 Premium leader benefits
+                  💰 {translate('leaderProgram.steps.step3.benefits.monthlyPayout')}<br />
+                  💰 {translate('leaderProgram.steps.step3.benefits.credited3rd')}<br />
+                  💰 {translate('leaderProgram.steps.step3.benefits.premiumBenefits')}
                 </p>
               </div>
             </motion.div>
@@ -709,8 +709,8 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 <Crown className="w-8 h-8 text-purple-900" />
               </div>
               <div>
-                <h3 className="text-3xl font-bold">Leader Income Rules</h3>
-                <p className="text-white/60">Clear path to premium earnings</p>
+                <h3 className="text-3xl font-bold">{translate('leaderProgram.rules.title')}</h3>
+                <p className="text-white/60">{translate('leaderProgram.rules.subtitle')}</p>
               </div>
             </div>
 
@@ -722,9 +722,9 @@ export default function Landing({ onJoinClick }: LandingProps) {
                     <span className="text-2xl">🎯</span>
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold mb-2 text-amber-400">100 Members Required</h4>
+                    <h4 className="text-xl font-bold mb-2 text-amber-400">{translate('leaderProgram.rules.rule1.title')}</h4>
                     <p className="text-white/70">
-                      You must have <span className="text-amber-400 font-bold text-lg">100 total members</span> (direct + indirect) in your team to become a Leader. No shortcuts!
+                      {translate('leaderProgram.rules.rule1.desc')} <span className="text-amber-400 font-bold text-lg">{translate('leaderProgram.rules.rule1.descHighlight')}</span> {translate('leaderProgram.rules.rule1.desc2')}
                     </p>
                   </div>
                 </div>
@@ -737,9 +737,9 @@ export default function Landing({ onJoinClick }: LandingProps) {
                     <span className="text-2xl">💰</span>
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold mb-2 text-purple-400">10 Direct Members for Income</h4>
+                    <h4 className="text-xl font-bold mb-2 text-purple-400">{translate('leaderProgram.rules.rule2.title')}</h4>
                     <p className="text-white/70">
-                      Leader income starts only when you have <span className="text-purple-400 font-bold text-lg">10+ direct members</span> under you. Build your direct team first!
+                      {translate('leaderProgram.rules.rule2.desc')} <span className="text-purple-400 font-bold text-lg">{translate('leaderProgram.rules.rule2.descHighlight')}</span> {translate('leaderProgram.rules.rule2.desc2')}
                     </p>
                   </div>
                 </div>
@@ -752,9 +752,9 @@ export default function Landing({ onJoinClick }: LandingProps) {
                     <span className="text-2xl">📅</span>
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold mb-2 text-green-400">Monthly Payout on 3rd</h4>
+                    <h4 className="text-xl font-bold mb-2 text-green-400">{translate('leaderProgram.rules.rule3.title')}</h4>
                     <p className="text-white/70">
-                      Leader payout is calculated and credited on the <span className="text-green-400 font-bold">3rd of every month</span> at 10:00 AM automatically.
+                      {translate('leaderProgram.rules.rule3.desc')} <span className="text-green-400 font-bold">{translate('leaderProgram.rules.rule3.descHighlight')}</span> {translate('leaderProgram.rules.rule3.desc2')}
                     </p>
                   </div>
                 </div>
@@ -767,9 +767,9 @@ export default function Landing({ onJoinClick }: LandingProps) {
                     <span className="text-2xl">🛡️</span>
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold mb-2 text-blue-400">Admin Managed</h4>
+                    <h4 className="text-xl font-bold mb-2 text-blue-400">{translate('leaderProgram.rules.rule4.title')}</h4>
                     <p className="text-white/70">
-                      All leader promotions and payouts are managed by <span className="text-blue-400 font-bold">Admin Panel</span>. Transparent and secure system!
+                      {translate('leaderProgram.rules.rule4.desc')} <span className="text-blue-400 font-bold">{translate('leaderProgram.rules.rule4.descHighlight')}</span>{translate('leaderProgram.rules.rule4.desc2')}
                     </p>
                   </div>
                 </div>
@@ -778,10 +778,10 @@ export default function Landing({ onJoinClick }: LandingProps) {
 
             {/* Visual Progress Bar */}
             <div className="mt-8 bg-white/5 rounded-2xl p-6 border border-white/10">
-              <h4 className="text-xl font-bold mb-4 text-center">Your Journey to Leader</h4>
+              <h4 className="text-xl font-bold mb-4 text-center">{translate('leaderProgram.journey.title')}</h4>
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-32 text-sm font-semibold text-white/70">Start (0 members)</div>
+                  <div className="w-32 text-sm font-semibold text-white/70">{translate('leaderProgram.journey.start')}</div>
                   <div className="flex-1 bg-white/10 rounded-full h-4 overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
@@ -791,10 +791,10 @@ export default function Landing({ onJoinClick }: LandingProps) {
                       className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
                     />
                   </div>
-                  <span className="text-sm font-bold text-blue-400">Member</span>
+                  <span className="text-sm font-bold text-blue-400">{translate('leaderProgram.journey.member')}</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-32 text-sm font-semibold text-white/70">10 members</div>
+                  <div className="w-32 text-sm font-semibold text-white/70">{translate('leaderProgram.journey.tenMembers')}</div>
                   <div className="flex-1 bg-white/10 rounded-full h-4 overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
@@ -804,10 +804,10 @@ export default function Landing({ onJoinClick }: LandingProps) {
                       className="h-full bg-gradient-to-r from-purple-500 to-purple-600 rounded-full"
                     />
                   </div>
-                  <span className="text-sm font-bold text-purple-400">Income Starts</span>
+                  <span className="text-sm font-bold text-purple-400">{translate('leaderProgram.journey.incomeStarts')}</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-32 text-sm font-semibold text-white/70">100 members</div>
+                  <div className="w-32 text-sm font-semibold text-white/70">{translate('leaderProgram.journey.hundredMembers')}</div>
                   <div className="flex-1 bg-white/10 rounded-full h-4 overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
@@ -817,7 +817,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                       className="h-full bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full shadow-lg shadow-amber-500/50"
                     />
                   </div>
-                  <span className="text-sm font-bold text-amber-400">👑 LEADER</span>
+                  <span className="text-sm font-bold text-amber-400">{translate('leaderProgram.journey.leader')}</span>
                 </div>
               </div>
             </div>
@@ -838,10 +838,10 @@ export default function Landing({ onJoinClick }: LandingProps) {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               <Crown className="w-7 h-7 inline mr-3 relative" />
-              <span className="relative">Start Your Leader Journey Now</span>
+              <span className="relative">{translate('leaderProgram.cta.text')}</span>
             </motion.button>
             <p className="text-white/60 mt-4 text-lg">
-              Join today and start building your team to become a Leader!
+              {translate('leaderProgram.cta.subtitle')}
             </p>
           </motion.div>
         </div>
@@ -857,18 +857,18 @@ export default function Landing({ onJoinClick }: LandingProps) {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="text-sm font-bold text-amber-400 uppercase tracking-wider">Simple Process</span>
+            <span className="text-sm font-bold text-amber-400 uppercase tracking-wider">{translate('common.features')}</span>
             <h2 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mt-3 mb-4" style={{ textShadow: '0 0 40px rgba(255, 215, 0, 0.3)' }}>
-              How It <span className="gradient-text">Works</span>
+              {translate('howItWorks.title')}
             </h2>
-            <p className="text-lg text-white/60 max-w-xl mx-auto">Bas 3 simple steps mein shuru karein apna gold journey</p>
+            <p className="text-lg text-white/60 max-w-xl mx-auto">{translate('howItWorks.subtitle')}</p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { icon: Users, step: '01', title: 'Join & Contribute', desc: 'Sign up with a referral code, make your first monthly contribution starting from ₹1,000. Your gold savings begin!', color: 'from-amber-500 to-yellow-600' },
-              { icon: TrendingUp, step: '02', title: 'Build Your Team', desc: 'Share your unique referral code. Earn 10% on Level 1 and 5% on Level 2 contributions. Team grows, income grows!', color: 'from-purple-500 to-pink-600' },
-              { icon: Gem, step: '03', title: 'Earn & Own Gold', desc: 'Withdraw commissions anytime. After 12 months, convert contributions to gold or withdraw. Access showroom at factory prices!', color: 'from-emerald-500 to-teal-600' },
+              { icon: Users, step: '01', title: translate('howItWorks.steps.step1.title'), desc: translate('howItWorks.steps.step1.desc'), color: 'from-amber-500 to-yellow-600' },
+              { icon: TrendingUp, step: '02', title: translate('howItWorks.steps.step2.title'), desc: translate('howItWorks.steps.step2.desc'), color: 'from-purple-500 to-pink-600' },
+              { icon: Gem, step: '03', title: translate('howItWorks.steps.step3.title'), desc: translate('howItWorks.steps.step3.desc'), color: 'from-emerald-500 to-teal-600' },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -902,20 +902,20 @@ export default function Landing({ onJoinClick }: LandingProps) {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="text-sm font-bold text-amber-400 uppercase tracking-wider">Multiple Income Streams</span>
+            <span className="text-sm font-bold text-amber-400 uppercase tracking-wider">{translate('common.features')}</span>
             <h2 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mt-3 mb-4" style={{ textShadow: '0 0 40px rgba(255, 215, 0, 0.3)' }}>
-              Income <span className="gradient-text">Plan</span>
+              {translate('incomePlan.title')}
             </h2>
-            <p className="text-lg text-white/60 max-w-xl mx-auto">4 ways to earn - the more you build, the more you make!</p>
+            <p className="text-lg text-white/60 max-w-xl mx-auto">{translate('incomePlan.subtitle')}</p>
           </motion.div>
 
           {/* Commission Cards */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             {[
-              { title: 'Level 1', rate: '10%', desc: 'Direct referral contribution', icon: Users, gradient: 'from-green-500 to-emerald-600' },
-              { title: 'Level 2', rate: '5%', desc: "Referral's referral contribution", icon: TrendingUp, gradient: 'from-blue-500 to-indigo-600' },
-              { title: 'Leader Income', rate: '5%', desc: 'Monthly on team total income', icon: Crown, gradient: 'from-amber-500 to-orange-600' },
-              { title: 'Gold Bonus', rate: '4%', desc: 'On referred gold orders', icon: Gem, gradient: 'from-purple-500 to-pink-600' },
+              { title: translate('incomePlan.commissions.level1'), rate: '10%', desc: translate('incomePlan.commissions.level1Desc'), icon: Users, gradient: 'from-green-500 to-emerald-600' },
+              { title: translate('incomePlan.commissions.level2'), rate: '5%', desc: translate('incomePlan.commissions.level2Desc'), icon: TrendingUp, gradient: 'from-blue-500 to-indigo-600' },
+              { title: translate('incomePlan.commissions.leader'), rate: '5%', desc: translate('incomePlan.commissions.leaderDesc'), icon: Crown, gradient: 'from-amber-500 to-orange-600' },
+              { title: translate('incomePlan.commissions.goldBonus'), rate: '4%', desc: translate('incomePlan.commissions.goldBonusDesc'), icon: Gem, gradient: 'from-purple-500 to-pink-600' },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -948,8 +948,8 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 <Zap className="w-6 h-6 text-purple-900" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold">Income Calculator</h3>
-                <p className="text-sm text-white/50">Estimate your potential monthly earnings</p>
+                <h3 className="text-2xl font-bold">{translate('incomePlan.calculator.title')}</h3>
+                <p className="text-sm text-white/50">{translate('incomePlan.calculator.subtitle')}</p>
               </div>
             </div>
 
@@ -957,7 +957,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
               <div className="space-y-6">
                 <div>
                   <label className="flex items-center justify-between text-sm text-white/70 mb-2">
-                    <span>Number of Team Members</span>
+                    <span>{translate('incomePlan.calculator.teamMembers')}</span>
                     <span className="text-amber-400 font-bold text-lg">{calcMembers}</span>
                   </label>
                   <input
@@ -971,7 +971,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 </div>
                 <div>
                   <label className="flex items-center justify-between text-sm text-white/70 mb-2">
-                    <span>Monthly Contribution (₹)</span>
+                    <span>{translate('incomePlan.calculator.monthlyContribution')}</span>
                     <span className="text-amber-400 font-bold text-lg">₹{calcContribution.toLocaleString()}</span>
                   </label>
                   <input
@@ -987,23 +987,23 @@ export default function Landing({ onJoinClick }: LandingProps) {
               </div>
 
               <div className="bg-gradient-to-br from-amber-500/10 to-purple-500/10 rounded-2xl p-6 border-2 border-amber-500/20">
-                <p className="text-sm text-white/50 mb-4">Estimated Monthly Income</p>
+                <p className="text-sm text-white/50 mb-4">{translate('incomePlan.calculator.estimatedIncome')}</p>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-white/70">Level 1 (10%)</span>
+                    <span className="text-sm text-white/70">{translate('incomePlan.commissions.level1')} (10%)</span>
                     <span className="font-bold text-green-400 text-lg">₹{incomeL1.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-white/70">Level 2 (5%)</span>
+                    <span className="text-sm text-white/70">{translate('incomePlan.commissions.level2')} (5%)</span>
                     <span className="font-bold text-blue-400 text-lg">₹{incomeL2.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-white/70">Leader (5%)</span>
+                    <span className="text-sm text-white/70">{translate('incomePlan.commissions.leader')} (5%)</span>
                     <span className="font-bold text-amber-400 text-lg">₹{leaderIncome.toLocaleString()}</span>
                   </div>
                   <div className="border-t border-white/10 pt-3 mt-3">
                     <div className="flex justify-between items-center">
-                      <span className="font-bold text-lg">Total Monthly</span>
+                      <span className="font-bold text-lg">{translate('incomePlan.calculator.totalMonthly')}</span>
                       <span className="text-3xl font-bold gradient-text">₹{totalMonthly.toLocaleString()}</span>
                     </div>
                   </div>
@@ -1025,9 +1025,9 @@ export default function Landing({ onJoinClick }: LandingProps) {
             className="text-center mb-12"
           >
             <h2 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mb-4" style={{ textShadow: '0 0 40px rgba(255, 215, 0, 0.3)' }}>
-              Success <span className="gradient-text">Stories</span>
+              {translate('testimonials.title')}
             </h2>
-            <p className="text-lg text-white/60">Real members, real earnings, real gold!</p>
+            <p className="text-lg text-white/60">{translate('testimonials.subtitle')}</p>
           </motion.div>
 
           {/* Testimonial Slider */}
@@ -1096,10 +1096,10 @@ export default function Landing({ onJoinClick }: LandingProps) {
             
             <div className="relative">
               <h2 className="text-4xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6" style={{ textShadow: '0 0 60px rgba(255, 215, 0, 0.4)' }}>
-                Ready to Start Your <span className="gradient-text">Gold Journey</span>?
+                {translate('finalCTA.title1')} <span className="gradient-text">{translate('finalCTA.title2')}</span>
               </h2>
               <p className="text-xl text-white/70 mb-10 max-w-2xl mx-auto">
-                Join 12,000+ members already building wealth. Ab der kis baat ki? 🚀
+                {translate('finalCTA.subtitle')}
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
                 <motion.button
@@ -1109,7 +1109,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                   className="w-full sm:w-auto px-12 py-6 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold text-xl rounded-2xl shadow-2xl shadow-amber-500/50 hover:shadow-amber-500/70 transition-shadow relative overflow-hidden group"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <span className="relative">Join Now - It's Free ✨</span>
+                  <span className="relative">{translate('finalCTA.joinFree')}</span>
                 </motion.button>
                 <a
                   href="https://wa.me/919876543210"
@@ -1118,7 +1118,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                   className="w-full sm:w-auto px-12 py-6 bg-green-600/20 border-2 border-green-500/30 text-green-400 font-bold text-xl rounded-2xl flex items-center justify-center gap-3 hover:bg-green-600/30 transition-colors backdrop-blur-xl"
                 >
                   <MessageCircle className="w-6 h-6" />
-                  WhatsApp Us
+                  {translate('showroom.whatsappUs')}
                 </a>
               </div>
             </div>
