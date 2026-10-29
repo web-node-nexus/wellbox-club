@@ -44,8 +44,29 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Hide navbar ONLY if user is logged in (not based on route)
-  if (user) return null;
+  // Public routes where navbar should ALWAYS show
+  const publicRoutes = [
+    '/',
+    '/about',
+    '/how-it-works',
+    '/income-plan',
+    '/leader-program',
+    '/gold-showroom-public',
+    '/why-buy-gold',
+    '/faq',
+    '/contact',
+    '/terms',
+    '/privacy',
+    '/refund-policy',
+    '/login',
+    '/register',
+  ];
+
+  // Show navbar on public routes, hide on dashboard/admin routes
+  const isPublicRoute = publicRoutes.includes(location.pathname) || 
+    location.pathname.startsWith('/register/');
+  
+  if (!isPublicRoute) return null;
 
   const navLinks = [
     { label: translate('navbar.home'), path: '/' },
