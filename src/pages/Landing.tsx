@@ -537,7 +537,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
               viewport={{ once: true }}
               className="text-white/60 mt-8 text-lg"
             >
-              💡 <span className="text-amber-400 font-bold">Pro Tip:</span> Join as a member and earn 3% commission on every gold order you refer!
+              💡 <span className="text-amber-400 font-bold">Pro Tip:</span> Join as a member and earn 4% commission on every gold order you refer!
             </motion.p>
           </motion.div>
         </div>
@@ -915,7 +915,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
               { title: 'Level 1', rate: '10%', desc: 'Direct referral contribution', icon: Users, gradient: 'from-green-500 to-emerald-600' },
               { title: 'Level 2', rate: '5%', desc: "Referral's referral contribution", icon: TrendingUp, gradient: 'from-blue-500 to-indigo-600' },
               { title: 'Leader Income', rate: '5%', desc: 'Monthly on team total income', icon: Crown, gradient: 'from-amber-500 to-orange-600' },
-              { title: 'Gold Bonus', rate: '3%', desc: 'On referred gold orders', icon: Gem, gradient: 'from-purple-500 to-pink-600' },
+              { title: 'Gold Bonus', rate: '4%', desc: 'On referred gold orders', icon: Gem, gradient: 'from-purple-500 to-pink-600' },
             ].map((item, i) => (
               <motion.div
                 key={i}

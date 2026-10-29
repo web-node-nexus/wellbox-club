@@ -52,7 +52,7 @@ export default function AdminGoldOrders() {
                   <th className="px-6 py-4 font-medium">User</th>
                   <th className="px-6 py-4 font-medium">Design</th>
                   <th className="px-6 py-4 font-medium">Amount</th>
-                  <th className="px-6 py-4 font-medium">Commission (3%)</th>
+                  <th className="px-6 py-4 font-medium">Commission (4%)</th>
                   <th className="px-6 py-4 font-medium">Status</th>
                   <th className="px-6 py-4 font-medium">Date</th>
                 </tr>

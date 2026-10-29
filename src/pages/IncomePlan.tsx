@@ -11,14 +11,14 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
   const l1 = members * contribution * 0.10;
   const l2 = Math.floor(members * 0.5) * contribution * 0.05;
   const leader = members * contribution * 0.05;
-  const goldBonus = Math.floor(members * 0.1) * 50000 * 0.03;
+  const goldBonus = Math.floor(members * 0.1) * 50000 * 0.04;
   const total = l1 + l2 + leader + goldBonus;
 
   const commissions = [
     { title: 'Level 1 Commission', rate: '10%', desc: 'Earn 10% of every direct referral\'s monthly contribution. If your referral contributes ₹3,000, you earn ₹300 instantly!', color: 'from-green-500 to-emerald-600', example: '20 direct refs × ₹3,000 × 10% = ₹6,000/month', emoji: '👥', benefits: ['Instant credit', 'No cap on earnings', 'Lifetime commissions'] },
     { title: 'Level 2 Commission', rate: '5%', desc: 'Earn 5% on contributions made by people your referrals bring in. Multi-level earning with no limits!', color: 'from-blue-500 to-indigo-600', example: '10 L2 members × ₹3,000 × 5% = ₹1,500/month', emoji: '📈', benefits: ['Passive income', 'Network effect', 'Unlimited levels'] },
     { title: 'Leader Income', rate: '5%', desc: 'Once you reach 100 team members, earn 5% monthly on your entire team\'s total contribution. Credited on 3rd of every month!', color: 'from-amber-500 to-orange-600', example: '100 members × ₹3,000 × 5% = ₹15,000/month', emoji: '👑', benefits: ['Monthly payout', 'Auto-qualification', 'Premium benefits'] },
-    { title: 'Gold Order Bonus', rate: '3%', desc: 'When your team member purchases gold from showroom, earn 3% of order value. High-value orders = high commissions!', color: 'from-purple-500 to-pink-600', example: '10 gold orders × ₹50,000 × 3% = ₹15,000', emoji: '💎', benefits: ['High-value orders', 'Instant credit', 'No limits'] },
+    { title: 'Gold Order Bonus', rate: '4%', desc: 'When your team member purchases gold from showroom, earn 4% of order value. High-value orders = high commissions!', color: 'from-purple-500 to-pink-600', example: '10 gold orders × ₹50,000 × 4% = ₹20,000', emoji: '💎', benefits: ['High-value orders', 'Instant credit', 'No limits'] },
   ];
 
   return (
@@ -169,7 +169,7 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
                   <span className="font-bold text-amber-400 text-2xl">₹{leader.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center pb-3 border-b border-white/10">
-                  <span className="text-white/70 font-medium">Gold Bonus (3%)</span>
+                  <span className="text-white/70 font-medium">Gold Bonus (4%)</span>
                   <span className="font-bold text-purple-400 text-2xl">₹{goldBonus.toLocaleString()}</span>
                 </div>
                 <div className="pt-4">

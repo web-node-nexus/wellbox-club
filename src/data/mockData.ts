@@ -86,7 +86,7 @@ export const appSettings: Settings = {
   level1Commission: 10,
   level2Commission: 5,
   leaderCommission: 5,
-  goldOrderCommission: 3,
+  goldOrderCommission: 4,
   lockPeriodMonths: 12,
 };
 

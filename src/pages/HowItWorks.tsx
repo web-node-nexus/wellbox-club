@@ -9,7 +9,7 @@ export default function HowItWorks({ onJoinClick }: PageProps) {
     { icon: Users, title: 'Sign Up & Get Your Code', desc: 'Register as a member with your mobile number. Get your unique referral code instantly. Share it with friends and family to start building your team.', color: 'from-blue-500 to-indigo-600', emoji: '👥' },
     { icon: Wallet, title: 'Make Monthly Contributions', desc: 'Start saving for gold with monthly contributions from ₹1,000. Your money is securely locked for 12 months — building your gold fund while you earn.', color: 'from-green-500 to-emerald-600', emoji: '💰' },
     { icon: TrendingUp, title: 'Earn Commissions', desc: 'Earn 10% on direct referrals (Level 1) and 5% on their referrals (Level 2). Commissions are credited instantly to your withdrawable wallet.', color: 'from-amber-500 to-orange-600', emoji: '📈' },
-    { icon: Gem, title: 'Access Gold Showroom', desc: 'Browse 850+ gold designs at manufacturer prices. Express interest, get a call, and purchase BIS hallmarked gold. Plus earn 3% commission on referred orders!', color: 'from-purple-500 to-pink-600', emoji: '💎' },
+    { icon: Gem, title: 'Access Gold Showroom', desc: 'Browse 850+ gold designs at manufacturer prices. Express interest, get a call, and purchase BIS hallmarked gold. Plus earn 4% commission on referred orders!', color: 'from-purple-500 to-pink-600', emoji: '💎' },
     { icon: Shield, title: 'Withdraw or Convert', desc: 'Withdraw commissions anytime. After 12 months, unlock your contribution — withdraw to bank OR convert to gold purchase. Complete flexibility!', color: 'from-teal-500 to-cyan-600', emoji: '🔐' },
   ];
 

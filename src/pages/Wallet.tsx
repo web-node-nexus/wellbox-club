@@ -135,7 +135,7 @@ export default function WalletPage() {
                 <li>✓ Level 1 commissions (10%)</li>
                 <li>✓ Level 2 commissions (5%)</li>
                 <li>✓ Leader payouts (5%)</li>
-                <li>✓ Gold order bonuses (3%)</li>
+                <li>✓ Gold order bonuses (4%)</li>
               </ul>
             </div>
 

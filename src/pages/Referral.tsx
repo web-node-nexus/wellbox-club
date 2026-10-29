@@ -162,8 +162,8 @@ export default function Referral() {
             className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200"
           >
             <Gift className="w-8 h-8 text-purple-600 mb-3" />
-            <h4 className="text-lg font-bold text-gray-900 mb-2">Gold Bonus: 3%</h4>
-            <p className="text-sm text-gray-600">Earn 3% commission when your referrals purchase gold from showroom</p>
+            <h4 className="text-lg font-bold text-gray-900 mb-2">Gold Bonus: 4%</h4>
+            <p className="text-sm text-gray-600">Earn 4% commission when your referrals purchase gold from showroom</p>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
