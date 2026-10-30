@@ -1,10 +1,11 @@
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wallet, ArrowDownRight, ArrowUpRight, Send, CheckCircle, Clock, XCircle, Calendar, CreditCard, Building2, Smartphone, Download, Eye, X, Lock, Unlock, Gem, IndianRupee, AlertCircle } from 'lucide-react';
+import { Wallet, ArrowDownRight, ArrowUpRight, Send, CheckCircle, Clock, XCircle, Calendar, CreditCard, Building2, Smartphone, Download, Eye, X, Lock, Unlock, Gem, IndianRupee, AlertCircle, Plus } from 'lucide-react';
 import { getCommissionWalletBalance, walletTransactions, withdrawals } from '../data/mockData';
 import { useState, useEffect } from 'react';
 import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
+import PaymentModal from '../components/PaymentModal';
 
 export default function WalletPage() {
   const { user } = useAuth();
@@ -22,6 +23,8 @@ export default function WalletPage() {
   const [showHistory, setShowHistory] = useState(false);
   const [viewingTransaction, setViewingTransaction] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'commission' | 'investment'>('commission');
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState(0);
 
   if (!user) return null;
 
@@ -139,14 +142,28 @@ export default function WalletPage() {
               </ul>
             </div>
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setShowWithdraw(!showWithdraw)}
-              className="mt-6 w-full py-4 bg-white/20 hover:bg-white/30 rounded-xl font-semibold text-lg transition-colors backdrop-blur"
-            >
-              Withdraw Now
-            </motion.button>
+            <div className="mt-6 flex gap-3">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowWithdraw(!showWithdraw)}
+                className="flex-1 py-4 bg-white/20 hover:bg-white/30 rounded-xl font-semibold text-lg transition-colors backdrop-blur"
+              >
+                Withdraw Now
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  setPaymentAmount(1000);
+                  setShowPaymentModal(true);
+                }}
+                className="flex-1 py-4 bg-white/30 hover:bg-white/40 rounded-xl font-semibold text-lg transition-colors backdrop-blur flex items-center justify-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                Add Funds
+              </motion.button>
+            </div>
           </div>
 
           {/* Withdraw Form */}
@@ -517,6 +534,24 @@ export default function WalletPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        amount={paymentAmount}
+        description="Add funds to wallet"
+        onSuccess={(response) => {
+          console.log('Payment successful:', response);
+          showToast('success', 'Funds added successfully!', 'Success');
+          // Here you would typically update the wallet balance
+          // For now, we'll just show a success message
+        }}
+        onFailure={(error) => {
+          console.error('Payment failed:', error);
+          showToast('error', 'Payment failed. Please try again.', 'Error');
+        }}
+      />
     </div>
   );
 }
