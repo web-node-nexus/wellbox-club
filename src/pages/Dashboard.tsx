@@ -1,6 +1,6 @@
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { Crown, Copy, Share2, CheckCircle, Wallet, Lock, Unlock, Calendar, TrendingUp, DollarSign, Users, Gift, ArrowUpRight, ArrowDownRight, Target, Zap, Award, Eye, Bell, Trophy, Star, Flame, Sparkles } from 'lucide-react';
+import { Crown, Copy, Share2, CheckCircle, Wallet, Lock, Unlock, Calendar, TrendingUp, DollarSign, Users, Gift, ArrowUpRight, ArrowDownRight, Target, Zap, Award, Eye, Bell, Trophy, Star, Flame, Sparkles, Gem } from 'lucide-react';
 import { walletTransactions, contributions, getCommissionWalletBalance, getContributionWalletBalance, users } from '../data/mockData';
 import { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, RadialBarChart, RadialBar, Legend } from 'recharts';
@@ -283,10 +283,12 @@ export default function Dashboard() {
           <p className="text-4xl font-bold mt-2">₹{contributionBalance.toLocaleString()}</p>
           <p className="text-sm text-blue-200 mt-2">🔒 Locked for 12 months</p>
           {myContributions.length > 0 && myContributions[0].status === 'unlocked' ? (
-            <div className="flex gap-2 mt-4">
-              <button className="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-xl font-semibold transition-colors backdrop-blur">Withdraw</button>
-              <button className="flex-1 py-3 bg-amber-500 hover:bg-amber-600 rounded-xl font-semibold transition-colors">Buy Gold</button>
-            </div>
+            <Link to="/gold-showroom" className="mt-4 block">
+              <button className="w-full py-3 bg-amber-500 hover:bg-amber-600 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
+                <Gem className="w-5 h-5" />
+                Order Gold from Showroom
+              </button>
+            </Link>
           ) : (
             <div className="flex items-center gap-2 mt-4 p-3 bg-white/10 rounded-xl">
               <Calendar className="w-5 h-5" />

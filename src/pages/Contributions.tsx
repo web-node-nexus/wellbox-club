@@ -47,22 +47,19 @@ export default function Contributions() {
       setInvestError('Minimum investment is ₹1,000 per month');
       return;
     }
-    if (amount > 100000) {
-      setInvestError('Maximum investment is ₹1,00,000 per month');
-      return;
-    }
+    // No maximum limit - user can invest any amount
 
     const newInvestment = {
       id: Date.now().toString(),
       userId: user.id,
       amount: amount,
       date: new Date().toISOString().split('T')[0],
-      lockedUntil: new Date(Date.now() + 11 * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      lockedUntil: new Date(Date.now() + 12 * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 12 months lock
       status: 'locked' as const,
     };
 
     setMonthlyInvestments([...monthlyInvestments, newInvestment]);
-    showToast('success', `₹${amount.toLocaleString()} invested successfully! Locked for 11 months.`, 'Investment Successful');
+    showToast('success', `₹${amount.toLocaleString()} invested successfully! Locked for minimum 12 months.`, 'Investment Successful');
     setShowInvestModal(false);
     setInvestAmount('');
     setInvestError('');
@@ -156,8 +153,8 @@ export default function Contributions() {
               <div className="flex items-start gap-2">
                 <Calendar className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-blue-900">11-Month Lock Period</p>
-                  <p className="text-xs text-blue-700">Each investment is locked for 11 months</p>
+                  <p className="text-sm font-semibold text-blue-900">12-Month Lock Period</p>
+                  <p className="text-xs text-blue-700">Each investment is locked for minimum 12 months</p>
                 </div>
               </div>
               <div className="flex items-start gap-2">
@@ -292,7 +289,7 @@ export default function Contributions() {
             <div className="space-y-4">
               <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
                 <p className="text-sm text-blue-800">
-                  <strong>Important:</strong> Investment is locked for 11 months. After lock period, you can order gold from showroom. Cash withdrawal is not available for investments.
+                  <strong>Important:</strong> Investment is locked for minimum 12 months. After lock period, you can order gold from showroom. Cash withdrawal is not available for investments.
                 </p>
               </div>
 
@@ -325,7 +322,7 @@ export default function Contributions() {
               <div className="p-4 bg-gray-50 rounded-xl">
                 <p className="text-xs text-gray-600">
                   <Lock className="w-3 h-3 inline mr-1" />
-                  Lock Period: <strong>11 months</strong><br />
+                  Lock Period: <strong>12 months</strong><br />
                   <Gem className="w-3 h-3 inline mr-1" />
                   After lock: Can order gold from showroom<br />
                   <IndianRupee className="w-3 h-3 inline mr-1" />

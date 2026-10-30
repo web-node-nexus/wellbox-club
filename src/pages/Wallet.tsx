@@ -373,13 +373,13 @@ export default function WalletPage() {
             </div>
             <p className="text-sm text-blue-100 font-medium">Total Investment Balance</p>
             <p className="text-5xl font-bold mt-2">₹{totalInvested.toLocaleString()}</p>
-            <p className="text-sm text-blue-200 mt-3">🔒 Locked for 11 months • Can order gold after lock period</p>
+            <p className="text-sm text-blue-200 mt-3">🔒 Locked for minimum 12 months • Can order gold after lock period</p>
             
             <div className="mt-4 p-4 bg-white/10 rounded-xl">
               <p className="text-xs text-blue-100 mb-2 font-semibold">Investment Rules:</p>
               <ul className="text-xs text-blue-100 space-y-1">
-                <li>✓ Minimum ₹1,000 per month</li>
-                <li>✓ Locked for 11 months</li>
+                <li>✓ Minimum ₹1,000 per month (no maximum limit)</li>
+                <li>✓ Locked for minimum 12 months (can extend)</li>
                 <li>✓ Can order gold from showroom after lock</li>
                 <li>✗ Cannot withdraw as cash</li>
                 <li>✗ No early withdrawal allowed</li>
@@ -389,7 +389,7 @@ export default function WalletPage() {
             <div className="mt-4 p-4 bg-amber-500/20 border border-amber-400/30 rounded-xl">
               <p className="text-xs text-amber-100">
                 <AlertCircle className="w-4 h-4 inline mr-1" />
-                <strong>Important:</strong> Investment amount can only be used to order gold from our showroom after the 11-month lock period. Cash withdrawal is not available for investments.
+                <strong>Important:</strong> Investment amount can only be used to order gold from our showroom after the 12-month lock period. Cash withdrawal is not available for investments.
               </p>
             </div>
 
