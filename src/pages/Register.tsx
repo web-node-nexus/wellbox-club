@@ -1,65 +1,140 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { motion } from 'framer-motion';
-import { Crown, User, Phone, Tag, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Crown, User, Phone, Tag, AlertCircle, CheckCircle, Loader2, CreditCard, ArrowRight, ArrowLeft } from 'lucide-react';
+import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP } from '../services/otpService';
+import PaymentModal from '../components/PaymentModal';
 
 export default function Register() {
   const { referralCode } = useParams();
+  const [step, setStep] = useState<'details' | 'otp' | 'payment' | 'success'>('details');
   const [formData, setFormData] = useState({
     name: '',
     mobile: '',
-    password: '',
-    confirmPassword: '',
     referralCode: referralCode || '',
+    investmentAmount: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
+  const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [sendingOTP, setSendingOTP] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
   const { register } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
     
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (!formData.name.trim()) {
+      setError('Please enter your name');
       return;
     }
     if (!/^[6-9]\d{9}$/.test(formData.mobile)) {
-      setError('Enter valid 10-digit mobile number');
+      setError('Please enter a valid 10-digit mobile number');
+      return;
+    }
+    if (!formData.investmentAmount || Number(formData.investmentAmount) < 1000) {
+      setError('First installment must be at least ₹1,000');
       return;
     }
 
-    setLoading(true);
-    setTimeout(() => {
-      const result = register({
-        name: formData.name,
-        mobile: formData.mobile,
-        password: formData.password,
-        referralCode: formData.referralCode,
-        role: 'member',
-      });
-
-      if (result.success) {
-        setSuccess('Registration successful! Redirecting to login...');
-        setTimeout(() => navigate('/login'), 2000);
-      } else {
-        setError(result.message);
+    setSendingOTP(true);
+    
+    try {
+      const demoOTP = generateDemoOTP();
+      storeDemoOTP(formData.mobile, demoOTP);
+      
+      try {
+        await sendOTP(formData.mobile);
+        showToast('success', `OTP sent to +91 ${formData.mobile}`, 'OTP Sent');
+        console.log('Demo OTP:', demoOTP);
+      } catch (apiError) {
+        showToast('info', `Demo OTP: ${demoOTP}`, 'Demo Mode');
       }
-      setLoading(false);
-    }, 500);
+      
+      setStep('otp');
+    } catch (err) {
+      setError('Failed to send OTP. Please try again.');
+    } finally {
+      setSendingOTP(false);
+    }
   };
 
-  const updateField = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleVerifyOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    
+    try {
+      const isValid = verifyDemoOTP(formData.mobile, otp);
+      
+      if (!isValid) {
+        try {
+          await verifyOTP(formData.mobile, otp);
+        } catch (err) {
+          setError('Invalid OTP. Please try again.');
+          setLoading(false);
+          return;
+        }
+      }
+      
+      showToast('success', 'OTP verified successfully!', 'Verified');
+      setStep('payment');
+    } catch (err) {
+      setError('Verification failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    // Payment successful, now register user
+    const result = register({
+      name: formData.name,
+      mobile: formData.mobile,
+      referralCode: formData.referralCode,
+      role: 'member',
+      password: otp, // Use OTP as temporary password
+    });
+
+    if (result.success) {
+      // Save first investment
+      const investment = {
+        id: Date.now().toString(),
+        userId: result.user?.id || '',
+        amount: Number(formData.investmentAmount),
+        date: new Date().toISOString().split('T')[0],
+        lockedUntil: new Date(Date.now() + 12 * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        status: 'locked' as const,
+      };
+      
+      const existingInvestments = JSON.parse(localStorage.getItem(`investments_${result.user?.id}`) || '[]');
+      localStorage.setItem(`investments_${result.user?.id}`, JSON.stringify([...existingInvestments, investment]));
+      
+      setStep('success');
+      setTimeout(() => navigate('/login'), 3000);
+    } else {
+      setError(result.message);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    setOtp('');
+    setError('');
+    const demoOTP = generateDemoOTP();
+    storeDemoOTP(formData.mobile, demoOTP);
+    
+    try {
+      await sendOTP(formData.mobile);
+      showToast('success', 'OTP resent successfully', 'OTP Resent');
+      console.log('New Demo OTP:', demoOTP);
+    } catch (err) {
+      showToast('info', `New Demo OTP: ${demoOTP}`, 'Demo Mode');
+    }
   };
 
   return (
@@ -77,6 +152,35 @@ export default function Register() {
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Join Jewellbox Club</h1>
           <p className="text-gray-500 mt-1">Start your gold investment journey today</p>
+          
+          {/* Progress Indicator */}
+          <div className="flex items-center justify-center gap-2 mt-4">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+              step === 'details' ? 'bg-amber-500 text-white' : 'bg-green-500 text-white'
+            }`}>
+              {step === 'details' ? '1' : <CheckCircle className="w-5 h-5" />}
+            </div>
+            <div className="w-8 h-1 bg-gray-200 rounded">
+              <div className={`h-full rounded transition-all ${
+                step === 'otp' || step === 'payment' || step === 'success' ? 'bg-green-500 w-full' : 'w-0'
+              }`} />
+            </div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+              step === 'otp' ? 'bg-amber-500 text-white' : step === 'payment' || step === 'success' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'
+            }`}>
+              {step === 'otp' ? '2' : step === 'payment' || step === 'success' ? <CheckCircle className="w-5 h-5" /> : '2'}
+            </div>
+            <div className="w-8 h-1 bg-gray-200 rounded">
+              <div className={`h-full rounded transition-all ${
+                step === 'payment' || step === 'success' ? 'bg-green-500 w-full' : 'w-0'
+              }`} />
+            </div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+              step === 'payment' ? 'bg-amber-500 text-white' : step === 'success' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'
+            }`}>
+              {step === 'payment' ? '3' : step === 'success' ? <CheckCircle className="w-5 h-5" /> : '3'}
+            </div>
+          </div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
@@ -87,99 +191,252 @@ export default function Register() {
             </motion.div>
           )}
 
-          {success && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl flex items-start gap-2">
-              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-green-600">{success}</p>
-            </motion.div>
-          )}
+          <AnimatePresence mode="wait">
+            {step === 'details' && (
+              <motion.form
+                key="details"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                onSubmit={handleSendOTP}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={e => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Enter your full name"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+                      required
+                    />
+                  </div>
+                </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={e => updateField('name', e.target.value)}
-                  placeholder="Enter your full name"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
-                  required
-                />
-              </div>
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Mobile Number</label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <span className="absolute left-10 top-1/2 -translate-y-1/2 text-sm text-gray-500">+91</span>
+                    <input
+                      type="tel"
+                      value={formData.mobile}
+                      onChange={e => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                      placeholder="9876543210"
+                      className="w-full pl-20 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+                      required
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Mobile Number</label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <span className="absolute left-10 top-1/2 -translate-y-1/2 text-sm text-gray-500">+91</span>
-                <input
-                  type="tel"
-                  value={formData.mobile}
-                  onChange={e => updateField('mobile', e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  placeholder="9876543210"
-                  className="w-full pl-20 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
-                  required
-                />
-              </div>
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Referral Code (Optional)</label>
+                  <div className="relative">
+                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      value={formData.referralCode}
+                      onChange={e => setFormData({ ...formData, referralCode: e.target.value.toUpperCase() })}
+                      placeholder="Enter referral code"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all uppercase"
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Referral Code {referralCode && <span className="text-green-600">(auto-filled)</span>}</label>
-              <div className="relative">
-                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  value={formData.referralCode}
-                  onChange={e => updateField('referralCode', e.target.value.toUpperCase())}
-                  placeholder="Enter referral code (optional)"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all uppercase"
-                />
-                {referralCode && <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />}
-              </div>
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">First Investment Amount (₹) *</label>
+                  <div className="relative">
+                    <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="number"
+                      value={formData.investmentAmount}
+                      onChange={e => setFormData({ ...formData, investmentAmount: e.target.value })}
+                      placeholder="Minimum ₹1,000"
+                      min="1000"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+                      required
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Minimum ₹1,000 required. This will be locked for 12 months for gold purchase.
+                  </p>
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.password}
-                  onChange={e => updateField('password', e.target.value)}
-                  placeholder="Min 6 characters"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
-                  required
-                />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                <button
+                  type="submit"
+                  disabled={sendingOTP}
+                  className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg shadow-amber-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {sendingOTP ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Sending OTP...
+                    </>
+                  ) : (
+                    <>
+                      Continue
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
                 </button>
-              </div>
-            </div>
+              </motion.form>
+            )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password</label>
-              <div className="relative">
-                <input
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={e => updateField('confirmPassword', e.target.value)}
-                  placeholder="Re-enter password"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
-                  required
-                />
-              </div>
-            </div>
+            {step === 'otp' && (
+              <motion.form
+                key="otp"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                onSubmit={handleVerifyOTP}
+                className="space-y-4"
+              >
+                <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                  <p className="text-sm text-green-700 flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    OTP sent to +91 {formData.mobile}
+                  </p>
+                </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg shadow-amber-200 disabled:opacity-50"
-            >
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </button>
-          </form>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Enter OTP</label>
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="Enter 6-digit OTP"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all text-center text-2xl font-mono tracking-widest"
+                    required
+                    maxLength={6}
+                    disabled={loading}
+                  />
+                  <p className="text-xs text-gray-500 mt-2">OTP expires in 5 minutes</p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading || otp.length !== 6}
+                  className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg shadow-amber-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Verifying...
+                    </>
+                  ) : (
+                    <>
+                      Verify OTP
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+
+                <div className="flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('details');
+                      setOtp('');
+                      setError('');
+                    }}
+                    className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleResendOTP}
+                    disabled={loading}
+                    className="text-sm text-amber-600 hover:text-amber-700 font-medium"
+                  >
+                    Resend OTP
+                  </button>
+                </div>
+              </motion.form>
+            )}
+
+            {step === 'payment' && (
+              <motion.div
+                key="payment"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="space-y-4"
+              >
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                  <p className="text-sm text-amber-800 font-semibold mb-2">Complete Your Registration</p>
+                  <p className="text-xs text-amber-700">
+                    Pay your first investment of <strong>₹{Number(formData.investmentAmount).toLocaleString()}</strong> to complete registration.
+                    This amount will be locked for 12 months and can be used to purchase gold.
+                  </p>
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-xl space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Name:</span>
+                    <span className="font-medium">{formData.name}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Mobile:</span>
+                    <span className="font-medium">+91 {formData.mobile}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Investment Amount:</span>
+                    <span className="font-bold text-amber-600">₹{Number(formData.investmentAmount).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setShowPayment(true)}
+                  className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg shadow-green-200 flex items-center justify-center gap-2"
+                >
+                  <CreditCard className="w-5 h-5" />
+                  Pay ₹{Number(formData.investmentAmount).toLocaleString()}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep('otp');
+                    setError('');
+                  }}
+                  className="w-full text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back
+                </button>
+              </motion.div>
+            )}
+
+            {step === 'success' && (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-8"
+              >
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', delay: 0.2 }}
+                  className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/30"
+                >
+                  <CheckCircle className="w-10 h-10 text-white" />
+                </motion.div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Registration Successful! 🎉</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Welcome to Jewellbox Club! Your payment has been processed successfully.
+                </p>
+                <p className="text-xs text-gray-500">
+                  Redirecting to login page...
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
@@ -189,6 +446,22 @@ export default function Register() {
           </div>
         </div>
       </motion.div>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPayment}
+        onClose={() => setShowPayment(false)}
+        amount={Number(formData.investmentAmount)}
+        description="First Investment - Jewellbox Club Membership"
+        onSuccess={() => {
+          setShowPayment(false);
+          handlePaymentSuccess();
+        }}
+        onFailure={(error) => {
+          console.error('Payment failed:', error);
+          setError('Payment failed. Please try again.');
+        }}
+      />
     </div>
   );
 }

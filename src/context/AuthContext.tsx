@@ -150,16 +150,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true, message: 'Registration successful!', user: newUser };
   };
 
-  const login = (mobile: string, password: string) => {
+  const login = (mobile: string, otp: string) => {
     const users = getAllUsers();
-    const found = users.find(u => u.mobile === mobile && u.password === password);
+    
+    // For demo users, accept any OTP (for testing)
+    const demoUser = DEMO_USERS.find(u => u.mobile === mobile);
+    if (demoUser) {
+      setUser(demoUser);
+      localStorage.setItem('jwellbox_current_user', JSON.stringify(demoUser));
+      return { success: true, message: 'Login successful!' };
+    }
+    
+    // For registered users, check if they exist
+    const found = users.find(u => u.mobile === mobile);
     
     if (found) {
+      // OTP is already verified in Login component, so just login
       setUser(found);
       localStorage.setItem('jwellbox_current_user', JSON.stringify(found));
       return { success: true, message: 'Login successful!' };
     }
-    return { success: false, message: 'Invalid mobile number or password!' };
+    
+    return { success: false, message: 'Mobile number not registered. Please sign up first.' };
   };
 
   const logout = () => {
