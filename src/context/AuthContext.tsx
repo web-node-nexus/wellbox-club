@@ -1,4 +1,14 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import {
+  ensureDemoMembers,
+  fetchAllMembers,
+  fetchMemberByMobile,
+  getMembersCache,
+  getMembersCacheError,
+  normalizeMobile,
+  upsertMember,
+} from '../services/memberDb';
+import { fetchInvestmentsForUser } from '../services/investmentService';
 
 export interface RegisteredUser {
   id: string;
@@ -17,24 +27,26 @@ export interface RegisteredUser {
 
 interface AuthContextType {
   user: RegisteredUser | null;
+  authReady: boolean;
+  dbError: string | null;
   /** OTP must already be verified by the caller — passwordless login */
-  login: (mobile: string) => { success: boolean; message: string };
+  login: (mobile: string) => Promise<{ success: boolean; message: string }>;
   register: (data: {
     name: string;
     mobile: string;
     city?: string;
     referralCode?: string;
     role: 'member' | 'leader' | 'individual';
-  }) => { success: boolean; message: string; user?: RegisteredUser };
+  }) => Promise<{ success: boolean; message: string; user?: RegisteredUser }>;
   logout: () => void;
   getAllUsers: () => RegisteredUser[];
+  refreshUsers: () => Promise<void>;
   /** Promote to leader when team hits 100 (leader remains a member too) */
   promoteToLeaderIfEligible: (teamSize: number) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// Demo users (pre-seeded) — OTP only, no password
 const DEMO_USERS: RegisteredUser[] = [
   {
     id: '1',
@@ -86,137 +98,168 @@ const DEMO_USERS: RegisteredUser[] = [
   },
 ];
 
-function stripPassword(u: RegisteredUser & { password?: string }): RegisteredUser {
-  const { password: _p, ...rest } = u;
-  return rest;
-}
+const SESSION_KEY = 'jwellbox_current_user';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<RegisteredUser | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [dbError, setDbError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem('jwellbox_current_user');
-    if (savedUser) {
-      try {
-        setUser(stripPassword(JSON.parse(savedUser)));
-      } catch {
-        localStorage.removeItem('jwellbox_current_user');
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    const existingUsers = localStorage.getItem('jwellbox_users');
-    if (!existingUsers) {
-      localStorage.setItem('jwellbox_users', JSON.stringify(DEMO_USERS));
-      return;
-    }
-    // Migrate any stored users that still have password fields
+  const refreshUsers = async () => {
     try {
-      const users = (JSON.parse(existingUsers) as Array<RegisteredUser & { password?: string }>).map(
-        stripPassword
-      );
-      localStorage.setItem('jwellbox_users', JSON.stringify(users));
-    } catch {
-      localStorage.setItem('jwellbox_users', JSON.stringify(DEMO_USERS));
+      await fetchAllMembers();
+      await ensureDemoMembers(DEMO_USERS);
+      await fetchAllMembers();
+      setDbError(null);
+    } catch (e: any) {
+      const msg =
+        e?.message ||
+        getMembersCacheError() ||
+        'Supabase members table missing. Run supabase/schema.sql in SQL Editor.';
+      setDbError(msg);
+      throw e;
     }
-  }, []);
-
-  const getAllUsers = (): RegisteredUser[] => {
-    const stored = localStorage.getItem('jwellbox_users');
-    if (stored) {
-      try {
-        return (JSON.parse(stored) as Array<RegisteredUser & { password?: string }>).map(
-          stripPassword
-        );
-      } catch {
-        return DEMO_USERS;
-      }
-    }
-    return DEMO_USERS;
   };
 
-  const register = (data: {
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        await refreshUsers();
+      } catch {
+        /* dbError already set */
+      }
+
+      if (cancelled) return;
+
+      const savedUser = localStorage.getItem(SESSION_KEY);
+      if (savedUser) {
+        try {
+          const parsed = JSON.parse(savedUser) as RegisteredUser;
+          const fresh =
+            (await fetchMemberByMobile(parsed.mobile).catch(() => null)) ||
+            getMembersCache().find(u => u.id === parsed.id) ||
+            parsed;
+          setUser(fresh);
+          localStorage.setItem(SESSION_KEY, JSON.stringify(fresh));
+          await fetchInvestmentsForUser(fresh.id, fresh.mobile).catch(() => undefined);
+        } catch {
+          localStorage.removeItem(SESSION_KEY);
+        }
+      }
+
+      if (!cancelled) setAuthReady(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const getAllUsers = (): RegisteredUser[] => getMembersCache();
+
+  const register = async (data: {
     name: string;
     mobile: string;
     city?: string;
     referralCode?: string;
     role: 'member' | 'leader' | 'individual';
   }) => {
-    const users = getAllUsers();
+    const mobile = normalizeMobile(data.mobile);
 
-    const existing = users.find(u => u.mobile === data.mobile);
-    if (existing) {
-      const roleLabel =
-        existing.role === 'leader' || existing.isLeader
-          ? 'leader'
-          : existing.role === 'admin'
-            ? 'admin'
-            : existing.role === 'individual'
-              ? 'buyer'
-              : 'member';
+    try {
+      const existing = await fetchMemberByMobile(mobile);
+      if (existing) {
+        const roleLabel =
+          existing.role === 'leader' || existing.isLeader
+            ? 'leader'
+            : existing.role === 'admin'
+              ? 'admin'
+              : existing.role === 'individual'
+                ? 'buyer'
+                : 'member';
+        return {
+          success: false,
+          message: `Ye number pehle se hi ${roleLabel} hai. Dobara member nahi ban sakte — Login with OTP use karo.`,
+        };
+      }
+
+      const referralCode =
+        data.role === 'individual'
+          ? ''
+          : data.name.substring(0, 3).toUpperCase() +
+            Math.floor(100 + Math.random() * 900).toString();
+
+      const newUser: RegisteredUser = {
+        id: String(Date.now()),
+        name: data.name,
+        mobile,
+        referralCode,
+        referredBy: data.referralCode || '',
+        city: data.city || '',
+        role: data.role,
+        isLeader: data.role === 'leader',
+        teamSize: 0,
+        joinDate: new Date().toISOString().split('T')[0],
+      };
+
+      const saved = await upsertMember(newUser);
+      return { success: true, message: 'Registration successful!', user: saved };
+    } catch (e: any) {
       return {
         success: false,
-        message: `Ye number pehle se hi ${roleLabel} hai. Dobara member nahi ban sakte — login with OTP use karo.`,
+        message:
+          e?.message?.includes('Could not find the table') || e?.code === 'PGRST205'
+            ? 'Database tables missing. Supabase SQL Editor me supabase/schema.sql run karo.'
+            : e?.message || 'Registration failed. Please try again.',
       };
     }
-
-    const referralCode =
-      data.role === 'individual'
-        ? ''
-        : data.name.substring(0, 3).toUpperCase() +
-          Math.floor(100 + Math.random() * 900).toString();
-
-    const newUser: RegisteredUser = {
-      id: String(users.length + 1),
-      name: data.name,
-      mobile: data.mobile,
-      referralCode,
-      referredBy: data.referralCode || '',
-      city: data.city || '',
-      role: data.role,
-      isLeader: data.role === 'leader',
-      teamSize: 0,
-      joinDate: new Date().toISOString().split('T')[0],
-    };
-
-    users.push(newUser);
-    localStorage.setItem('jwellbox_users', JSON.stringify(users));
-
-    return { success: true, message: 'Registration successful!', user: newUser };
   };
 
-  const login = (mobile: string) => {
-    const users = getAllUsers();
-    const found =
-      DEMO_USERS.find(u => u.mobile === mobile) || users.find(u => u.mobile === mobile);
+  const login = async (mobile: string) => {
+    const m = normalizeMobile(mobile);
 
-    if (found) {
-      const clean = stripPassword(found);
+    try {
+      const found = await fetchMemberByMobile(m);
+      if (!found) {
+        return {
+          success: false,
+          message:
+            'Is number ka membership Supabase me nahi mila. Pehle Join Now se register + pay karo — phir kisi bhi browser se login chalega.',
+        };
+      }
+
+      const clean = await upsertMember(found);
+      await fetchInvestmentsForUser(clean.id, m).catch(() => undefined);
       setUser(clean);
-      localStorage.setItem('jwellbox_current_user', JSON.stringify(clean));
+      localStorage.setItem(SESSION_KEY, JSON.stringify(clean));
       return { success: true, message: 'Login successful!' };
+    } catch (e: any) {
+      return {
+        success: false,
+        message:
+          e?.message?.includes('Could not find the table') || e?.code === 'PGRST205'
+            ? 'Database tables missing. Supabase SQL Editor me supabase/schema.sql run karo.'
+            : e?.message || 'Login failed. Please try again.',
+      };
     }
-
-    return {
-      success: false,
-      message: 'Mobile number not registered. Please sign up first.',
-    };
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('jwellbox_current_user');
+    localStorage.removeItem(SESSION_KEY);
   };
 
   const promoteToLeaderIfEligible = (teamSize: number) => {
     if (!user || teamSize < 100) return;
     if (user.isLeader || user.role === 'leader' || user.role === 'admin') {
-      // keep teamSize fresh
       if (user.teamSize !== teamSize) {
         const updated = { ...user, teamSize, isLeader: true };
         setUser(updated);
-        localStorage.setItem('jwellbox_current_user', JSON.stringify(updated));
+        void upsertMember(updated);
+        localStorage.setItem(SESSION_KEY, JSON.stringify(updated));
       }
       return;
     }
@@ -226,19 +269,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       role: user.role === 'individual' ? 'individual' : 'leader',
       teamSize,
     };
-    // Leader can still be a member — keep membership economics; mark leader badge
-    if (updated.role !== 'individual') {
-      updated.role = 'leader';
-    }
+    if (updated.role !== 'individual') updated.role = 'leader';
     setUser(updated);
-    localStorage.setItem('jwellbox_current_user', JSON.stringify(updated));
-    const users = getAllUsers().map(u => (u.id === updated.id ? updated : u));
-    localStorage.setItem('jwellbox_users', JSON.stringify(users));
+    void upsertMember(updated);
+    localStorage.setItem(SESSION_KEY, JSON.stringify(updated));
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, getAllUsers, promoteToLeaderIfEligible }}
+      value={{
+        user,
+        authReady,
+        dbError,
+        login,
+        register,
+        logout,
+        getAllUsers,
+        refreshUsers,
+        promoteToLeaderIfEligible,
+      }}
     >
       {children}
     </AuthContext.Provider>

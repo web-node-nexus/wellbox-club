@@ -9,6 +9,7 @@ import AdminLayout from './components/AdminLayout';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import JoinModal from './components/JoinModal';
+import DbStatusBanner from './components/DbStatusBanner';
 
 // Public Pages
 import Landing from './pages/Landing';
@@ -163,6 +164,7 @@ export default function App() {
           <AppProvider>
             <ToastProvider>
               <AppRoutes />
+              <DbStatusBanner />
             </ToastProvider>
           </AppProvider>
         </AuthProvider>

@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, User, Phone, Tag, AlertCircle, CheckCircle, Loader2, CreditCard, ArrowRight, ArrowLeft } from 'lucide-react';
 import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP } from '../services/otpService';
 import { addInvestment } from '../services/investmentService';
+import { getMembershipByMobileAsync } from '../services/userStore';
 import PaymentModal from '../components/PaymentModal';
 
 export default function Register() {
@@ -22,7 +23,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [sendingOTP, setSendingOTP] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
-  const { register, login, getAllUsers } = useAuth();
+  const { register, login } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
@@ -43,23 +44,24 @@ export default function Register() {
       return;
     }
 
-    const existing = getAllUsers().find(u => u.mobile === formData.mobile);
-    if (existing) {
-      const label =
-        existing.role === 'leader' || existing.isLeader
-          ? 'Leader'
-          : existing.role === 'admin'
-            ? 'Admin'
-            : existing.role === 'individual'
-              ? 'Buyer'
-              : 'Member';
-      setError(`Ye number pehle se hi ${label} hai. Dobara member nahi ban sakte — Login with OTP use karo.`);
-      return;
-    }
-
     setSendingOTP(true);
-    
+
     try {
+      const existing = await getMembershipByMobileAsync(formData.mobile);
+      if (existing) {
+        const label =
+          existing.role === 'leader' || existing.isLeader
+            ? 'Leader'
+            : existing.role === 'admin'
+              ? 'Admin'
+              : existing.role === 'individual'
+                ? 'Buyer'
+                : 'Member';
+        setError(`Ye number pehle se hi ${label} hai. Dobara member nahi ban sakte — Login with OTP use karo.`);
+        setSendingOTP(false);
+        return;
+      }
+
       try {
         await sendOTP(formData.mobile);
         showToast('success', `OTP sent to +91 ${formData.mobile}`, 'OTP Sent');
@@ -106,26 +108,35 @@ export default function Register() {
     }
   };
 
-  const handlePaymentSuccess = (response?: any) => {
+  const handlePaymentSuccess = async (response?: any) => {
     // Payment required — without pay, user is NOT a member
-    const result = register({
-      name: formData.name,
-      mobile: formData.mobile,
-      referralCode: formData.referralCode,
-      role: 'member',
-    });
+    setLoading(true);
+    setError('');
+    try {
+      const result = await register({
+        name: formData.name,
+        mobile: formData.mobile,
+        referralCode: formData.referralCode,
+        role: 'member',
+      });
 
-    if (result.success && result.user) {
-      addInvestment(
-        result.user.id,
-        Number(formData.investmentAmount),
-        response?.razorpay_payment_id
-      );
-      login(formData.mobile);
-      setStep('success');
-      setTimeout(() => navigate('/dashboard'), 1500);
-    } else {
-      setError(result.message || 'Registration failed');
+      if (result.success && result.user) {
+        await addInvestment(
+          result.user.id,
+          Number(formData.investmentAmount),
+          response?.razorpay_payment_id,
+          formData.mobile
+        );
+        await login(formData.mobile);
+        setStep('success');
+        setTimeout(() => navigate('/dashboard'), 1500);
+      } else {
+        setError(result.message || 'Registration failed');
+      }
+    } catch (e: any) {
+      setError(e?.message || 'Registration failed');
+    } finally {
+      setLoading(false);
     }
   };
 

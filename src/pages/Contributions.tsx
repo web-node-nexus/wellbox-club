@@ -1,73 +1,102 @@
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { Coins, Lock, Unlock, Calendar, ArrowRight, Gem, Download, Eye, X, TrendingUp, IndianRupee, AlertCircle } from 'lucide-react';
-import { contributions } from '../data/mockData';
-import { useState, useEffect } from 'react';
+import {
+  Coins, Lock, Unlock, Calendar, Gem, Download, X, IndianRupee, AlertCircle,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
+import PaymentModal from '../components/PaymentModal';
+import {
+  addInvestment,
+  fetchInvestmentsForUser,
+  getInvestments,
+  getLockedInvested,
+  getTotalInvested,
+  getUnlockedInvested,
+  type Investment,
+} from '../services/investmentService';
 
 export default function Contributions() {
   const { user } = useAuth();
   const { showToast } = useToast();
-  const [viewingContribution, setViewingContribution] = useState<any>(null);
   const [showInvestModal, setShowInvestModal] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
   const [investAmount, setInvestAmount] = useState('');
   const [investError, setInvestError] = useState('');
-  
-  if (!user) return null;
-
-  // Get monthly investments from localStorage
-  const [monthlyInvestments, setMonthlyInvestments] = useState(() => {
-    const stored = localStorage.getItem(`investments_${user.id}`);
-    return stored ? JSON.parse(stored) : [];
-  });
+  const [investments, setInvestments] = useState<Investment[]>([]);
+  const [, setTick] = useState(0);
 
   useEffect(() => {
-    localStorage.setItem(`investments_${user.id}`, JSON.stringify(monthlyInvestments));
-  }, [monthlyInvestments, user.id]);
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await fetchInvestmentsForUser(user.id, user.mobile);
+        if (!cancelled) setInvestments(list);
+      } catch {
+        if (!cancelled) setInvestments(getInvestments(user.id));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
-  const myContributions = contributions.filter(c => c.userId === user.id);
-  const allInvestments = [...monthlyInvestments, ...myContributions];
-  
-  const totalContributed = allInvestments.reduce((s: number, c: any) => s + c.amount, 0);
-  const lockedAmount = allInvestments.filter((c: any) => c.status === 'locked').reduce((s: number, c: any) => s + c.amount, 0);
-  const unlockedAmount = allInvestments.filter((c: any) => c.status === 'unlocked').reduce((s: number, c: any) => s + c.amount, 0);
+  if (!user) return null;
+
+  const refresh = () => {
+    setInvestments(getInvestments(user.id));
+    setTick(t => t + 1);
+  };
+
+  const totalContributed = getTotalInvested(user.id);
+  const lockedAmount = getLockedInvested(user.id);
+  const unlockedAmount = getUnlockedInvested(user.id);
 
   const getDaysUntilUnlock = (lockedUntil: string) => {
-    const now = new Date();
-    const unlock = new Date(lockedUntil);
-    const diff = unlock.getTime() - now.getTime();
-    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    const days = Math.ceil((new Date(lockedUntil).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
     return days > 0 ? days : 0;
   };
 
-  const handleInvest = () => {
+  const openPayment = () => {
     const amount = Number(investAmount);
     if (amount < 1000) {
       setInvestError('Minimum investment is ₹1,000 per month');
       return;
     }
-    // No maximum limit - user can invest any amount
-
-    const newInvestment = {
-      id: Date.now().toString(),
-      userId: user.id,
-      amount: amount,
-      date: new Date().toISOString().split('T')[0],
-      lockedUntil: new Date(Date.now() + 12 * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 12 months lock
-      status: 'locked' as const,
-    };
-
-    setMonthlyInvestments([...monthlyInvestments, newInvestment]);
-    showToast('success', `₹${amount.toLocaleString()} invested successfully! Locked for minimum 12 months.`, 'Investment Successful');
-    setShowInvestModal(false);
-    setInvestAmount('');
     setInvestError('');
+    setShowInvestModal(false);
+    setShowPayment(true);
+  };
+
+  const handlePaymentSuccess = async (response?: { razorpay_payment_id?: string }) => {
+    try {
+      await addInvestment(
+        user.id,
+        Number(investAmount),
+        response?.razorpay_payment_id,
+        user.mobile
+      );
+      refresh();
+      showToast(
+        'success',
+        `₹${Number(investAmount).toLocaleString()} invested — locked 12 months.`,
+        'Investment Successful'
+      );
+      setShowPayment(false);
+      setInvestAmount('');
+    } catch (e: any) {
+      showToast('error', e?.message || 'Could not save investment', 'Error');
+    }
   };
 
   const exportCSV = () => {
-    const csv = 'ID,Amount,Date,Locked Until,Status\n' +
-      allInvestments.map((c: any) => `${c.id},${c.amount},${c.date},${c.lockedUntil},${c.status}`).join('\n');
+    const csv =
+      'ID,Amount,Date,Locked Until,Status\n' +
+      investments
+        .map(c => `${c.id},${c.amount},${c.date},${c.lockedUntil},${c.status}`)
+        .join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -81,15 +110,15 @@ export default function Contributions() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">My Investments</h1>
-          <p className="text-white/50 mt-1">Track your monthly gold savings</p>
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">My Investments</h1>
+          <p className="text-gray-500 mt-1">Track your monthly gold savings</p>
         </div>
         <div className="flex gap-3">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={exportCSV}
-            className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm hover:bg-white/10 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm hover:bg-gray-50 transition-colors"
           >
             <Download className="w-4 h-4" />
             Export CSV
@@ -98,7 +127,7 @@ export default function Contributions() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowInvestModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold rounded-xl shadow-lg"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-xl shadow-lg"
           >
             <IndianRupee className="w-4 h-4" />
             Invest Now
@@ -106,7 +135,6 @@ export default function Contributions() {
         </div>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
           <div className="flex items-center gap-3">
@@ -143,7 +171,6 @@ export default function Contributions() {
         </motion.div>
       </div>
 
-      {/* Important Info Banner */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-200">
         <div className="flex items-start gap-3">
           <AlertCircle className="w-6 h-6 text-blue-600 mt-0.5 flex-shrink-0" />
@@ -183,12 +210,11 @@ export default function Contributions() {
         </div>
       </div>
 
-      {/* Investments List */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-gray-100">
           <h3 className="font-semibold text-gray-900">Investment History</h3>
         </div>
-        {allInvestments.length === 0 ? (
+        {investments.length === 0 ? (
           <div className="text-center py-12">
             <Coins className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500 mb-4">No investments yet</p>
@@ -196,16 +222,16 @@ export default function Contributions() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowInvestModal(true)}
-              className="px-6 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold rounded-xl shadow-lg"
+              className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-xl shadow-lg"
             >
               Make Your First Investment
             </motion.button>
           </div>
         ) : (
           <div className="divide-y divide-gray-50">
-            {allInvestments.map((c: any) => {
+            {investments.map(c => {
               const daysLeft = getDaysUntilUnlock(c.lockedUntil);
-              const isUnlocked = daysLeft === 0;
+              const isUnlocked = c.status === 'unlocked' || daysLeft === 0;
               return (
                 <motion.div
                   key={c.id}
@@ -215,10 +241,16 @@ export default function Contributions() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                        isUnlocked ? 'bg-green-100' : 'bg-orange-100'
-                      }`}>
-                        {isUnlocked ? <Unlock className="w-5 h-5 text-green-600" /> : <Lock className="w-5 h-5 text-orange-600" />}
+                      <div
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                          isUnlocked ? 'bg-green-100' : 'bg-orange-100'
+                        }`}
+                      >
+                        {isUnlocked ? (
+                          <Unlock className="w-5 h-5 text-green-600" />
+                        ) : (
+                          <Lock className="w-5 h-5 text-orange-600" />
+                        )}
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">₹{c.amount.toLocaleString()}</p>
@@ -229,7 +261,7 @@ export default function Contributions() {
                       {isUnlocked ? (
                         <div>
                           <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
-                            🔓 Unlocked
+                            Unlocked
                           </span>
                           <Link to="/gold-showroom">
                             <button className="mt-2 px-4 py-1.5 bg-amber-600 text-white text-xs rounded-lg hover:bg-amber-700 transition-colors">
@@ -240,7 +272,7 @@ export default function Contributions() {
                       ) : (
                         <div>
                           <span className="px-3 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">
-                            🔒 {daysLeft} days left
+                            {daysLeft} days left
                           </span>
                           <p className="text-xs text-gray-500 mt-1">Unlocks: {c.lockedUntil}</p>
                         </div>
@@ -252,10 +284,9 @@ export default function Contributions() {
                       <div className="w-full bg-gray-200 rounded-full h-1.5">
                         <div
                           className="bg-gradient-to-r from-orange-400 to-amber-500 h-1.5 rounded-full"
-                          style={{ width: `${Math.max(0, 100 - (daysLeft / 330) * 100)}%` }}
+                          style={{ width: `${Math.max(0, Math.min(100, 100 - (daysLeft / 365) * 100))}%` }}
                         />
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">{Math.round(100 - (daysLeft / 330) * 100)}% of lock period completed</p>
                     </div>
                   )}
                 </motion.div>
@@ -265,7 +296,6 @@ export default function Contributions() {
         )}
       </div>
 
-      {/* Investment Modal */}
       {showInvestModal && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -285,11 +315,11 @@ export default function Contributions() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="space-y-4">
               <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
                 <p className="text-sm text-blue-800">
-                  <strong>Important:</strong> Investment is locked for minimum 12 months. After lock period, you can order gold from showroom. Cash withdrawal is not available for investments.
+                  <strong>Important:</strong> Investment is locked for 12 months. After unlock you can order gold — cash withdrawal is not allowed.
                 </p>
               </div>
 
@@ -298,9 +328,11 @@ export default function Contributions() {
                 <input
                   type="number"
                   value={investAmount}
-                  onChange={e => { setInvestAmount(e.target.value); setInvestError(''); }}
+                  onChange={e => {
+                    setInvestAmount(e.target.value);
+                    setInvestError('');
+                  }}
                   min={1000}
-                  max={100000}
                   placeholder="Minimum ₹1,000"
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                 />
@@ -310,24 +342,16 @@ export default function Contributions() {
                     <button
                       key={val}
                       type="button"
-                      onClick={() => { setInvestAmount(String(val)); setInvestError(''); }}
+                      onClick={() => {
+                        setInvestAmount(String(val));
+                        setInvestError('');
+                      }}
                       className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-medium transition-colors"
                     >
                       ₹{val.toLocaleString()}
                     </button>
                   ))}
                 </div>
-              </div>
-
-              <div className="p-4 bg-gray-50 rounded-xl">
-                <p className="text-xs text-gray-600">
-                  <Lock className="w-3 h-3 inline mr-1" />
-                  Lock Period: <strong>12 months</strong><br />
-                  <Gem className="w-3 h-3 inline mr-1" />
-                  After lock: Can order gold from showroom<br />
-                  <IndianRupee className="w-3 h-3 inline mr-1" />
-                  Minimum: ₹1,000 per month
-                </p>
               </div>
 
               <div className="flex gap-3">
@@ -340,16 +364,25 @@ export default function Contributions() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={handleInvest}
-                  className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold rounded-xl shadow-lg"
+                  onClick={openPayment}
+                  className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-xl shadow-lg"
                 >
-                  Invest Now
+                  Continue to Pay
                 </motion.button>
               </div>
             </div>
           </motion.div>
         </motion.div>
       )}
+
+      <PaymentModal
+        isOpen={showPayment}
+        onClose={() => setShowPayment(false)}
+        amount={Number(investAmount) || 1000}
+        description="Monthly investment — Jewellbox Club"
+        onSuccess={handlePaymentSuccess}
+        onFailure={() => showToast('error', 'Payment failed. Please try again.', 'Error')}
+      />
     </div>
   );
 }

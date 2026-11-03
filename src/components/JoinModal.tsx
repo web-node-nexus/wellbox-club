@@ -6,6 +6,7 @@ import {
   ArrowRight, ArrowLeft, CreditCard, IndianRupee,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { getMembershipByMobileAsync } from '../services/userStore';
 import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP } from '../services/otpService';
 import { addInvestment } from '../services/investmentService';
 import PaymentModal from './PaymentModal';
@@ -17,7 +18,7 @@ interface JoinModalProps {
 }
 
 export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: JoinModalProps) {
-  const { register, login, getAllUsers } = useAuth();
+  const { register, login } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'member' | 'leader' | 'individual'>(initialTab);
   const [step, setStep] = useState<'form' | 'otp' | 'payment' | 'success'>('form');
@@ -54,27 +55,28 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     e.preventDefault();
     if (!validate()) return;
 
-    // Same number cannot join again
-    const existing = getAllUsers().find(u => u.mobile === formData.mobile);
-    if (existing) {
-      const label =
-        existing.role === 'leader' || existing.isLeader
-          ? 'Leader'
-          : existing.role === 'admin'
-            ? 'Admin'
-            : existing.role === 'individual'
-              ? 'Buyer'
-              : 'Member';
-      setErrors({
-        mobile: `Ye number pehle se hi ${label} hai. Dobara join nahi ho sakta — Login with OTP use karo.`,
-      });
-      return;
-    }
-
     setSendingOTP(true);
     setErrors({});
 
     try {
+      // Same number cannot join again — check Supabase
+      const existing = await getMembershipByMobileAsync(formData.mobile);
+      if (existing) {
+        const label =
+          existing.role === 'leader' || existing.isLeader
+            ? 'Leader'
+            : existing.role === 'admin'
+              ? 'Admin'
+              : existing.role === 'individual'
+                ? 'Buyer'
+                : 'Member';
+        setErrors({
+          mobile: `Ye number pehle se hi ${label} hai. Dobara join nahi ho sakta — Login with OTP use karo.`,
+        });
+        setSendingOTP(false);
+        return;
+      }
+
       try {
         await sendOTP(formData.mobile);
       } catch {
@@ -132,43 +134,50 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     }
   };
 
-  const finishRegistration = (paymentId?: string) => {
-    const result = register({
-      name: formData.name,
-      mobile: formData.mobile,
-      referralCode: formData.referralCode,
-      city: formData.city,
-      role: activeTab,
-    });
+  const finishRegistration = async (paymentId?: string) => {
+    setLoading(true);
+    try {
+      const result = await register({
+        name: formData.name,
+        mobile: formData.mobile,
+        referralCode: formData.referralCode,
+        city: formData.city,
+        role: activeTab,
+      });
 
-    if (!result.success || !result.user) {
-      setErrors({ otp: result.message });
+      if (!result.success || !result.user) {
+        setErrors({ otp: result.message });
+        setLoading(false);
+        return;
+      }
+
+      if (activeTab === 'member') {
+        await addInvestment(
+          result.user.id,
+          Number(formData.investmentAmount),
+          paymentId,
+          formData.mobile
+        );
+      }
+
+      await login(formData.mobile);
+      setStep('success');
       setLoading(false);
-      return;
+
+      setTimeout(() => {
+        handleClose();
+        if (activeTab === 'individual') navigate('/individual-dashboard');
+        else navigate('/dashboard');
+      }, 1500);
+    } catch (e: any) {
+      setErrors({ otp: e?.message || 'Registration failed' });
+      setLoading(false);
     }
-
-    if (activeTab === 'member') {
-      addInvestment(
-        result.user.id,
-        Number(formData.investmentAmount),
-        paymentId
-      );
-    }
-
-    login(formData.mobile);
-    setStep('success');
-    setLoading(false);
-
-    setTimeout(() => {
-      handleClose();
-      if (activeTab === 'individual') navigate('/individual-dashboard');
-      else navigate('/dashboard');
-    }, 1500);
   };
 
   const handlePaymentSuccess = (response: any) => {
     setShowPayment(false);
-    finishRegistration(response?.razorpay_payment_id);
+    void finishRegistration(response?.razorpay_payment_id);
   };
 
   const handleResendOTP = async () => {

@@ -2,13 +2,10 @@ import { RegisteredUser } from '../context/AuthContext';
 import { BUSINESS_RULES } from '../data/businessRules';
 import { getInvestments, getTotalInvested } from './investmentService';
 import { walletTransactions } from '../data/mockData';
+import { getMembersCache } from './memberDb';
 
 function usersKeyUsers(): RegisteredUser[] {
-  try {
-    return JSON.parse(localStorage.getItem('jwellbox_users') || '[]');
-  } catch {
-    return [];
-  }
+  return getMembersCache();
 }
 
 /** Direct referrals (level 1) — referredBy stores referral CODE or user id */

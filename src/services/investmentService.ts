@@ -1,3 +1,6 @@
+import { supabase, type DbInvestment, type DbGoldOrder, isSupabaseConfigured } from '../lib/supabase';
+import { normalizeMobile } from './memberDb';
+
 export interface Investment {
   id: string;
   userId: string;
@@ -6,6 +9,7 @@ export interface Investment {
   lockedUntil: string;
   status: 'locked' | 'unlocked' | 'used';
   paymentId?: string;
+  mobile?: string;
 }
 
 export interface GoldOrderRecord {
@@ -22,9 +26,6 @@ export interface GoldOrderRecord {
   investmentIds: string[];
 }
 
-const investmentsKey = (userId: string) => `investments_${userId}`;
-const GOLD_ORDERS_KEY = 'jwellbox_gold_orders';
-
 function addMonths(date: Date, months: number) {
   const d = new Date(date);
   d.setMonth(d.getMonth() + months);
@@ -37,36 +38,128 @@ function refreshStatus(inv: Investment): Investment {
   return { ...inv, status: unlocked ? 'unlocked' : 'locked' };
 }
 
-export function getInvestments(userId: string): Investment[] {
-  try {
-    const raw = JSON.parse(localStorage.getItem(investmentsKey(userId)) || '[]') as Investment[];
-    const refreshed = raw.map(refreshStatus);
-    localStorage.setItem(investmentsKey(userId), JSON.stringify(refreshed));
-    return refreshed;
-  } catch {
-    return [];
-  }
+function rowToInvestment(row: DbInvestment): Investment {
+  return refreshStatus({
+    id: row.id,
+    userId: row.user_id,
+    amount: Number(row.amount),
+    date: row.date,
+    lockedUntil: row.locked_until,
+    status: row.status,
+    paymentId: row.payment_id || undefined,
+    mobile: row.mobile,
+  });
 }
 
-export function addInvestment(
+function investmentToRow(inv: Investment, mobile: string): DbInvestment {
+  return {
+    id: inv.id,
+    user_id: inv.userId,
+    mobile: normalizeMobile(mobile || inv.mobile || ''),
+    amount: inv.amount,
+    date: inv.date,
+    locked_until: inv.lockedUntil,
+    status: inv.status,
+    payment_id: inv.paymentId ?? null,
+  };
+}
+
+/** In-memory cache keyed by userId */
+const byUser = new Map<string, Investment[]>();
+let goldOrdersCache: GoldOrderRecord[] = [];
+
+function setUserInvestments(userId: string, list: Investment[]) {
+  byUser.set(userId, list.map(refreshStatus));
+}
+
+export function getInvestments(userId: string): Investment[] {
+  return (byUser.get(userId) || []).map(refreshStatus);
+}
+
+export async function fetchInvestmentsForUser(userId: string, mobile?: string): Promise<Investment[]> {
+  if (!isSupabaseConfigured) return getInvestments(userId);
+
+  let query = supabase.from('investments').select('*').eq('user_id', userId);
+  const { data, error } = await query.order('created_at', { ascending: true });
+
+  if (error) {
+    // Fallback: try by mobile if user id changed
+    if (mobile) {
+      const m = normalizeMobile(mobile);
+      const { data: byMobile, error: err2 } = await supabase
+        .from('investments')
+        .select('*')
+        .eq('mobile', m)
+        .order('created_at', { ascending: true });
+      if (err2) throw err2;
+      const list = (byMobile as DbInvestment[]).map(rowToInvestment).map(i => ({ ...i, userId }));
+      setUserInvestments(userId, list);
+      // Re-link rows to current user id
+      await Promise.all(
+        list
+          .filter(i => i.userId === userId)
+          .map(i =>
+            supabase
+              .from('investments')
+              .update({ user_id: userId })
+              .eq('id', i.id)
+          )
+      );
+      return getInvestments(userId);
+    }
+    throw error;
+  }
+
+  setUserInvestments(userId, (data as DbInvestment[]).map(rowToInvestment));
+  return getInvestments(userId);
+}
+
+export async function restoreInvestmentsByMobile(userId: string, mobile: string) {
+  return fetchInvestmentsForUser(userId, mobile);
+}
+
+export async function addInvestment(
   userId: string,
   amount: number,
-  paymentId?: string
-): Investment {
+  paymentId?: string,
+  mobile?: string
+): Promise<Investment> {
   const now = new Date();
+  const m = normalizeMobile(mobile || '');
   const inv: Investment = {
-    id: `inv_${Date.now()}`,
+    id: `inv_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
     userId,
     amount,
     date: now.toISOString().split('T')[0],
     lockedUntil: addMonths(now, 12).toISOString().split('T')[0],
     status: 'locked',
     paymentId,
+    mobile: m,
   };
+
+  if (!isSupabaseConfigured) {
+    const list = getInvestments(userId);
+    list.push(inv);
+    setUserInvestments(userId, list);
+    return inv;
+  }
+
+  const { data, error } = await supabase
+    .from('investments')
+    .insert(investmentToRow(inv, m))
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error('Supabase addInvestment failed:', error.message);
+    throw error;
+  }
+
+  const saved = rowToInvestment(data as DbInvestment);
   const list = getInvestments(userId);
-  list.push(inv);
-  localStorage.setItem(investmentsKey(userId), JSON.stringify(list));
-  return inv;
+  list.push(saved);
+  setUserInvestments(userId, list);
+  return saved;
 }
 
 export function getTotalInvested(userId: string): number {
@@ -87,11 +180,10 @@ export function getUnlockedInvested(userId: string): number {
     .reduce((s, i) => s + i.amount, 0);
 }
 
-/** Spend unlocked investment on a gold order (FIFO). Returns false if insufficient. */
-export function spendUnlockedInvestment(
+export async function spendUnlockedInvestment(
   userId: string,
   amount: number
-): { success: boolean; investmentIds: string[]; message: string } {
+): Promise<{ success: boolean; investmentIds: string[]; message: string }> {
   const list = getInvestments(userId);
   let remaining = amount;
   const usedIds: string[] = [];
@@ -112,22 +204,77 @@ export function spendUnlockedInvestment(
     };
   }
 
-  localStorage.setItem(investmentsKey(userId), JSON.stringify(list));
+  setUserInvestments(userId, list);
+
+  if (isSupabaseConfigured && usedIds.length) {
+    const { error } = await supabase
+      .from('investments')
+      .update({ status: 'used' })
+      .in('id', usedIds);
+    if (error) {
+      console.error('Supabase spendUnlockedInvestment failed:', error.message);
+      throw error;
+    }
+  }
+
   return { success: true, investmentIds: usedIds, message: 'OK' };
 }
 
-export function getGoldOrders(): GoldOrderRecord[] {
-  try {
-    return JSON.parse(localStorage.getItem(GOLD_ORDERS_KEY) || '[]');
-  } catch {
-    return [];
-  }
+function rowToGoldOrder(row: DbGoldOrder): GoldOrderRecord {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    userName: row.user_name,
+    userMobile: row.user_mobile,
+    designId: row.design_id,
+    designName: row.design_name,
+    weightGrams: Number(row.weight_grams),
+    amount: Number(row.amount),
+    status: row.status,
+    createdAt: row.created_at,
+    investmentIds: Array.isArray(row.investment_ids) ? row.investment_ids : [],
+  };
 }
 
-export function saveGoldOrder(order: GoldOrderRecord) {
-  const orders = getGoldOrders();
-  orders.unshift(order);
-  localStorage.setItem(GOLD_ORDERS_KEY, JSON.stringify(orders));
+export function getGoldOrders(): GoldOrderRecord[] {
+  return goldOrdersCache;
+}
+
+export async function fetchGoldOrders(): Promise<GoldOrderRecord[]> {
+  if (!isSupabaseConfigured) return goldOrdersCache;
+  const { data, error } = await supabase
+    .from('gold_orders')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  goldOrdersCache = (data as DbGoldOrder[]).map(rowToGoldOrder);
+  return goldOrdersCache;
+}
+
+export async function saveGoldOrder(order: GoldOrderRecord) {
+  goldOrdersCache = [order, ...goldOrdersCache.filter(o => o.id !== order.id)];
+
+  if (!isSupabaseConfigured) return;
+
+  const row: DbGoldOrder = {
+    id: order.id,
+    user_id: order.userId,
+    user_name: order.userName,
+    user_mobile: order.userMobile,
+    design_id: order.designId,
+    design_name: order.designName,
+    weight_grams: order.weightGrams,
+    amount: order.amount,
+    status: order.status,
+    created_at: order.createdAt,
+    investment_ids: order.investmentIds,
+  };
+
+  const { error } = await supabase.from('gold_orders').upsert(row);
+  if (error) {
+    console.error('Supabase saveGoldOrder failed:', error.message);
+    throw error;
+  }
 }
 
 export function getUserGoldOrders(userId: string) {

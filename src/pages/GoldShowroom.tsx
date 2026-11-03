@@ -39,7 +39,7 @@ export default function GoldShowroom() {
     [user, refresh]
   );
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     if (!user || !selectedDesign) return;
     const amt = Number(orderAmount);
     if (!amt || amt <= 0) {
@@ -51,36 +51,40 @@ export default function GoldShowroom() {
       return;
     }
 
-    const spent = spendUnlockedInvestment(user.id, amt);
-    if (!spent.success) {
-      showToast('error', spent.message, 'Error');
-      return;
+    try {
+      const spent = await spendUnlockedInvestment(user.id, amt);
+      if (!spent.success) {
+        showToast('error', spent.message, 'Error');
+        return;
+      }
+
+      const referrerCommission = Math.round(amt * (BUSINESS_RULES.goldOrderPercent / 100));
+
+      await saveGoldOrder({
+        id: `go_${Date.now()}`,
+        userId: user.id,
+        userName: user.name,
+        userMobile: user.mobile,
+        designId: selectedDesign.id,
+        designName: selectedDesign.name,
+        weightGrams: selectedDesign.weightGrams,
+        amount: amt,
+        status: 'pending',
+        createdAt: new Date().toISOString().split('T')[0],
+        investmentIds: spent.investmentIds,
+      });
+
+      showToast(
+        'success',
+        `Order placed. Referrer earns ${BUSINESS_RULES.goldOrderPercent}% (${formatInr(referrerCommission)}) when referred.`,
+        'Gold Order'
+      );
+      setSelectedDesign(null);
+      setOrderAmount('');
+      setRefresh(x => x + 1);
+    } catch (e: any) {
+      showToast('error', e?.message || 'Order failed', 'Error');
     }
-
-    const referrerCommission = Math.round(amt * (BUSINESS_RULES.goldOrderPercent / 100));
-
-    saveGoldOrder({
-      id: `go_${Date.now()}`,
-      userId: user.id,
-      userName: user.name,
-      userMobile: user.mobile,
-      designId: selectedDesign.id,
-      designName: selectedDesign.name,
-      weightGrams: selectedDesign.weightGrams,
-      amount: amt,
-      status: 'pending',
-      createdAt: new Date().toISOString().split('T')[0],
-      investmentIds: spent.investmentIds,
-    });
-
-    showToast(
-      'success',
-      `Order placed. Referrer earns ${BUSINESS_RULES.goldOrderPercent}% (${formatInr(referrerCommission)}) when referred.`,
-      'Gold Order'
-    );
-    setSelectedDesign(null);
-    setOrderAmount('');
-    setRefresh(x => x + 1);
   };
 
   return (

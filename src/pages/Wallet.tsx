@@ -540,10 +540,19 @@ export default function WalletPage() {
         onClose={() => setShowPaymentModal(false)}
         amount={paymentAmount || 1000}
         description="Additional investment — Jewellbox Club"
-        onSuccess={(response) => {
-          addInvestment(user.id, paymentAmount || 1000, response?.razorpay_payment_id);
-          showToast('success', 'Investment added (locked 12 months)', 'Success');
-          setShowPaymentModal(false);
+        onSuccess={async (response) => {
+          try {
+            await addInvestment(
+              user.id,
+              paymentAmount || 1000,
+              response?.razorpay_payment_id,
+              user.mobile
+            );
+            showToast('success', 'Investment added (locked 12 months)', 'Success');
+            setShowPaymentModal(false);
+          } catch (e: any) {
+            showToast('error', e?.message || 'Could not save investment', 'Error');
+          }
         }}
         onFailure={() => {
           showToast('error', 'Payment failed. Please try again.', 'Error');

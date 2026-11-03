@@ -69,7 +69,7 @@ export default function Login() {
 
       clearDemoOTP(mobile);
 
-      const result = login(mobile);
+      const result = await login(mobile);
       if (result.success) {
         showToast('success', 'Login successful!', 'Welcome');
         const saved = localStorage.getItem('jwellbox_current_user');
@@ -78,7 +78,10 @@ export default function Login() {
         else if (role === 'individual') navigate('/individual-dashboard');
         else navigate('/dashboard');
       } else {
-        setError(result.message);
+        setError(
+          result.message ||
+            'OTP verified, but membership not found. Use Join Now to continue.'
+        );
       }
     } catch {
       setError('Verification failed. Please try again.');
@@ -225,11 +228,23 @@ export default function Login() {
             </form>
           )}
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-gray-500">
               {translate('login.dontHaveAccount')}{' '}
               <Link to="/register" className="text-amber-600 font-medium hover:text-amber-700">{translate('common.joinNow')}</Link>
             </p>
+            {(error.toLowerCase().includes('browser') ||
+              error.toLowerCase().includes('join now') ||
+              error.toLowerCase().includes('not found') ||
+              error.toLowerCase().includes('sign up') ||
+              error.toLowerCase().includes('register')) && (
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center w-full py-3 rounded-xl border border-amber-300 bg-amber-50 text-amber-800 text-sm font-semibold"
+              >
+                Join Now — pehle member bano (₹1,000+)
+              </Link>
+            )}
           </div>
 
           <div className="mt-6 p-4 bg-amber-50 rounded-xl border border-amber-100">
