@@ -58,10 +58,9 @@ export default function GoldShowroom() {
         return;
       }
 
-      const referrerCommission = Math.round(amt * (BUSINESS_RULES.goldOrderPercent / 100));
-
+      const orderId = `go_${Date.now()}`;
       await saveGoldOrder({
-        id: `go_${Date.now()}`,
+        id: orderId,
         userId: user.id,
         userName: user.name,
         userMobile: user.mobile,
@@ -74,9 +73,25 @@ export default function GoldShowroom() {
         investmentIds: spent.investmentIds,
       });
 
+      // Credit 3% gold referral commission to upline
+      const { findReferrer, creditGoldOrderCommission } = await import('../services/commissionService');
+      const referrer = findReferrer(user);
+      let referrerCommission = 0;
+      if (referrer) {
+        const credited = await creditGoldOrderCommission({
+          referrerId: referrer.id,
+          orderAmount: amt,
+          orderId,
+          buyerName: user.name,
+        });
+        referrerCommission = credited?.amount || 0;
+      }
+
       showToast(
         'success',
-        `Order placed. Referrer earns ${BUSINESS_RULES.goldOrderPercent}% (${formatInr(referrerCommission)}) when referred.`,
+        referrer
+          ? `Order placed. Referrer earned ${BUSINESS_RULES.goldOrderPercent}% (${formatInr(referrerCommission)}).`
+          : 'Order placed successfully.',
         'Gold Order'
       );
       setSelectedDesign(null);

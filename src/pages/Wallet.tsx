@@ -1,12 +1,18 @@
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Wallet, ArrowDownRight, ArrowUpRight, Send, CheckCircle, Clock, XCircle, Calendar, CreditCard, Building2, Smartphone, Download, Eye, X, Lock, Unlock, Gem, IndianRupee, AlertCircle, Plus } from 'lucide-react';
-import { getCommissionWalletBalance, walletTransactions, withdrawals } from '../data/mockData';
-import { useState } from 'react';
+import { withdrawals } from '../data/mockData';
+import { useEffect, useState } from 'react';
 import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
 import PaymentModal from '../components/PaymentModal';
 import { getInvestments, getTotalInvested, addInvestment } from '../services/investmentService';
+import {
+  fetchCommissions,
+  getCommissionBalance,
+  getCommissionsCache,
+} from '../services/commissionService';
+import { BUSINESS_RULES } from '../data/businessRules';
 
 export default function WalletPage() {
   const { user } = useAuth();
@@ -27,13 +33,18 @@ export default function WalletPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(0);
 
+  useEffect(() => {
+    if (!user) return;
+    fetchCommissions(user.id).catch(() => undefined);
+  }, [user]);
+
   if (!user) return null;
 
-  const commissionBalance = getCommissionWalletBalance(user.id);
+  const commissionBalance = getCommissionBalance(user.id);
   const monthlyInvestments = getInvestments(user.id);
   const totalInvested = getTotalInvested(user.id);
-  
-  const myTransactions = walletTransactions.filter(t => t.userId === user.id);
+
+  const myTransactions = getCommissionsCache(user.id);
   const myWithdrawals = withdrawals.filter(w => w.userId === user.id);
 
   const handleWithdraw = (e: React.FormEvent) => {
@@ -63,8 +74,11 @@ export default function WalletPage() {
   };
 
   const exportTransactions = () => {
-    const csv = 'Date,Type,Description,Amount\n' +
-      myTransactions.map(t => `${t.createdAt},${t.type},"${t.description}",${t.amount}`).join('\n');
+    const csv =
+      'Date,Type,Description,Amount,Status\n' +
+      myTransactions
+        .map(t => `${t.createdAt},${t.type},"${t.description}",${t.amount},${t.status}`)
+        .join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -134,10 +148,10 @@ export default function WalletPage() {
             <div className="mt-4 p-4 bg-white/10 rounded-xl">
               <p className="text-xs text-green-100 mb-2 font-semibold">This wallet includes:</p>
               <ul className="text-xs text-green-100 space-y-1">
-                <li>✓ Level 1 commissions (10%)</li>
-                <li>✓ Level 2 commissions (5%)</li>
-                <li>✓ Leader payouts (5%)</li>
-                <li>✓ Gold order bonuses (4%)</li>
+                <li>✓ Level 1 commissions ({BUSINESS_RULES.level1Percent}%)</li>
+                <li>✓ Level 2 commissions ({BUSINESS_RULES.level2Percent}%)</li>
+                <li>✓ Leader payouts ({BUSINESS_RULES.leaderPercent}%)</li>
+                <li>✓ Gold order bonuses ({BUSINESS_RULES.goldOrderPercent}%)</li>
               </ul>
             </div>
 
@@ -450,7 +464,12 @@ export default function WalletPage() {
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
           <h3 className="text-xl font-bold text-gray-900 mb-4">Commission Transaction Ledger</h3>
           <div className="space-y-2">
-            {myTransactions.slice(0, 10).map(tx => (
+            {myTransactions.length === 0 ? (
+              <p className="text-sm text-gray-500 text-center py-8">
+                Abhi koi commission nahi. Jab aapka referral invest karega, L1/L2 yahan credit hoga.
+              </p>
+            ) : (
+              myTransactions.slice(0, 10).map(tx => (
               <motion.div
                 key={tx.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -458,20 +477,21 @@ export default function WalletPage() {
                 className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
                 onClick={() => setViewingTransaction(tx)}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  tx.type === 'contribution' ? 'bg-blue-100' : 'bg-green-100'
-                }`}>
-                  {tx.type === 'contribution' ? <ArrowUpRight className="w-5 h-5 text-blue-600" /> : <ArrowDownRight className="w-5 h-5 text-green-600" />}
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-green-100">
+                  <ArrowDownRight className="w-5 h-5 text-green-600" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">{tx.description}</p>
-                  <p className="text-xs text-gray-500">{tx.createdAt}</p>
+                  <p className="text-xs text-gray-500">
+                    {tx.createdAt} · {tx.type} · {tx.status}
+                  </p>
                 </div>
-                <p className={`text-sm font-bold ${tx.type === 'contribution' ? 'text-blue-600' : 'text-green-600'}`}>
-                  {tx.type === 'contribution' ? '-' : '+'}₹{tx.amount.toLocaleString()}
+                <p className="text-sm font-bold text-green-600">
+                  +₹{tx.amount.toLocaleString()}
                 </p>
               </motion.div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       )}

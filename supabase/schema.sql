@@ -57,6 +57,25 @@ create table if not exists public.gold_orders (
 
 create index if not exists gold_orders_user_id_idx on public.gold_orders (user_id);
 
+-- Commission ledger (L1 / L2 / leader / gold)
+create table if not exists public.commissions (
+  id text primary key,
+  user_id text not null references public.members(id) on delete cascade,
+  type text not null check (type in ('commission_l1', 'commission_l2', 'leader_payout', 'gold_order_commission')),
+  amount numeric not null check (amount >= 0),
+  description text not null default '',
+  source_user_id text,
+  source_investment_id text,
+  status text not null check (status in ('completed', 'pending')) default 'completed',
+  created_at timestamptz not null default now()
+);
+
+create index if not exists commissions_user_id_idx on public.commissions (user_id);
+create index if not exists commissions_type_idx on public.commissions (type);
+create unique index if not exists commissions_dedupe_idx
+  on public.commissions (user_id, type, source_investment_id)
+  where source_investment_id is not null;
+
 -- App uses custom 2Factor OTP (not Supabase Auth), so anon key needs CRUD.
 alter table public.members enable row level security;
 alter table public.investments enable row level security;
@@ -74,6 +93,12 @@ create policy "investments_anon_all" on public.investments
 
 drop policy if exists "gold_orders_anon_all" on public.gold_orders;
 create policy "gold_orders_anon_all" on public.gold_orders
+  for all to anon, authenticated
+  using (true) with check (true);
+
+alter table public.commissions enable row level security;
+drop policy if exists "commissions_anon_all" on public.commissions;
+create policy "commissions_anon_all" on public.commissions
   for all to anon, authenticated
   using (true) with check (true);
 

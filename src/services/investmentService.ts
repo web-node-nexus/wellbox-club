@@ -1,5 +1,6 @@
 import { supabase, type DbInvestment, type DbGoldOrder, isSupabaseConfigured } from '../lib/supabase';
-import { normalizeMobile } from './memberDb';
+import { getMembersCache, normalizeMobile } from './memberDb';
+import { creditReferralCommissionsOnInvestment } from './commissionService';
 
 export interface Investment {
   id: string;
@@ -137,29 +138,75 @@ export async function addInvestment(
     mobile: m,
   };
 
+  let saved = inv;
+
   if (!isSupabaseConfigured) {
     const list = getInvestments(userId);
     list.push(inv);
     setUserInvestments(userId, list);
-    return inv;
+  } else {
+    const { data, error } = await supabase
+      .from('investments')
+      .insert(investmentToRow(inv, m))
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('Supabase addInvestment failed:', error.message);
+      throw error;
+    }
+
+    saved = rowToInvestment(data as DbInvestment);
+    const list = getInvestments(userId);
+    list.push(saved);
+    setUserInvestments(userId, list);
   }
 
-  const { data, error } = await supabase
-    .from('investments')
-    .insert(investmentToRow(inv, m))
-    .select('*')
-    .single();
+  // Credit L1 / L2 to upline from this investment
+  const investor =
+    getMembersCache().find(u => u.id === userId) ||
+    ({
+      id: userId,
+      name: 'Member',
+      mobile: m,
+      referralCode: '',
+      referredBy: '',
+      city: '',
+      role: 'member' as const,
+      isLeader: false,
+      teamSize: 0,
+      joinDate: inv.date,
+    });
 
-  if (error) {
-    console.error('Supabase addInvestment failed:', error.message);
-    throw error;
+  try {
+    await creditReferralCommissionsOnInvestment({
+      investor,
+      amount: saved.amount,
+      investmentId: saved.id,
+    });
+  } catch (e) {
+    console.error('Commission credit failed', e);
   }
 
-  const saved = rowToInvestment(data as DbInvestment);
-  const list = getInvestments(userId);
-  list.push(saved);
-  setUserInvestments(userId, list);
   return saved;
+}
+
+/** Prefetch investments for many users (team income calc) */
+export async function fetchInvestmentsForUsers(userIds: string[]) {
+  if (!isSupabaseConfigured || !userIds.length) return;
+  const { data, error } = await supabase.from('investments').select('*').in('user_id', userIds);
+  if (error) {
+    console.error('fetchInvestmentsForUsers', error.message);
+    return;
+  }
+  const byUser = new Map<string, Investment[]>();
+  (data as DbInvestment[]).forEach(row => {
+    const inv = rowToInvestment(row);
+    const list = byUser.get(inv.userId) || [];
+    list.push(inv);
+    byUser.set(inv.userId, list);
+  });
+  byUser.forEach((list, id) => setUserInvestments(id, list));
 }
 
 export function getTotalInvested(userId: string): number {

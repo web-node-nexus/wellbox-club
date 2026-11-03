@@ -248,13 +248,9 @@ export default function Login() {
           </div>
 
           <div className="mt-6 p-4 bg-amber-50 rounded-xl border border-amber-100">
-            <p className="text-xs font-medium text-amber-700 mb-2">Demo numbers (OTP via SMS / demo fallback)</p>
-            <div className="space-y-1 text-xs text-amber-600">
-              <p>• 9876543210 — Admin</p>
-              <p>• 9876543211 — Leader</p>
-              <p>• 9876543212 — Member</p>
-              <p>• 9876543213 — Buyer</p>
-            </div>
+            <p className="text-xs text-amber-700">
+              Pehle se account nahi hai? <Link to="/register" className="font-semibold underline">Join Now</Link> se OTP + payment ke baad member bano.
+            </p>
           </div>
         </div>
       </motion.div>

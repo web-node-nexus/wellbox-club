@@ -91,17 +91,26 @@ export async function fetchAllMembers(): Promise<RegisteredUser[]> {
   return cache;
 }
 
+export function clearMembersCache() {
+  cache = [];
+  cacheReady = false;
+  cacheError = null;
+}
+
 export async function fetchMemberByMobile(mobile: string): Promise<RegisteredUser | null> {
   const m = normalizeMobile(mobile);
-  const cached = cache.find(u => normalizeMobile(u.mobile) === m);
-  if (cached) return cached;
 
+  // Always check Supabase first so wiped DB isn't blocked by stale memory cache
   const { data, error } = await supabase.from('members').select('*').eq('mobile', m).maybeSingle();
   if (error) {
     console.error('Supabase member lookup failed:', error.message);
     throw error;
   }
-  if (!data) return null;
+  if (!data) {
+    // Drop stale cache entry if DB no longer has this mobile
+    cache = cache.filter(u => normalizeMobile(u.mobile) !== m);
+    return null;
+  }
   const user = rowToUser(data as DbMember);
   upsertMembersCache(user);
   return user;

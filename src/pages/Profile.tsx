@@ -1,7 +1,8 @@
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { User, Phone, Tag, Calendar, Crown, Users, Copy, CheckCircle, Shield, Edit, Save, X } from 'lucide-react';
-import { getCommissionWalletBalance, getContributionWalletBalance } from '../data/mockData';
+import { getCommissionBalance } from '../services/commissionService';
+import { getTotalInvested } from '../services/investmentService';
 import { useState } from 'react';
 import { useToast } from '../context/ToastContext';
 
@@ -18,8 +19,8 @@ export default function Profile() {
 
   if (!user) return null;
 
-  const commissionBalance = getCommissionWalletBalance(user.id);
-  const contributionBalance = getContributionWalletBalance(user.id);
+  const commissionBalance = getCommissionBalance(user.id);
+  const contributionBalance = getTotalInvested(user.id);
 
   const copyCode = () => {
     navigator.clipboard.writeText(user.referralCode);

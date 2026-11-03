@@ -1,10 +1,16 @@
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { DollarSign, TrendingUp, Crown, Download, Filter, Calendar, Eye, X, Search } from 'lucide-react';
-import { walletTransactions } from '../data/mockData';
-import { useState } from 'react';
+import { DollarSign, TrendingUp, Crown, Download, Filter, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
+import {
+  fetchCommissions,
+  getCommissionsByType,
+  type CommissionRecord,
+  type CommissionType,
+} from '../services/commissionService';
+import { BUSINESS_RULES, formatInr } from '../data/businessRules';
 
 export default function Income() {
   const { user } = useAuth();
@@ -12,31 +18,64 @@ export default function Income() {
   const location = useLocation();
   const [dateFilter, setDateFilter] = useState('all');
   const [search, setSearch] = useState('');
-  const [viewingTransaction, setViewingTransaction] = useState<any>(null);
-  if (!user) return null;
+  const [rows, setRows] = useState<CommissionRecord[]>([]);
+  const [viewingTransaction, setViewingTransaction] = useState<CommissionRecord | null>(null);
 
   const getIncomeType = () => {
-    if (location.pathname.includes('level1')) return { type: 'commission_l1', label: 'Level 1', icon: DollarSign, color: 'from-green-500 to-emerald-600', description: 'Commission from your direct referrals' };
-    if (location.pathname.includes('level2')) return { type: 'commission_l2', label: 'Level 2', icon: TrendingUp, color: 'from-blue-500 to-indigo-600', description: 'Commission from your referrals\' referrals' };
-    if (location.pathname.includes('leader')) return { type: 'leader_payout', label: 'Leader', icon: Crown, color: 'from-amber-500 to-orange-600', description: 'Monthly leader payout on team income' };
-    return { type: 'commission_l1', label: 'Level 1', icon: DollarSign, color: 'from-green-500 to-emerald-600', description: 'Commission from your direct referrals' };
+    if (location.pathname.includes('level2'))
+      return {
+        type: 'commission_l2' as CommissionType,
+        label: 'Level 2',
+        icon: TrendingUp,
+        color: 'from-blue-500 to-indigo-600',
+        description: `${BUSINESS_RULES.level2Percent}% from your referrals' referrals' investments`,
+      };
+    if (location.pathname.includes('leader'))
+      return {
+        type: 'leader_payout' as CommissionType,
+        label: 'Leader',
+        icon: Crown,
+        color: 'from-amber-500 to-orange-600',
+        description: `${BUSINESS_RULES.leaderPercent}% of team income (team ≥ ${BUSINESS_RULES.leaderTeamRequirement}, payout on ${BUSINESS_RULES.leaderPayoutDay}rd)`,
+      };
+    return {
+      type: 'commission_l1' as CommissionType,
+      label: 'Level 1',
+      icon: DollarSign,
+      color: 'from-green-500 to-emerald-600',
+      description: `${BUSINESS_RULES.level1Percent}% from your direct referrals' investments`,
+    };
   };
 
   const incomeType = getIncomeType();
-  const myTransactions = walletTransactions.filter(t => t.userId === user.id && t.type === incomeType.type);
-  
-  const filteredTransactions = myTransactions.filter(t => {
+
+  useEffect(() => {
+    if (!user) return;
+    fetchCommissions(user.id)
+      .then(() => setRows(getCommissionsByType(user.id, incomeType.type)))
+      .catch(() => setRows(getCommissionsByType(user.id, incomeType.type)));
+  }, [user, incomeType.type, location.pathname]);
+
+  if (!user) return null;
+
+  const filteredTransactions = rows.filter(t => {
     const matchesSearch = t.description.toLowerCase().includes(search.toLowerCase());
-    const matchesDate = dateFilter === 'all' || 
-      (dateFilter === 'month' && new Date(t.createdAt).getMonth() === new Date().getMonth()) ||
-      (dateFilter === 'year' && new Date(t.createdAt).getFullYear() === new Date().getFullYear());
+    const d = new Date(t.createdAt);
+    const matchesDate =
+      dateFilter === 'all' ||
+      (dateFilter === 'month' && d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear()) ||
+      (dateFilter === 'year' && d.getFullYear() === new Date().getFullYear());
     return matchesSearch && matchesDate;
   });
 
-  const totalIncome = filteredTransactions.reduce((s, t) => s + t.amount, 0);
+  const totalIncome = filteredTransactions
+    .filter(t => t.status === 'completed' || t.type === 'leader_payout')
+    .reduce((s, t) => s + t.amount, 0);
 
   const exportCSV = () => {
-    const csv = 'Date,Description,Amount\n' + filteredTransactions.map(t => `${t.createdAt},"${t.description}",${t.amount}`).join('\n');
+    const csv =
+      'Date,Description,Amount,Status\n' +
+      filteredTransactions.map(t => `${t.createdAt},"${t.description}",${t.amount},${t.status}`).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -50,33 +89,35 @@ export default function Income() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold flex items-center gap-3">
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 flex items-center gap-3">
             <div className={`w-12 h-12 bg-gradient-to-br ${incomeType.color} rounded-xl flex items-center justify-center shadow-lg`}>
               <incomeType.icon className="w-6 h-6 text-white" />
             </div>
             {incomeType.label} Income
           </h1>
-          <p className="text-white/50 mt-1">{incomeType.description}</p>
+          <p className="text-gray-500 mt-1">{incomeType.description}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={exportCSV}
-          className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm hover:bg-white/10 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm hover:bg-gray-50 transition-colors"
         >
           <Download className="w-4 h-4" />
           Export CSV
         </motion.button>
       </div>
 
-      {/* Total Card */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={`bg-gradient-to-br ${incomeType.color} rounded-3xl p-8 text-white shadow-2xl`}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`bg-gradient-to-br ${incomeType.color} rounded-3xl p-8 text-white shadow-2xl`}
+      >
         <p className="text-sm opacity-80 font-medium">Total {incomeType.label} Income</p>
-        <p className="text-5xl font-bold mt-2">₹{totalIncome.toLocaleString()}</p>
+        <p className="text-5xl font-bold mt-2">{formatInr(totalIncome)}</p>
         <p className="text-sm opacity-80 mt-3">{filteredTransactions.length} transactions</p>
       </motion.div>
 
-      {/* Filters */}
       <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
@@ -104,106 +145,61 @@ export default function Income() {
         </div>
       </div>
 
-      {/* Transactions Table */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr className="text-left text-xs text-gray-500">
-                <th className="px-6 py-4 font-medium">Date</th>
-                <th className="px-6 py-4 font-medium">Description</th>
-                <th className="px-6 py-4 font-medium">Amount</th>
-                <th className="px-6 py-4 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {filteredTransactions.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
-                    <DollarSign className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    No {incomeType.label.toLowerCase()} income found
-                  </td>
-                </tr>
-              ) : (
-                filteredTransactions.map(tx => (
-                  <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        {tx.createdAt}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm">{tx.description}</td>
-                    <td className="px-6 py-4 text-sm font-bold text-green-600">+₹{tx.amount.toLocaleString()}</td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => setViewingTransaction(tx)}
-                        className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="View Details"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        {filteredTransactions.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <p className="font-medium">No {incomeType.label} income yet</p>
+            <p className="text-sm mt-1">
+              Jab aapka referral invest karega, yahan {incomeType.label} commission dikhega.
+            </p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-50">
+            {filteredTransactions.map(t => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setViewingTransaction(t)}
+                className="w-full text-left p-4 hover:bg-gray-50 flex items-center justify-between"
+              >
+                <div>
+                  <p className="font-medium text-gray-900">{t.description}</p>
+                  <p className="text-sm text-gray-500">
+                    {t.createdAt} · {t.status}
+                  </p>
+                </div>
+                <p className="font-bold text-green-600">+{formatInr(t.amount)}</p>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* View Transaction Modal */}
       {viewingTransaction && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+        <div
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
           onClick={() => setViewingTransaction(null)}
         >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl"
+          <div
+            className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">Transaction Details</h3>
-              <button onClick={() => setViewingTransaction(null)} className="p-2 hover:bg-gray-100 rounded-lg">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-gray-500 mb-1">Transaction ID</p>
-                  <p className="font-mono font-medium text-gray-900">{viewingTransaction.id}</p>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-gray-500 mb-1">Amount</p>
-                  <p className="text-xl font-bold text-green-600">₹{viewingTransaction.amount.toLocaleString()}</p>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-gray-500 mb-1">Type</p>
-                  <p className="font-medium text-gray-900">{viewingTransaction.type}</p>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-gray-500 mb-1">Date</p>
-                  <p className="font-medium text-gray-900">{viewingTransaction.createdAt}</p>
-                </div>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-xl">
-                <p className="text-xs text-gray-500 mb-1">Description</p>
-                <p className="font-medium text-gray-900">{viewingTransaction.description}</p>
-              </div>
-              <button
-                onClick={() => setViewingTransaction(null)}
-                className="w-full py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </motion.div>
-        </motion.div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Transaction</h3>
+            <p className="text-sm text-gray-600 mb-4">{viewingTransaction.description}</p>
+            <p className="text-2xl font-bold text-green-600 mb-1">
+              {formatInr(viewingTransaction.amount)}
+            </p>
+            <p className="text-xs text-gray-500">
+              {viewingTransaction.createdAt} · {viewingTransaction.status}
+            </p>
+            <button
+              onClick={() => setViewingTransaction(null)}
+              className="mt-6 w-full py-2.5 bg-gray-100 rounded-xl font-medium"
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

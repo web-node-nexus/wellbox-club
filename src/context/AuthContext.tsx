@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import {
-  ensureDemoMembers,
   fetchAllMembers,
   fetchMemberByMobile,
   getMembersCache,
@@ -8,7 +7,14 @@ import {
   normalizeMobile,
   upsertMember,
 } from '../services/memberDb';
-import { fetchInvestmentsForUser } from '../services/investmentService';
+import { fetchInvestmentsForUser, fetchInvestmentsForUsers } from '../services/investmentService';
+import {
+  backfillCommissionsFromInvestments,
+  fetchCommissions,
+  getTeamTreeIds,
+  refreshUplineTeamSizes,
+  syncLeaderPayout,
+} from '../services/commissionService';
 
 export interface RegisteredUser {
   id: string;
@@ -47,57 +53,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const DEMO_USERS: RegisteredUser[] = [
-  {
-    id: '1',
-    name: 'Admin User',
-    mobile: '9876543210',
-    referralCode: 'ADMIN001',
-    referredBy: '',
-    city: 'Jaipur',
-    role: 'admin',
-    isLeader: true,
-    teamSize: 250,
-    joinDate: '2023-01-01',
-  },
-  {
-    id: '2',
-    name: 'Rajesh Kumar',
-    mobile: '9876543211',
-    referralCode: 'RAJ002',
-    referredBy: '1',
-    city: 'Delhi',
-    role: 'leader',
-    isLeader: true,
-    teamSize: 120,
-    joinDate: '2023-03-15',
-  },
-  {
-    id: '3',
-    name: 'Priya Sharma',
-    mobile: '9876543212',
-    referralCode: 'PRI003',
-    referredBy: '2',
-    city: 'Mumbai',
-    role: 'member',
-    isLeader: false,
-    teamSize: 45,
-    joinDate: '2023-05-20',
-  },
-  {
-    id: '4',
-    name: 'Amit Patel',
-    mobile: '9876543213',
-    referralCode: '',
-    referredBy: '',
-    city: 'Ahmedabad',
-    role: 'individual',
-    isLeader: false,
-    teamSize: 0,
-    joinDate: '2024-01-15',
-  },
-];
-
 const SESSION_KEY = 'jwellbox_current_user';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -107,8 +62,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUsers = async () => {
     try {
-      await fetchAllMembers();
-      await ensureDemoMembers(DEMO_USERS);
       await fetchAllMembers();
       setDbError(null);
     } catch (e: any) {
@@ -197,7 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         name: data.name,
         mobile,
         referralCode,
-        referredBy: data.referralCode || '',
+        referredBy: (data.referralCode || '').trim().toUpperCase(),
         city: data.city || '',
         role: data.role,
         isLeader: data.role === 'leader',
@@ -206,6 +159,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
 
       const saved = await upsertMember(newUser);
+      // Grow upline team size / leader eligibility immediately on join
+      await refreshUplineTeamSizes(saved).catch(() => undefined);
       return { success: true, message: 'Registration successful!', user: saved };
     } catch (e: any) {
       return {
@@ -233,8 +188,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const clean = await upsertMember(found);
       await fetchInvestmentsForUser(clean.id, m).catch(() => undefined);
-      setUser(clean);
-      localStorage.setItem(SESSION_KEY, JSON.stringify(clean));
+      await fetchCommissions().catch(() => undefined);
+      await backfillCommissionsFromInvestments().catch(() => undefined);
+      await fetchCommissions(clean.id).catch(() => undefined);
+      const teamIds = getTeamTreeIds(clean.id);
+      await fetchInvestmentsForUsers([clean.id, ...teamIds]).catch(() => undefined);
+      await syncLeaderPayout(clean).catch(() => undefined);
+      // refresh user in case team/leader fields updated
+      const refreshed = (await fetchMemberByMobile(m)) || clean;
+      setUser(refreshed);
+      localStorage.setItem(SESSION_KEY, JSON.stringify(refreshed));
       return { success: true, message: 'Login successful!' };
     } catch (e: any) {
       return {
