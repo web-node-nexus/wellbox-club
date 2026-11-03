@@ -28,6 +28,8 @@ interface AuthContextType {
   }) => { success: boolean; message: string; user?: RegisteredUser };
   logout: () => void;
   getAllUsers: () => RegisteredUser[];
+  /** Promote to leader when team hits 100 (leader remains a member too) */
+  promoteToLeaderIfEligible: (teamSize: number) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -143,8 +145,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }) => {
     const users = getAllUsers();
 
-    if (users.find(u => u.mobile === data.mobile)) {
-      return { success: false, message: 'This mobile number is already registered!' };
+    const existing = users.find(u => u.mobile === data.mobile);
+    if (existing) {
+      const roleLabel =
+        existing.role === 'leader' || existing.isLeader
+          ? 'leader'
+          : existing.role === 'admin'
+            ? 'admin'
+            : existing.role === 'individual'
+              ? 'buyer'
+              : 'member';
+      return {
+        success: false,
+        message: `Ye number pehle se hi ${roleLabel} hai. Dobara member nahi ban sakte — login with OTP use karo.`,
+      };
     }
 
     const referralCode =
@@ -195,8 +209,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('jwellbox_current_user');
   };
 
+  const promoteToLeaderIfEligible = (teamSize: number) => {
+    if (!user || teamSize < 100) return;
+    if (user.isLeader || user.role === 'leader' || user.role === 'admin') {
+      // keep teamSize fresh
+      if (user.teamSize !== teamSize) {
+        const updated = { ...user, teamSize, isLeader: true };
+        setUser(updated);
+        localStorage.setItem('jwellbox_current_user', JSON.stringify(updated));
+      }
+      return;
+    }
+    const updated: RegisteredUser = {
+      ...user,
+      isLeader: true,
+      role: user.role === 'individual' ? 'individual' : 'leader',
+      teamSize,
+    };
+    // Leader can still be a member — keep membership economics; mark leader badge
+    if (updated.role !== 'individual') {
+      updated.role = 'leader';
+    }
+    setUser(updated);
+    localStorage.setItem('jwellbox_current_user', JSON.stringify(updated));
+    const users = getAllUsers().map(u => (u.id === updated.id ? updated : u));
+    localStorage.setItem('jwellbox_users', JSON.stringify(users));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, getAllUsers }}>
+    <AuthContext.Provider
+      value={{ user, login, register, logout, getAllUsers, promoteToLeaderIfEligible }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -16,7 +16,7 @@ export default function AdminGoldOrders() {
       designName: o.designName,
       weightGrams: o.weightGrams,
       amount: o.amount,
-      commission: Math.round(o.amount * 0.04),
+      commission: Math.round(o.amount * 0.03),
       status: o.status,
       createdAt: o.createdAt,
       source: 'live' as const,
@@ -88,7 +88,7 @@ export default function AdminGoldOrders() {
                   <th className="px-6 py-4 font-medium">Design</th>
                   <th className="px-6 py-4 font-medium">Weight</th>
                   <th className="px-6 py-4 font-medium">Amount</th>
-                  <th className="px-6 py-4 font-medium">Commission (4%)</th>
+                  <th className="px-6 py-4 font-medium">Commission (3%)</th>
                   <th className="px-6 py-4 font-medium">Status</th>
                   <th className="px-6 py-4 font-medium">Date</th>
                 </tr>

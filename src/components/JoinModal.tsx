@@ -17,7 +17,7 @@ interface JoinModalProps {
 }
 
 export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: JoinModalProps) {
-  const { register, login } = useAuth();
+  const { register, login, getAllUsers } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'member' | 'leader' | 'individual'>(initialTab);
   const [step, setStep] = useState<'form' | 'otp' | 'payment' | 'success'>('form');
@@ -53,6 +53,23 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+
+    // Same number cannot join again
+    const existing = getAllUsers().find(u => u.mobile === formData.mobile);
+    if (existing) {
+      const label =
+        existing.role === 'leader' || existing.isLeader
+          ? 'Leader'
+          : existing.role === 'admin'
+            ? 'Admin'
+            : existing.role === 'individual'
+              ? 'Buyer'
+              : 'Member';
+      setErrors({
+        mobile: `Ye number pehle se hi ${label} hai. Dobara join nahi ho sakta — Login with OTP use karo.`,
+      });
+      return;
+    }
 
     setSendingOTP(true);
     setErrors({});

@@ -77,7 +77,9 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <h1 className={`text-xl font-bold font-[var(--font-heading)] ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   Jewellbox
                 </h1>
-                <p className={`text-xs ${darkMode ? 'text-amber-400' : 'text-amber-600'} -mt-1 tracking-wider font-semibold`}>MEMBER DASHBOARD</p>
+                <p className={`text-xs ${darkMode ? 'text-amber-400' : 'text-amber-600'} -mt-1 tracking-wider font-semibold`}>
+                  {user?.isLeader || user?.role === 'leader' ? 'LEADER DASHBOARD' : 'MEMBER DASHBOARD'}
+                </p>
               </div>
             </Link>
           </div>
@@ -90,10 +92,13 @@ export default function Layout({ children }: { children: ReactNode }) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'} truncate`}>{user?.name}</p>
-                <div className="flex items-center gap-1 mt-0.5">
-                  {user?.isLeader && (
+                <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-500/15 text-purple-700 text-xs font-bold rounded-full">
+                    Member
+                  </span>
+                  {(user?.isLeader || user?.role === 'leader') && (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-500/20 text-amber-600 text-xs font-bold rounded-full">
-                      <Crown className="w-3 h-3" /> Leader
+                      <Crown className="w-3 h-3" /> Leader Badge
                     </span>
                   )}
                 </div>

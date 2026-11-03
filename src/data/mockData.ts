@@ -86,7 +86,7 @@ export const appSettings: Settings = {
   level1Commission: 10,
   level2Commission: 5,
   leaderCommission: 5,
-  goldOrderCommission: 4,
+  goldOrderCommission: 3, // 3% of gold order to referrer
   lockPeriodMonths: 12,
 };
 

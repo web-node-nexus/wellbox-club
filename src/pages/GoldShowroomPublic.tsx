@@ -156,7 +156,7 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
                     <Scale className="w-5 h-5 text-amber-400" />
                     <span className="text-base font-bold gold-text-shimmer">{item.weight}g</span>
                   </div>
-                  <span className="text-xs text-white/40">{item.purity}</span>
+                    <span className="text-xs text-white/40">Call for price · {item.purity}</span>
                 </div>
               </div>
             </motion.div>

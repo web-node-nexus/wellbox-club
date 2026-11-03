@@ -22,7 +22,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [sendingOTP, setSendingOTP] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
-  const { register, login } = useAuth();
+  const { register, login, getAllUsers } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
@@ -40,6 +40,20 @@ export default function Register() {
     }
     if (!formData.investmentAmount || Number(formData.investmentAmount) < 1000) {
       setError('First installment must be at least ₹1,000');
+      return;
+    }
+
+    const existing = getAllUsers().find(u => u.mobile === formData.mobile);
+    if (existing) {
+      const label =
+        existing.role === 'leader' || existing.isLeader
+          ? 'Leader'
+          : existing.role === 'admin'
+            ? 'Admin'
+            : existing.role === 'individual'
+              ? 'Buyer'
+              : 'Member';
+      setError(`Ye number pehle se hi ${label} hai. Dobara member nahi ban sakte — Login with OTP use karo.`);
       return;
     }
 

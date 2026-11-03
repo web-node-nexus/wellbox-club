@@ -19,6 +19,7 @@ import HowItWorks from './pages/HowItWorks';
 import IncomePlan from './pages/IncomePlan';
 import LeaderProgram from './pages/LeaderProgram';
 import GoldShowroomPublic from './pages/GoldShowroomPublic';
+import GoldShowroom from './pages/GoldShowroom';
 import WhyBuyGold from './pages/WhyBuyGold';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
@@ -128,7 +129,7 @@ function AppRoutes() {
         <Route path="/income/leader" element={<ProtectedRoute><Layout><Income /></Layout></ProtectedRoute>} />
         <Route path="/wallet" element={<ProtectedRoute><Layout><Wallet /></Layout></ProtectedRoute>} />
         <Route path="/contributions" element={<ProtectedRoute><Layout><Contributions /></Layout></ProtectedRoute>} />
-        <Route path="/gold-showroom" element={<ProtectedRoute><Layout><GoldShowroomPublic onJoinClick={() => {}} /></Layout></ProtectedRoute>} />
+        <Route path="/gold-showroom" element={<ProtectedRoute><Layout><GoldShowroom /></Layout></ProtectedRoute>} />
         <Route path="/orders" element={<ProtectedRoute><Layout><Orders /></Layout></ProtectedRoute>} />
         <Route path="/referral" element={<ProtectedRoute><Layout><Referral /></Layout></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
