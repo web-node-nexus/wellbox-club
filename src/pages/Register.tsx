@@ -4,7 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, User, Phone, Tag, AlertCircle, CheckCircle, Loader2, CreditCard, ArrowRight, ArrowLeft } from 'lucide-react';
-import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP } from '../services/otpService';
+import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP } from '../services/otpService';
+import { addInvestment } from '../services/investmentService';
 import PaymentModal from '../components/PaymentModal';
 
 export default function Register() {
@@ -21,7 +22,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [sendingOTP, setSendingOTP] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
-  const { register } = useAuth();
+  const { register, login } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
@@ -45,19 +46,16 @@ export default function Register() {
     setSendingOTP(true);
     
     try {
-      const demoOTP = generateDemoOTP();
-      storeDemoOTP(formData.mobile, demoOTP);
-      
       try {
         await sendOTP(formData.mobile);
         showToast('success', `OTP sent to +91 ${formData.mobile}`, 'OTP Sent');
-        console.log('Demo OTP:', demoOTP);
-      } catch (apiError) {
+      } catch {
+        const demoOTP = generateDemoOTP();
+        storeDemoOTP(formData.mobile, demoOTP);
         showToast('info', `Demo OTP: ${demoOTP}`, 'Demo Mode');
       }
-      
       setStep('otp');
-    } catch (err) {
+    } catch {
       setError('Failed to send OTP. Please try again.');
     } finally {
       setSendingOTP(false);
@@ -70,88 +68,81 @@ export default function Register() {
     setLoading(true);
     
     try {
-      const isValid = verifyDemoOTP(formData.mobile, otp);
-      
-      if (!isValid) {
-        try {
-          await verifyOTP(formData.mobile, otp);
-        } catch (err) {
-          setError('Invalid OTP. Please try again.');
-          setLoading(false);
-          return;
-        }
+      let verified = false;
+      try {
+        await verifyOTP(formData.mobile, otp);
+        verified = true;
+      } catch {
+        verified = verifyDemoOTP(formData.mobile, otp);
       }
-      
+
+      if (!verified) {
+        setError('Invalid OTP. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      clearDemoOTP(formData.mobile);
       showToast('success', 'OTP verified successfully!', 'Verified');
       setStep('payment');
-    } catch (err) {
+    } catch {
       setError('Verification failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePaymentSuccess = () => {
-    // Payment successful, now register user
+  const handlePaymentSuccess = (response?: any) => {
+    // Payment required — without pay, user is NOT a member
     const result = register({
       name: formData.name,
       mobile: formData.mobile,
       referralCode: formData.referralCode,
       role: 'member',
-      password: otp, // Use OTP as temporary password
     });
 
-    if (result.success) {
-      // Save first investment
-      const investment = {
-        id: Date.now().toString(),
-        userId: result.user?.id || '',
-        amount: Number(formData.investmentAmount),
-        date: new Date().toISOString().split('T')[0],
-        lockedUntil: new Date(Date.now() + 12 * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        status: 'locked' as const,
-      };
-      
-      const existingInvestments = JSON.parse(localStorage.getItem(`investments_${result.user?.id}`) || '[]');
-      localStorage.setItem(`investments_${result.user?.id}`, JSON.stringify([...existingInvestments, investment]));
-      
+    if (result.success && result.user) {
+      addInvestment(
+        result.user.id,
+        Number(formData.investmentAmount),
+        response?.razorpay_payment_id
+      );
+      login(formData.mobile);
       setStep('success');
-      setTimeout(() => navigate('/login'), 3000);
+      setTimeout(() => navigate('/dashboard'), 1500);
     } else {
-      setError(result.message);
+      setError(result.message || 'Registration failed');
     }
   };
 
   const handleResendOTP = async () => {
     setOtp('');
     setError('');
-    const demoOTP = generateDemoOTP();
-    storeDemoOTP(formData.mobile, demoOTP);
-    
     try {
       await sendOTP(formData.mobile);
       showToast('success', 'OTP resent successfully', 'OTP Resent');
-      console.log('New Demo OTP:', demoOTP);
-    } catch (err) {
+    } catch {
+      const demoOTP = generateDemoOTP();
+      storeDemoOTP(formData.mobile, demoOTP);
       showToast('info', `New Demo OTP: ${demoOTP}`, 'Demo Mode');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 flex items-center justify-center p-4 pt-28 sm:pt-32">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
+          <Link to="/" className="inline-flex items-center justify-center gap-3 mb-6 relative z-0">
+            <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shrink-0">
               <Crown className="w-7 h-7 text-white" />
             </div>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Join Jewellbox Club</h1>
-          <p className="text-gray-500 mt-1">Start your gold investment journey today</p>
+          <p className="text-gray-500 mt-1">Register with OTP — no password needed</p>
           
           {/* Progress Indicator */}
           <div className="flex items-center justify-center gap-2 mt-4">
@@ -429,10 +420,10 @@ export default function Register() {
                 </motion.div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Registration Successful! 🎉</h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Welcome to Jewellbox Club! Your payment has been processed successfully.
+                  Welcome to Jewellbox Club! Your investment is locked for 12 months.
                 </p>
                 <p className="text-xs text-gray-500">
-                  Redirecting to login page...
+                  Opening your dashboard...
                 </p>
               </motion.div>
             )}
@@ -453,13 +444,13 @@ export default function Register() {
         onClose={() => setShowPayment(false)}
         amount={Number(formData.investmentAmount)}
         description="First Investment - Jewellbox Club Membership"
-        onSuccess={() => {
+        guest={{ name: formData.name, mobile: formData.mobile }}
+        onSuccess={(response) => {
           setShowPayment(false);
-          handlePaymentSuccess();
+          handlePaymentSuccess(response);
         }}
-        onFailure={(error) => {
-          console.error('Payment failed:', error);
-          setError('Payment failed. Please try again.');
+        onFailure={() => {
+          setError('Payment failed. You are not a member until payment succeeds.');
         }}
       />
     </div>

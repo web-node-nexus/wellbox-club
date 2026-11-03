@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useToast } from '../context/ToastContext';
 import { motion } from 'framer-motion';
 import { Crown, Phone, Lock, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
-import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP } from '../services/otpService';
+import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP } from '../services/otpService';
 
 export default function Login() {
   const [mobile, setMobile] = useState('');
@@ -22,32 +22,25 @@ export default function Login() {
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!/^[6-9]\d{9}$/.test(mobile)) {
       setError('Please enter a valid 10-digit mobile number');
       return;
     }
 
     setSendingOTP(true);
-    
+
     try {
-      // Generate demo OTP for testing
-      const demoOTP = generateDemoOTP();
-      storeDemoOTP(mobile, demoOTP);
-      
-      // Try to send real OTP via 2Factor API
       try {
         await sendOTP(mobile);
         showToast('success', `OTP sent to +91 ${mobile}`, 'OTP Sent');
-        console.log('Demo OTP for testing:', demoOTP);
-      } catch (apiError) {
-        // If API fails, use demo OTP
-        console.log('Using demo OTP:', demoOTP);
+      } catch {
+        const demoOTP = generateDemoOTP();
+        storeDemoOTP(mobile, demoOTP);
         showToast('info', `Demo OTP: ${demoOTP} (API unavailable)`, 'Demo Mode');
       }
-      
       setOtpSent(true);
-    } catch (err) {
+    } catch {
       setError('Failed to send OTP. Please try again.');
     } finally {
       setSendingOTP(false);
@@ -58,30 +51,36 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     try {
-      // Verify OTP (demo or real)
-      const isValid = verifyDemoOTP(mobile, otp);
-      
-      if (!isValid) {
-        try {
-          await verifyOTP(mobile, otp);
-        } catch (err) {
-          setError('Invalid OTP. Please try again.');
-          setLoading(false);
-          return;
-        }
+      let verified = false;
+      try {
+        await verifyOTP(mobile, otp);
+        verified = true;
+      } catch {
+        verified = verifyDemoOTP(mobile, otp);
       }
-      
-      // OTP verified, now login user
-      const result = login(mobile, otp);
+
+      if (!verified) {
+        setError('Invalid OTP. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      clearDemoOTP(mobile);
+
+      const result = login(mobile);
       if (result.success) {
         showToast('success', 'Login successful!', 'Welcome');
-        navigate('/dashboard');
+        const saved = localStorage.getItem('jwellbox_current_user');
+        const role = saved ? (JSON.parse(saved).role as string) : 'member';
+        if (role === 'admin') navigate('/admin');
+        else if (role === 'individual') navigate('/individual-dashboard');
+        else navigate('/dashboard');
       } else {
         setError(result.message);
       }
-    } catch (err) {
+    } catch {
       setError('Verification failed. Please try again.');
     } finally {
       setLoading(false);
@@ -91,33 +90,31 @@ export default function Login() {
   const handleResendOTP = async () => {
     setOtp('');
     setError('');
-    const demoOTP = generateDemoOTP();
-    storeDemoOTP(mobile, demoOTP);
-    
     try {
       await sendOTP(mobile);
       showToast('success', 'OTP resent successfully', 'OTP Resent');
-      console.log('New Demo OTP:', demoOTP);
-    } catch (err) {
+    } catch {
+      const demoOTP = generateDemoOTP();
+      storeDemoOTP(mobile, demoOTP);
       showToast('info', `New Demo OTP: ${demoOTP}`, 'Demo Mode');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 flex items-center justify-center p-4 pt-28 sm:pt-32">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
+          <Link to="/" className="inline-flex items-center justify-center gap-3 mb-6 relative z-0">
+            <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shrink-0">
               <Crown className="w-7 h-7 text-white" />
             </div>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">{translate('login.welcomeBack')}</h1>
-          <p className="text-gray-500 mt-1">{translate('login.signInAccount')}</p>
+          <p className="text-gray-500 mt-1">Login with OTP — no password needed</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
@@ -129,7 +126,6 @@ export default function Login() {
           )}
 
           {!otpSent ? (
-            // Step 1: Enter Mobile Number
             <form onSubmit={handleSendOTP} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{translate('login.mobileNumber')}</label>
@@ -167,7 +163,6 @@ export default function Login() {
               </button>
             </form>
           ) : (
-            // Step 2: Enter OTP
             <form onSubmit={handleVerifyOTP} className="space-y-5">
               <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
                 <p className="text-sm text-green-700 flex items-center gap-2">
@@ -191,9 +186,7 @@ export default function Login() {
                     disabled={loading}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  OTP expires in 5 minutes
-                </p>
+                <p className="text-xs text-gray-500 mt-2">OTP expires in 5 minutes</p>
               </div>
 
               <button
@@ -215,12 +208,7 @@ export default function Login() {
               </button>
 
               <div className="text-center">
-                <button
-                  type="button"
-                  onClick={handleResendOTP}
-                  disabled={loading}
-                  className="text-sm text-amber-600 hover:text-amber-700 font-medium"
-                >
+                <button type="button" onClick={handleResendOTP} disabled={loading} className="text-sm text-amber-600 hover:text-amber-700 font-medium">
                   Didn't receive OTP? Resend
                 </button>
               </div>
@@ -228,11 +216,7 @@ export default function Login() {
               <div className="text-center">
                 <button
                   type="button"
-                  onClick={() => {
-                    setOtpSent(false);
-                    setOtp('');
-                    setError('');
-                  }}
+                  onClick={() => { setOtpSent(false); setOtp(''); setError(''); }}
                   className="text-sm text-gray-500 hover:text-gray-700"
                 >
                   ← Change mobile number
@@ -249,12 +233,12 @@ export default function Login() {
           </div>
 
           <div className="mt-6 p-4 bg-amber-50 rounded-xl border border-amber-100">
-            <p className="text-xs font-medium text-amber-700 mb-2">Demo Accounts (Use OTP: 123456)</p>
+            <p className="text-xs font-medium text-amber-700 mb-2">Demo numbers (OTP via SMS / demo fallback)</p>
             <div className="space-y-1 text-xs text-amber-600">
-              <p>• Mobile: 9876543210 ({translate('admin.adminPanel')})</p>
-              <p>• Mobile: 9876543211 ({translate('navbar.leaders')})</p>
-              <p>• Mobile: 9876543212 ({translate('navbar.becomeMember')})</p>
-              <p>• Mobile: 9876543213 ({translate('joinModal.registerAsBuyer')})</p>
+              <p>• 9876543210 — Admin</p>
+              <p>• 9876543211 — Leader</p>
+              <p>• 9876543212 — Member</p>
+              <p>• 9876543213 — Buyer</p>
             </div>
           </div>
         </div>

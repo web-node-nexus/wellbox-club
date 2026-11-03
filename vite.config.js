@@ -11,5 +11,13 @@ export default defineConfig({
     hmr: {
       port: 3000,
     },
+    proxy: {
+      "/api/2factor": {
+        target: "https://2factor.in",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/2factor/, "/API/V1"),
+        secure: true,
+      },
+    },
   },
 });

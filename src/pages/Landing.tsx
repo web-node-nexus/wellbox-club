@@ -170,7 +170,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
         <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-yellow-500/15 rounded-full blur-3xl" />
 
         {/* Hero Content */}
-        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-24 pb-16">
+        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-36 sm:pt-40 pb-16">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -414,14 +414,14 @@ export default function Landing({ onJoinClick }: LandingProps) {
           {/* Featured Designs Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
             {[
-              { name: 'Royal Necklace', weight: '45.5g', purity: '22K', image: designImages['Royal Necklace Set'], category: 'Necklace', price: '₹2,85,000' },
-              { name: 'Diamond Ring', weight: '4.8g', purity: '24K', image: designImages['Minimalist Ring'], category: 'Ring', price: '₹30,000' },
-              { name: 'Temple Set', weight: '120g', purity: '22K', image: designImages['Temple Jewelry Set'], category: 'Set', price: '₹7,50,000' },
-              { name: 'Gold Coin', weight: '10g', purity: '24K', image: designImages['Gold Coin 10g'], category: 'Coins', price: '₹62,500' },
-              { name: 'Jhumka Earrings', weight: '18.5g', purity: '22K', image: designImages['Jhumka Earrings'], category: 'Earrings', price: '₹1,16,000' },
-              { name: 'Antique Bangles', weight: '28g', purity: '22K', image: designImages['Antique Bangles Pair'], category: 'Bangles', price: '₹1,76,000' },
-              { name: 'Bridal Choker', weight: '85g', purity: '22K', image: designImages['Bridal Choker'], category: 'Necklace', price: '₹5,35,000' },
-              { name: 'Gold Bar', weight: '50g', purity: '24K', image: designImages['Gold Bar 50g'], category: 'Coins', price: '₹3,12,500' },
+              { name: 'Royal Necklace', weight: '45.5g', purity: '22K', image: designImages['Royal Necklace Set'], category: 'Necklace' },
+              { name: 'Diamond Ring', weight: '4.8g', purity: '24K', image: designImages['Minimalist Ring'], category: 'Ring' },
+              { name: 'Temple Set', weight: '120g', purity: '22K', image: designImages['Temple Jewelry Set'], category: 'Set' },
+              { name: 'Gold Coin', weight: '10g', purity: '24K', image: designImages['Gold Coin 10g'], category: 'Coins' },
+              { name: 'Jhumka Earrings', weight: '18.5g', purity: '22K', image: designImages['Jhumka Earrings'], category: 'Earrings' },
+              { name: 'Antique Bangles', weight: '28g', purity: '22K', image: designImages['Antique Bangles Pair'], category: 'Bangles' },
+              { name: 'Bridal Choker', weight: '85g', purity: '22K', image: designImages['Bridal Choker'], category: 'Necklace' },
+              { name: 'Gold Bar', weight: '50g', purity: '24K', image: designImages['Gold Bar 50g'], category: 'Coins' },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -482,7 +482,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
                       <Scale className="w-5 h-5 text-amber-400" />
                       <span className="text-base font-bold text-amber-400">{item.weight}</span>
                     </div>
-                    <span className="text-sm font-bold text-white">{item.price}</span>
+                    <span className="text-xs text-white/50">{item.purity} · Weight only</span>
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.05 }}

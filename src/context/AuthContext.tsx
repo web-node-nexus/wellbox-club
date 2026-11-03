@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
-interface RegisteredUser {
+export interface RegisteredUser {
   id: string;
   name: string;
   mobile: string;
@@ -13,20 +13,26 @@ interface RegisteredUser {
   isLeader: boolean;
   teamSize: number;
   joinDate: string;
-  password: string;
 }
 
 interface AuthContextType {
   user: RegisteredUser | null;
-  login: (mobile: string, password: string) => { success: boolean; message: string };
-  register: (data: { name: string; mobile: string; city?: string; referralCode?: string; role: 'member' | 'leader' | 'individual'; password: string }) => { success: boolean; message: string; user?: RegisteredUser };
+  /** OTP must already be verified by the caller — passwordless login */
+  login: (mobile: string) => { success: boolean; message: string };
+  register: (data: {
+    name: string;
+    mobile: string;
+    city?: string;
+    referralCode?: string;
+    role: 'member' | 'leader' | 'individual';
+  }) => { success: boolean; message: string; user?: RegisteredUser };
   logout: () => void;
   getAllUsers: () => RegisteredUser[];
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// Demo users (pre-seeded)
+// Demo users (pre-seeded) — OTP only, no password
 const DEMO_USERS: RegisteredUser[] = [
   {
     id: '1',
@@ -35,11 +41,10 @@ const DEMO_USERS: RegisteredUser[] = [
     referralCode: 'ADMIN001',
     referredBy: '',
     city: 'Jaipur',
-    role: 'leader',
+    role: 'admin',
     isLeader: true,
     teamSize: 250,
     joinDate: '2023-01-01',
-    password: 'admin123',
   },
   {
     id: '2',
@@ -52,7 +57,6 @@ const DEMO_USERS: RegisteredUser[] = [
     isLeader: true,
     teamSize: 120,
     joinDate: '2023-03-15',
-    password: 'raj123',
   },
   {
     id: '3',
@@ -65,7 +69,6 @@ const DEMO_USERS: RegisteredUser[] = [
     isLeader: false,
     teamSize: 45,
     joinDate: '2023-05-20',
-    password: 'pri123',
   },
   {
     id: '4',
@@ -78,29 +81,41 @@ const DEMO_USERS: RegisteredUser[] = [
     isLeader: false,
     teamSize: 0,
     joinDate: '2024-01-15',
-    password: 'amit123',
   },
 ];
+
+function stripPassword(u: RegisteredUser & { password?: string }): RegisteredUser {
+  const { password: _p, ...rest } = u;
+  return rest;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<RegisteredUser | null>(null);
 
-  // Load user from localStorage on mount
   useEffect(() => {
     const savedUser = localStorage.getItem('jwellbox_current_user');
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
+        setUser(stripPassword(JSON.parse(savedUser)));
+      } catch {
         localStorage.removeItem('jwellbox_current_user');
       }
     }
   }, []);
 
-  // Initialize demo users if not exists
   useEffect(() => {
     const existingUsers = localStorage.getItem('jwellbox_users');
     if (!existingUsers) {
+      localStorage.setItem('jwellbox_users', JSON.stringify(DEMO_USERS));
+      return;
+    }
+    // Migrate any stored users that still have password fields
+    try {
+      const users = (JSON.parse(existingUsers) as Array<RegisteredUser & { password?: string }>).map(
+        stripPassword
+      );
+      localStorage.setItem('jwellbox_users', JSON.stringify(users));
+    } catch {
       localStorage.setItem('jwellbox_users', JSON.stringify(DEMO_USERS));
     }
   }, []);
@@ -109,26 +124,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const stored = localStorage.getItem('jwellbox_users');
     if (stored) {
       try {
-        return JSON.parse(stored);
-      } catch (e) {
+        return (JSON.parse(stored) as Array<RegisteredUser & { password?: string }>).map(
+          stripPassword
+        );
+      } catch {
         return DEMO_USERS;
       }
     }
     return DEMO_USERS;
   };
 
-  const register = (data: { name: string; mobile: string; city?: string; referralCode?: string; role: 'member' | 'leader' | 'individual'; password: string }) => {
+  const register = (data: {
+    name: string;
+    mobile: string;
+    city?: string;
+    referralCode?: string;
+    role: 'member' | 'leader' | 'individual';
+  }) => {
     const users = getAllUsers();
-    
-    // Check if mobile already exists
+
     if (users.find(u => u.mobile === data.mobile)) {
       return { success: false, message: 'This mobile number is already registered!' };
     }
 
-    // Generate referral code (empty for individual users)
-    const referralCode = data.role === 'individual' 
-      ? '' 
-      : data.name.substring(0, 3).toUpperCase() + Math.floor(100 + Math.random() * 900).toString();
+    const referralCode =
+      data.role === 'individual'
+        ? ''
+        : data.name.substring(0, 3).toUpperCase() +
+          Math.floor(100 + Math.random() * 900).toString();
 
     const newUser: RegisteredUser = {
       id: String(users.length + 1),
@@ -141,7 +164,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLeader: data.role === 'leader',
       teamSize: 0,
       joinDate: new Date().toISOString().split('T')[0],
-      password: data.password,
     };
 
     users.push(newUser);
@@ -150,28 +172,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true, message: 'Registration successful!', user: newUser };
   };
 
-  const login = (mobile: string, otp: string) => {
+  const login = (mobile: string) => {
     const users = getAllUsers();
-    
-    // For demo users, accept any OTP (for testing)
-    const demoUser = DEMO_USERS.find(u => u.mobile === mobile);
-    if (demoUser) {
-      setUser(demoUser);
-      localStorage.setItem('jwellbox_current_user', JSON.stringify(demoUser));
-      return { success: true, message: 'Login successful!' };
-    }
-    
-    // For registered users, check if they exist
-    const found = users.find(u => u.mobile === mobile);
-    
+    const found =
+      DEMO_USERS.find(u => u.mobile === mobile) || users.find(u => u.mobile === mobile);
+
     if (found) {
-      // OTP is already verified in Login component, so just login
-      setUser(found);
-      localStorage.setItem('jwellbox_current_user', JSON.stringify(found));
+      const clean = stripPassword(found);
+      setUser(clean);
+      localStorage.setItem('jwellbox_current_user', JSON.stringify(clean));
       return { success: true, message: 'Login successful!' };
     }
-    
-    return { success: false, message: 'Mobile number not registered. Please sign up first.' };
+
+    return {
+      success: false,
+      message: 'Mobile number not registered. Please sign up first.',
+    };
   };
 
   const logout = () => {

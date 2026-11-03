@@ -1,11 +1,12 @@
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Copy, Share2, CheckCircle, Wallet, Lock, Unlock, Calendar, TrendingUp, DollarSign, Users, Gift, ArrowUpRight, ArrowDownRight, Target, Zap, Award, Eye, Bell, Trophy, Star, Flame, Sparkles, Gem, QrCode, BarChart3, PieChart as PieChartIcon, Activity, Clock, Filter, Download, Plus, Minus, RefreshCw, ExternalLink, ChevronRight, Medal, Rocket, Briefcase } from 'lucide-react';
-import { walletTransactions, contributions, getCommissionWalletBalance, getContributionWalletBalance, users } from '../data/mockData';
+import { walletTransactions, contributions, getCommissionWalletBalance, users } from '../data/mockData';
 import { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, RadialBarChart, RadialBar, Legend, BarChart, Bar } from 'recharts';
 import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
+import { getInvestments, getLockedInvested, getTotalInvested, getUnlockedInvested } from '../services/investmentService';
 
 function AnimatedCounter({ target, prefix = '', suffix = '' }: { target: number; prefix?: string; suffix?: string }) {
   const [count, setCount] = useState(0);
@@ -36,7 +37,10 @@ export default function Dashboard() {
   if (!user) return null;
 
   const commissionBalance = getCommissionWalletBalance(user.id);
-  const contributionBalance = getContributionWalletBalance(user.id);
+  const myInvestments = getInvestments(user.id);
+  const contributionBalance = getTotalInvested(user.id);
+  const lockedInvested = getLockedInvested(user.id);
+  const unlockedInvested = getUnlockedInvested(user.id);
   const myTransactions = walletTransactions.filter(t => t.userId === user.id);
   const myContributions = contributions.filter(c => c.userId === user.id);
   const teamMembers = users.filter(u => u.referredBy === user.id).length;
@@ -417,17 +421,39 @@ export default function Dashboard() {
                 <Lock className="w-10 h-10" />
                 <Lock className="w-6 h-6 text-blue-200" />
               </div>
-              <p className="text-sm text-blue-100 font-medium">Contribution Wallet</p>
+              <p className="text-sm text-blue-100 font-medium">Investment Wallet</p>
               <p className="text-4xl font-bold mt-2">₹{contributionBalance.toLocaleString()}</p>
-              <p className="text-sm text-blue-200 mt-2">🔒 Locked for 12 months</p>
+              <p className="text-sm text-blue-200 mt-2">🔒 Locked ₹{lockedInvested.toLocaleString()} · ✅ Unlocked ₹{unlockedInvested.toLocaleString()}</p>
+              <p className="text-xs text-blue-100/80 mt-1">Cash withdraw not allowed — only level income can be withdrawn</p>
               <Link to="/gold-showroom" className="mt-4 block">
                 <button className="w-full py-3 bg-amber-500 hover:bg-amber-600 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
                   <Gem className="w-5 h-5" />
-                  Order Gold from Showroom
+                  Order Gold (after 12 months)
                 </button>
               </Link>
             </motion.div>
           </div>
+
+          {myInvestments.length > 0 && (
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+              <h3 className="font-bold text-gray-900 mb-3">Your investments</h3>
+              <div className="space-y-2">
+                {myInvestments.map(inv => (
+                  <div key={inv.id} className="flex items-center justify-between p-3 rounded-xl bg-amber-50 border border-amber-100 text-sm">
+                    <div>
+                      <p className="font-semibold text-gray-900">₹{inv.amount.toLocaleString()}</p>
+                      <p className="text-xs text-gray-500">Invested {inv.date} · unlock {inv.lockedUntil}</p>
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                      inv.status === 'unlocked' ? 'bg-green-100 text-green-700' :
+                      inv.status === 'used' ? 'bg-gray-200 text-gray-600' :
+                      'bg-amber-100 text-amber-800'
+                    }`}>{inv.status}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
           {/* Achievements */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">

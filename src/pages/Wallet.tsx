@@ -2,10 +2,11 @@ import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Wallet, ArrowDownRight, ArrowUpRight, Send, CheckCircle, Clock, XCircle, Calendar, CreditCard, Building2, Smartphone, Download, Eye, X, Lock, Unlock, Gem, IndianRupee, AlertCircle, Plus } from 'lucide-react';
 import { getCommissionWalletBalance, walletTransactions, withdrawals } from '../data/mockData';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
 import PaymentModal from '../components/PaymentModal';
+import { getInvestments, getTotalInvested, addInvestment } from '../services/investmentService';
 
 export default function WalletPage() {
   const { user } = useAuth();
@@ -29,10 +30,8 @@ export default function WalletPage() {
   if (!user) return null;
 
   const commissionBalance = getCommissionWalletBalance(user.id);
-  
-  // Get investment data from localStorage
-  const monthlyInvestments = JSON.parse(localStorage.getItem(`investments_${user.id}`) || '[]');
-  const totalInvested = monthlyInvestments.reduce((sum: number, inv: any) => sum + inv.amount, 0);
+  const monthlyInvestments = getInvestments(user.id);
+  const totalInvested = getTotalInvested(user.id);
   
   const myTransactions = walletTransactions.filter(t => t.userId === user.id);
   const myWithdrawals = withdrawals.filter(w => w.userId === user.id);
@@ -156,12 +155,12 @@ export default function WalletPage() {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {
                   setPaymentAmount(1000);
-                  setShowPaymentModal(true);
+                  setActiveTab('investment');
                 }}
                 className="flex-1 py-4 bg-white/30 hover:bg-white/40 rounded-xl font-semibold text-lg transition-colors backdrop-blur flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                Add Funds
+                View Investment
               </motion.button>
             </div>
           </div>
@@ -373,16 +372,16 @@ export default function WalletPage() {
             </div>
             <p className="text-sm text-blue-100 font-medium">Total Investment Balance</p>
             <p className="text-5xl font-bold mt-2">₹{totalInvested.toLocaleString()}</p>
-            <p className="text-sm text-blue-200 mt-3">🔒 Locked for minimum 12 months • Can order gold after lock period</p>
+            <p className="text-sm text-blue-200 mt-3">🔒 Held 12 months • Gold order after unlock • Level income withdraw only</p>
             
             <div className="mt-4 p-4 bg-white/10 rounded-xl">
               <p className="text-xs text-blue-100 mb-2 font-semibold">Investment Rules:</p>
               <ul className="text-xs text-blue-100 space-y-1">
-                <li>✓ Minimum ₹1,000 per month (no maximum limit)</li>
-                <li>✓ Locked for minimum 12 months (can extend)</li>
-                <li>✓ Can order gold from showroom after lock</li>
-                <li>✗ Cannot withdraw as cash</li>
-                <li>✗ No early withdrawal allowed</li>
+                <li>✓ Minimum ₹1,000 first payment to become member</li>
+                <li>✓ Locked for 12 months from payment date</li>
+                <li>✓ After 12 months: order gold of unlocked amount</li>
+                <li>✗ Cannot withdraw invested amount as cash</li>
+                <li>✓ Only level / commission income is withdrawable</li>
               </ul>
             </div>
 
@@ -406,9 +405,9 @@ export default function WalletPage() {
             <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Investment History</h3>
               <div className="space-y-3">
-                {monthlyInvestments.map((inv: any) => {
+                {monthlyInvestments.map((inv) => {
                   const daysLeft = Math.ceil((new Date(inv.lockedUntil).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-                  const isUnlocked = daysLeft <= 0;
+                  const isUnlocked = inv.status === 'unlocked' || daysLeft <= 0;
                   
                   return (
                     <motion.div
@@ -535,20 +534,18 @@ export default function WalletPage() {
         )}
       </AnimatePresence>
 
-      {/* Payment Modal */}
+      {/* Extra investment payment */}
       <PaymentModal
         isOpen={showPaymentModal}
         onClose={() => setShowPaymentModal(false)}
-        amount={paymentAmount}
-        description="Add funds to wallet"
+        amount={paymentAmount || 1000}
+        description="Additional investment — Jewellbox Club"
         onSuccess={(response) => {
-          console.log('Payment successful:', response);
-          showToast('success', 'Funds added successfully!', 'Success');
-          // Here you would typically update the wallet balance
-          // For now, we'll just show a success message
+          addInvestment(user.id, paymentAmount || 1000, response?.razorpay_payment_id);
+          showToast('success', 'Investment added (locked 12 months)', 'Success');
+          setShowPaymentModal(false);
         }}
-        onFailure={(error) => {
-          console.error('Payment failed:', error);
+        onFailure={() => {
           showToast('error', 'Payment failed. Please try again.', 'Error');
         }}
       />

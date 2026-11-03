@@ -10,6 +10,10 @@ interface PaymentModalProps {
   onClose: () => void;
   amount: number;
   description: string;
+  /** Allow checkout before login (member join flow) */
+  guest?: { name: string; mobile: string };
+  /** Demo/simulate pay when Razorpay unavailable */
+  allowDemoPay?: boolean;
   onSuccess?: (response: any) => void;
   onFailure?: (error: any) => void;
 }
@@ -19,6 +23,8 @@ export default function PaymentModal({
   onClose,
   amount,
   description,
+  guest,
+  allowDemoPay = true,
   onSuccess,
   onFailure,
 }: PaymentModalProps) {
@@ -27,9 +33,38 @@ export default function PaymentModal({
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'failure'>('idle');
 
+  const payer = user
+    ? { name: user.name, mobile: user.mobile }
+    : guest;
+
+  const completeSuccess = (response: any) => {
+    setPaymentStatus('success');
+    setIsProcessing(false);
+    showToast('success', `Payment of ${formatAmount(amount)} successful!`, 'Success');
+    onSuccess?.(response);
+    setTimeout(() => {
+      onClose();
+      setPaymentStatus('idle');
+    }, 1500);
+  };
+
+  const handleDemoPay = () => {
+    if (!payer) {
+      showToast('error', 'Missing payer details', 'Error');
+      return;
+    }
+    setIsProcessing(true);
+    setTimeout(() => {
+      completeSuccess({
+        razorpay_payment_id: `demo_${Date.now()}`,
+        demo: true,
+      });
+    }, 800);
+  };
+
   const handlePayment = async () => {
-    if (!user) {
-      showToast('error', 'Please login to make payment', 'Error');
+    if (!payer) {
+      showToast('error', 'Please login or complete signup details first', 'Error');
       return;
     }
 
@@ -41,38 +76,21 @@ export default function PaymentModal({
         amount: amount,
         description: description,
         prefill: {
-          name: user.name,
-          contact: user.mobile,
+          name: payer.name,
+          contact: payer.mobile,
         },
         onSuccess: (response) => {
-          console.log('Payment successful:', response);
-          setPaymentStatus('success');
-          setIsProcessing(false);
-          showToast('success', `Payment of ${formatAmount(amount)} successful!`, 'Success');
-          
-          // Call the onSuccess callback if provided
-          if (onSuccess) {
-            onSuccess(response);
-          }
-
-          // Close modal after 2 seconds
-          setTimeout(() => {
-            onClose();
-            setPaymentStatus('idle');
-          }, 2000);
+          completeSuccess(response);
         },
         onFailure: (error) => {
           console.error('Payment failed:', error);
           setPaymentStatus('failure');
           setIsProcessing(false);
           showToast('error', 'Payment failed. Please try again.', 'Error');
-          
-          // Call the onFailure callback if provided
-          if (onFailure) {
-            onFailure(error);
-          }
+          onFailure?.(error);
         },
       });
+      setIsProcessing(false);
     } catch (error) {
       console.error('Payment error:', error);
       setPaymentStatus('failure');
@@ -199,7 +217,7 @@ export default function PaymentModal({
                   whileHover={{ scale: isProcessing ? 1 : 1.02 }}
                   whileTap={{ scale: isProcessing ? 1 : 0.98 }}
                   onClick={handlePayment}
-                  disabled={isProcessing}
+                  disabled={isProcessing || amount < 1}
                   className="w-full py-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isProcessing ? (
@@ -214,6 +232,17 @@ export default function PaymentModal({
                     </>
                   )}
                 </motion.button>
+
+                {allowDemoPay && (
+                  <button
+                    type="button"
+                    onClick={handleDemoPay}
+                    disabled={isProcessing}
+                    className="w-full mt-3 py-3 text-sm text-amber-300/80 hover:text-amber-200 border border-amber-500/20 rounded-xl"
+                  >
+                    Simulate payment (demo)
+                  </button>
+                )}
 
                 {/* Footer */}
                 <p className="text-xs text-white/40 text-center mt-4">

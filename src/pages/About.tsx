@@ -1,11 +1,107 @@
-import { motion } from 'framer-motion';
-import { Crown, Heart, Target, Award, Users, Shield, Sparkles, CheckCircle, TrendingUp, Gem } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Crown, Heart, Target, Award, Users, Shield, Sparkles, CheckCircle, FileText, Phone, Lock, X, Loader2, AlertCircle, ExternalLink } from 'lucide-react';
 import GoldBackground from '../components/GoldBackground';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
+
 interface PageProps { onJoinClick: () => void; }
+
+type DocItem = {
+  id: string;
+  title: string;
+  subtitle: string;
+  file: string;
+  emoji: string;
+};
+
+const COMPANY_DOCS: DocItem[] = [
+  {
+    id: 'gst',
+    title: 'GST / RC Certificate',
+    subtitle: 'Registration certificate',
+    file: '/docs/gst-registration-certificate.pdf',
+    emoji: '📜',
+  },
+  {
+    id: 'license',
+    title: 'Trade License Approval',
+    subtitle: 'Official license approval',
+    file: '/docs/trade-license-approval.pdf',
+    emoji: '✅',
+  },
+  {
+    id: 'udyam',
+    title: 'Udyam Registration',
+    subtitle: 'MSME / Udyam certificate',
+    file: '/docs/udyam-registration.pdf',
+    emoji: '🏢',
+  },
+];
 
 export default function About({ onJoinClick }: PageProps) {
   const { translate } = useLanguage();
+  const { getAllUsers, user } = useAuth();
+  const [verifyDoc, setVerifyDoc] = useState<DocItem | null>(null);
+  const [mobile, setMobile] = useState('');
+  const [error, setError] = useState('');
+  const [checking, setChecking] = useState(false);
+
+  const openDocRequest = (doc: DocItem) => {
+    setVerifyDoc(doc);
+    setError('');
+    // Prefill if already logged in as member/leader/admin
+    if (user && (user.role === 'member' || user.role === 'leader' || user.role === 'admin' || user.isLeader)) {
+      setMobile(user.mobile);
+    } else {
+      setMobile('');
+    }
+  };
+
+  const closeVerify = () => {
+    setVerifyDoc(null);
+    setMobile('');
+    setError('');
+    setChecking(false);
+  };
+
+  const handleVerifyAndOpen = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (!/^[6-9]\d{9}$/.test(mobile)) {
+      setError('Enter a valid 10-digit mobile number');
+      return;
+    }
+
+    setChecking(true);
+
+    // Check DB (local registered users)
+    const found = getAllUsers().find(u => u.mobile === mobile);
+    const allowed =
+      !!found &&
+      (found.role === 'member' ||
+        found.role === 'leader' ||
+        found.role === 'admin' ||
+        found.isLeader);
+
+    setTimeout(() => {
+      setChecking(false);
+      if (!found) {
+        setError('This number is not registered. Document access denied.');
+        return;
+      }
+      if (!allowed) {
+        setError('Only Members & Leaders can open company documents.');
+        return;
+      }
+      if (!verifyDoc) return;
+
+      // Open PDF in new tab only after verification
+      window.open(verifyDoc.file, '_blank', 'noopener,noreferrer');
+      closeVerify();
+    }, 400);
+  };
   
   const stats = [
     { icon: Heart, label: translate('about.stats.trust'), value: '12,000+', color: 'from-pink-500 to-rose-600', emoji: '❤️' },
@@ -233,6 +329,54 @@ export default function About({ onJoinClick }: PageProps) {
         </div>
       </section>
 
+      <div className="gold-divider" />
+
+      {/* Company Documents — Member / Leader only */}
+      <section className="py-20 max-w-6xl mx-auto px-4">
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-sm font-medium mb-4">
+            <Lock className="w-4 h-4" />
+            Members & Leaders only
+          </div>
+          <h2 className="text-4xl lg:text-5xl font-bold font-[var(--font-heading)] mb-4">
+            Company <span className="gold-text-shimmer">Documents</span>
+          </h2>
+          <p className="text-white/60 text-lg max-w-2xl mx-auto">
+            GST, Trade License & Udyam certificates. Open pe mobile number verify hoga — number DB me registered member/leader hona chahiye.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {COMPANY_DOCS.map((doc, i) => (
+            <motion.div
+              key={doc.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="card-inner-glow rounded-3xl p-6 flex flex-col"
+            >
+              <div className="text-5xl mb-4">{doc.emoji}</div>
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="w-5 h-5 text-amber-400" />
+                <h3 className="text-xl font-bold text-white">{doc.title}</h3>
+              </div>
+              <p className="text-sm text-white/50 mb-6 flex-1">{doc.subtitle}</p>
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                type="button"
+                onClick={() => openDocRequest(doc)}
+                className="w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-950 flex items-center justify-center gap-2"
+              >
+                <Lock className="w-4 h-4" />
+                Verify & Open
+              </motion.button>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20 text-center relative overflow-hidden">
         <GoldBackground intensity="medium" />
@@ -258,6 +402,95 @@ export default function About({ onJoinClick }: PageProps) {
           </motion.div>
         </div>
       </section>
+
+      {/* Mobile verification modal */}
+      <AnimatePresence>
+        {verifyDoc && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+            onClick={closeVerify}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 12 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 12 }}
+              className="relative w-full max-w-md rounded-3xl border border-amber-500/25 bg-gradient-to-b from-purple-950 to-[#0f0520] p-6 shadow-2xl"
+              onClick={e => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={closeVerify}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+
+              <div className="flex items-center gap-3 mb-4 pr-8">
+                <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-2xl">
+                  {verifyDoc.emoji}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">{verifyDoc.title}</h3>
+                  <p className="text-xs text-amber-300/80 flex items-center gap-1">
+                    <Lock className="w-3 h-3" /> Member / Leader verification required
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleVerifyAndOpen} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-white/60 mb-1.5">Registered Mobile Number</label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                    <span className="absolute left-10 top-1/2 -translate-y-1/2 text-sm text-white/40">+91</span>
+                    <input
+                      type="tel"
+                      value={mobile}
+                      onChange={e => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      placeholder="Enter mobile number"
+                      className="w-full pl-20 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:border-amber-500/50"
+                      required
+                      disabled={checking}
+                    />
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="flex items-start gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-300">
+                    <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                    <p>{error}</p>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={checking || mobile.length !== 10}
+                  className="w-full py-3.5 rounded-xl font-semibold bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-950 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {checking ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Checking…
+                    </>
+                  ) : (
+                    <>
+                      <ExternalLink className="w-5 h-5" />
+                      Verify & Open Document
+                    </>
+                  )}
+                </button>
+
+                <p className="text-[11px] text-center text-white/40">
+                  Agar number DB me nahi hai, ya role buyer/individual hai, document open nahi hoga.
+                </p>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

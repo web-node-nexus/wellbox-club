@@ -1,52 +1,108 @@
 import { motion } from 'framer-motion';
-import { Gem, Phone, MessageCircle, Heart, Filter, Scale, Award, X } from 'lucide-react';
+import { Gem, Phone, MessageCircle, Filter, Scale, Award, X, Lock, Unlock, ShoppingBag } from 'lucide-react';
 import { goldDesigns, GoldDesign } from '../data/mockData';
 import { designImages } from '../data/goldImages';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import {
+  getInvestments,
+  getUnlockedInvested,
+  getLockedInvested,
+  getTotalInvested,
+  spendUnlockedInvestment,
+  saveGoldOrder,
+  getUserGoldOrders,
+} from '../services/investmentService';
 
 export default function GoldShowroom() {
+  const { user } = useAuth();
+  const { showToast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedDesign, setSelectedDesign] = useState<GoldDesign | null>(null);
-  const [showInterest, setShowInterest] = useState(false);
-  const [interestSubmitted, setInterestSubmitted] = useState(false);
+  const [orderAmount, setOrderAmount] = useState('');
+  const [refresh, setRefresh] = useState(0);
 
   const categories = ['all', ...new Set(goldDesigns.map(d => d.category))];
   const filtered = selectedCategory === 'all' ? goldDesigns : goldDesigns.filter(d => d.category === selectedCategory);
 
-  const handleInterest = () => {
-    setInterestSubmitted(true);
-    setTimeout(() => {
-      setInterestSubmitted(false);
-      setShowInterest(false);
-    }, 3000);
+  const unlocked = user ? getUnlockedInvested(user.id) : 0;
+  const locked = user ? getLockedInvested(user.id) : 0;
+  const total = user ? getTotalInvested(user.id) : 0;
+  const investments = user ? getInvestments(user.id) : [];
+  const myOrders = useMemo(
+    () => (user ? getUserGoldOrders(user.id) : []),
+    [user, refresh]
+  );
+
+  const handleOrder = () => {
+    if (!user || !selectedDesign) return;
+    const amt = Number(orderAmount);
+    if (!amt || amt <= 0) {
+      showToast('error', 'Enter a valid order amount', 'Error');
+      return;
+    }
+    if (amt > unlocked) {
+      showToast('error', 'Not enough unlocked investment. Wait 12 months or invest more earlier.', 'Locked');
+      return;
+    }
+
+    const spent = spendUnlockedInvestment(user.id, amt);
+    if (!spent.success) {
+      showToast('error', spent.message, 'Error');
+      return;
+    }
+
+    saveGoldOrder({
+      id: `go_${Date.now()}`,
+      userId: user.id,
+      userName: user.name,
+      userMobile: user.mobile,
+      designId: selectedDesign.id,
+      designName: selectedDesign.name,
+      weightGrams: selectedDesign.weightGrams,
+      amount: amt,
+      status: 'pending',
+      createdAt: new Date().toISOString().split('T')[0],
+      investmentIds: spent.investmentIds,
+    });
+
+    showToast('success', 'Gold order placed — admin can see it now', 'Ordered');
+    setSelectedDesign(null);
+    setOrderAmount('');
+    setRefresh(x => x + 1);
   };
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Digital Gold Showroom</h1>
-        <p className="text-gray-500 mt-1">Browse premium gold designs at manufacturer prices</p>
+        <p className="text-gray-500 mt-1">Weight only — no product prices. Redeem unlocked investment after 12 months.</p>
       </div>
 
-      {/* Highlight Banner */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-amber-600 to-yellow-500 rounded-2xl p-5 text-white relative overflow-hidden"
+        className="grid sm:grid-cols-3 gap-3"
       >
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-        <div className="relative flex items-center gap-3">
-          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-            <Gem className="w-6 h-6" />
-          </div>
-          <div>
-            <p className="font-semibold">Get gold at very cheap price - directly from the manufacturer!</p>
-            <p className="text-sm text-amber-100 mt-0.5">No middlemen. Best quality. BIS Hallmarked. Custom designs available.</p>
-          </div>
+        <div className="rounded-2xl p-4 bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+          <p className="text-xs text-blue-100">Total invested</p>
+          <p className="text-2xl font-bold">₹{total.toLocaleString()}</p>
+        </div>
+        <div className="rounded-2xl p-4 bg-gradient-to-br from-amber-500 to-orange-600 text-white">
+          <p className="text-xs text-amber-100 flex items-center gap-1"><Lock className="w-3 h-3" /> Locked (12 mo)</p>
+          <p className="text-2xl font-bold">₹{locked.toLocaleString()}</p>
+        </div>
+        <div className="rounded-2xl p-4 bg-gradient-to-br from-green-500 to-emerald-600 text-white">
+          <p className="text-xs text-green-100 flex items-center gap-1"><Unlock className="w-3 h-3" /> Unlocked for gold</p>
+          <p className="text-2xl font-bold">₹{unlocked.toLocaleString()}</p>
         </div>
       </motion.div>
 
-      {/* Category Filter */}
+      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-800">
+        Product prices are hidden. Only weight is shown. Use unlocked investment to place a gold order — admin will see it.
+      </div>
+
       <div className="flex items-center gap-2 overflow-x-auto pb-2">
         <Filter className="w-4 h-4 text-gray-400 flex-shrink-0" />
         {categories.map(cat => (
@@ -64,7 +120,6 @@ export default function GoldShowroom() {
         ))}
       </div>
 
-      {/* Gold Designs Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filtered.map((design, i) => (
           <motion.div
@@ -74,9 +129,8 @@ export default function GoldShowroom() {
             transition={{ delay: i * 0.05 }}
             className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg hover:border-amber-200 transition-all group"
           >
-            {/* Real Image */}
             <div className="h-48 relative overflow-hidden">
-              <img 
+              <img
                 src={designImages[design.name] || designImages['Royal Necklace Set']}
                 alt={design.name}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -96,31 +150,73 @@ export default function GoldShowroom() {
             <div className="p-4">
               <h3 className="font-semibold text-gray-900 group-hover:text-amber-700 transition-colors">{design.name}</h3>
               <p className="text-xs text-gray-500 mt-1 line-clamp-2">{design.description}</p>
-              
+
               <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100">
                 <div className="flex items-center gap-1.5">
-                  <Scale className="w-3.5 h-3.5 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-700">{design.weightGrams}g</span>
+                  <Scale className="w-3.5 h-3.5 text-amber-500" />
+                  <span className="text-sm font-bold text-gray-900">{design.weightGrams}g</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Award className="w-3.5 h-3.5 text-gray-400" />
-                  <span className="text-sm text-gray-500">{design.makingCharges}</span>
+                  <span className="text-sm text-gray-500">{design.purity}</span>
                 </div>
               </div>
 
               <button
-                onClick={() => setSelectedDesign(design)}
+                onClick={() => {
+                  setSelectedDesign(design);
+                  setOrderAmount(unlocked > 0 ? String(Math.min(unlocked, 1000)) : '');
+                }}
                 className="w-full mt-3 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-sm font-medium rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all"
               >
-                I'm Interested
+                Order with Investment
               </button>
             </div>
           </motion.div>
         ))}
       </div>
 
-      {/* Design Detail Modal */}
-      {selectedDesign && !showInterest && (
+      {myOrders.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 p-5">
+          <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <ShoppingBag className="w-5 h-5 text-amber-600" /> My Gold Orders
+          </h3>
+          <div className="space-y-2">
+            {myOrders.map(o => (
+              <div key={o.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl text-sm">
+                <div>
+                  <p className="font-medium text-gray-900">{o.designName} · {o.weightGrams}g</p>
+                  <p className="text-xs text-gray-500">{o.createdAt} · {o.status}</p>
+                </div>
+                <p className="font-bold text-amber-700">₹{o.amount.toLocaleString()}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {investments.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 p-5">
+          <h3 className="font-bold text-gray-900 mb-3">Investment holdings</h3>
+          <div className="space-y-2">
+            {investments.map(inv => (
+              <div key={inv.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl text-sm">
+                <div>
+                  <p className="font-medium">₹{inv.amount.toLocaleString()}</p>
+                  <p className="text-xs text-gray-500">Until {inv.lockedUntil}</p>
+                </div>
+                <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                  inv.status === 'unlocked' ? 'bg-green-100 text-green-700' :
+                  inv.status === 'used' ? 'bg-gray-200 text-gray-600' :
+                  'bg-amber-100 text-amber-700'
+                }`}>{inv.status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {selectedDesign && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -134,7 +230,7 @@ export default function GoldShowroom() {
             onClick={e => e.stopPropagation()}
           >
             <div className="h-56 relative">
-              <img 
+              <img
                 src={designImages[selectedDesign.name] || designImages['Royal Necklace Set']}
                 alt={selectedDesign.name}
                 className="w-full h-full object-cover"
@@ -143,97 +239,57 @@ export default function GoldShowroom() {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="p-6">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-2">
                 <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-lg">{selectedDesign.category}</span>
                 <span className="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-lg">{selectedDesign.purity}</span>
               </div>
               <h2 className="text-xl font-bold text-gray-900">{selectedDesign.name}</h2>
-              <p className="text-sm text-gray-600 mt-2">{selectedDesign.description}</p>
-              
-              <div className="grid grid-cols-2 gap-4 mt-4 p-4 bg-gray-50 rounded-xl">
-                <div>
-                  <p className="text-xs text-gray-500">Weight</p>
-                  <p className="text-lg font-bold text-gray-900">{selectedDesign.weightGrams} grams</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Making Charges</p>
-                  <p className="text-lg font-bold text-gray-900">{selectedDesign.makingCharges}</p>
-                </div>
+              <p className="text-sm text-gray-600">{selectedDesign.description}</p>
+
+              <div className="p-4 bg-gray-50 rounded-xl">
+                <p className="text-xs text-gray-500">Weight</p>
+                <p className="text-2xl font-bold text-gray-900">{selectedDesign.weightGrams} grams</p>
+                <p className="text-xs text-gray-500 mt-2">Price not shown — redeem with unlocked investment only</p>
               </div>
 
-              <div className="mt-4 p-3 bg-amber-50 rounded-xl border border-amber-100">
-                <p className="text-xs text-amber-700">💡 Price available on request. Contact us for the best manufacturer price!</p>
+              <div className="p-3 bg-green-50 border border-green-100 rounded-xl text-sm text-green-800">
+                Unlocked for gold: <strong>₹{unlocked.toLocaleString()}</strong>
+                {unlocked <= 0 && (
+                  <span className="block text-xs mt-1 text-amber-700">No unlocked balance yet. Investment unlocks after 12 months.</span>
+                )}
               </div>
 
-              <div className="flex gap-3 mt-4">
-                <button
-                  onClick={() => setShowInterest(true)}
-                  className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-medium rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all flex items-center justify-center gap-2"
-                >
-                  <Heart className="w-4 h-4" /> I'm Interested
-                </button>
-                <a href="tel:+919876543210" className="py-3 px-4 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition-colors flex items-center gap-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Order amount (₹) from investment</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={unlocked}
+                  value={orderAmount}
+                  onChange={e => setOrderAmount(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
+                  placeholder={`Max ₹${unlocked.toLocaleString()}`}
+                />
+              </div>
+
+              <button
+                onClick={handleOrder}
+                disabled={unlocked <= 0}
+                className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-medium rounded-xl disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <Gem className="w-4 h-4" /> Place Gold Order
+              </button>
+
+              <div className="flex gap-3">
+                <a href="tel:+919876543210" className="flex-1 py-3 bg-green-600 text-white font-medium rounded-xl text-center flex items-center justify-center gap-2">
                   <Phone className="w-4 h-4" /> Call
                 </a>
-                <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="py-3 px-4 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition-colors flex items-center gap-2">
+                <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="flex-1 py-3 bg-emerald-600 text-white font-medium rounded-xl text-center flex items-center justify-center gap-2">
                   <MessageCircle className="w-4 h-4" /> WhatsApp
                 </a>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
-      )}
-
-      {/* Interest Form Modal */}
-      {showInterest && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-          onClick={() => { setShowInterest(false); setInterestSubmitted(false); }}
-        >
-          <motion.div
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            className="bg-white rounded-2xl max-w-md w-full p-6"
-            onClick={e => e.stopPropagation()}
-          >
-            {interestSubmitted ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Heart className="w-8 h-8 text-green-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900">Interest Registered!</h3>
-                <p className="text-sm text-gray-500 mt-2">Our team will contact you shortly. You can also call or WhatsApp us directly.</p>
-                <div className="flex gap-3 mt-6 justify-center">
-                  <a href="tel:+919876543210" className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg">📞 Call Now</a>
-                  <a href="https://wa.me/919876543210" className="px-4 py-2 bg-emerald-600 text-white text-sm rounded-lg">💬 WhatsApp</a>
-                </div>
-              </div>
-            ) : (
-              <>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">Express Interest</h3>
-                <p className="text-sm text-gray-500 mb-4">For: {selectedDesign?.name}</p>
-                <form onSubmit={handleInterest} className="space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
-                    <input type="text" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500" required />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                    <input type="tel" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500" required />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Message (optional)</label>
-                    <textarea className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500" rows={3} placeholder="Any specific requirements..." />
-                  </div>
-                  <button type="submit" className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-medium rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all">
-                    Submit Interest
-                  </button>
-                </form>
-              </>
-            )}
           </motion.div>
         </motion.div>
       )}

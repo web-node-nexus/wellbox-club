@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Menu, X, ChevronDown } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { Crown, Menu, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -14,8 +13,11 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const { user } = useAuth();
   const { translate } = useLanguage();
+  const isLightPage =
+    location.pathname === '/login' ||
+    location.pathname === '/register' ||
+    location.pathname.startsWith('/register/');
   
   // Check if current route is a protected dashboard route (exact match)
   const protectedRoutes = [
@@ -86,13 +88,13 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
         animate={{ y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled 
-            ? 'glass-dark shadow-2xl shadow-purple-900/20' 
-            : 'bg-transparent'
+          scrolled || isLightPage
+            ? 'glass-dark shadow-2xl shadow-purple-900/20 bg-[#0f0520]/90 backdrop-blur-xl'
+            : 'bg-[#0f0520]/40 backdrop-blur-md'
         }`}
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-          <div className="flex items-center justify-between h-16 lg:h-20 gap-2">
+          <div className="flex items-center justify-between h-14 lg:h-16 gap-2">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
               <motion.div
@@ -129,7 +131,6 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
 
             {/* CTA Buttons */}
             <div className="hidden lg:flex items-center gap-2">
-              <LanguageSwitcher />
               <Link to="/login" className="px-3 py-1.5 text-xs font-medium text-amber-300 hover:text-amber-200 transition-colors whitespace-nowrap">
                 {translate('common.signIn')}
               </Link>
@@ -150,6 +151,11 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
             >
               {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
+          </div>
+
+          {/* Language chips — right-aligned under CTAs so they don't cover hero/login */}
+          <div className="flex justify-end pb-2.5 pt-0.5 border-t border-white/5">
+            <LanguageSwitcher variant="dark" align="end" />
           </div>
         </div>
       </motion.nav>
@@ -193,7 +199,6 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
                   </motion.div>
                 ))}
                 <div className="pt-4 space-y-3">
-                  <LanguageSwitcher />
                   <Link to="/login" onClick={() => setMobileOpen(false)} className="block w-full text-center px-4 py-3 border border-amber-500/30 text-amber-300 rounded-xl font-medium whitespace-nowrap">
                     {translate('common.signIn')}
                   </Link>

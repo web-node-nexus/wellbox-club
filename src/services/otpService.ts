@@ -1,13 +1,24 @@
-// 2Factor OTP Service Integration
+// 2Factor OTP Service — AUTOGEN + VERIFY3
+// Send:  GET /API/V1/{KEY}/SMS/{mobile}/AUTOGEN/{TEMPLATE}
+// Verify: GET /API/V1/{KEY}/SMS/VERIFY3/{91mobile}/{otp}
 
-const TWOFACTOR_API_KEY = '36a45c11-c185-11f1-af74-0200cd936042';
-const TWOFACTOR_BASE_URL = 'https://2factor.in/API/V1';
-const TWOFACTOR_SMS_TEMPLATE = 'OTP1';
+const TWOFACTOR_API_KEY =
+  import.meta.env.VITE_TWOFACTOR_API_KEY || '36a45c11-c185-11f1-af74-0200cd936042';
+const TWOFACTOR_SMS_TEMPLATE =
+  import.meta.env.VITE_TWOFACTOR_SMS_TEMPLATE || 'OTP1';
+const TWOFACTOR_BASE_URL =
+  import.meta.env.VITE_TWOFACTOR_BASE_URL || 'https://2factor.in/API/V1';
+
+// Dev proxy avoids browser CORS; production hits 2factor directly
+const API_ROOT =
+  import.meta.env.DEV
+    ? `/api/2factor/${TWOFACTOR_API_KEY}`
+    : `${TWOFACTOR_BASE_URL}/${TWOFACTOR_API_KEY}`;
 
 interface OTPResponse {
   Status: string;
   Details: string;
-  Otp?: string; // Only in test mode
+  Otp?: string;
 }
 
 interface VerifyResponse {
@@ -15,102 +26,76 @@ interface VerifyResponse {
   Details: string;
 }
 
-// Send OTP to mobile number
+const to10Digit = (mobile: string) => mobile.replace(/\D/g, '').slice(-10);
+const to91 = (mobile: string) => `91${to10Digit(mobile)}`;
+
 export const sendOTP = async (mobile: string): Promise<OTPResponse> => {
-  try {
-    // Format mobile number (add 91 if not present)
-    const formattedMobile = mobile.startsWith('91') ? mobile : `91${mobile}`;
-    
-    const url = `${TWOFACTOR_BASE_URL}/${TWOFACTOR_API_KEY}/SMS/${formattedMobile}/${TWOFACTOR_SMS_TEMPLATE}`;
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
+  const phone = to10Digit(mobile);
+  const url = `${API_ROOT}/SMS/${phone}/AUTOGEN/${TWOFACTOR_SMS_TEMPLATE}`;
 
-    const data: OTPResponse = await response.json();
-    
-    if (data.Status === 'Success') {
-      console.log('OTP sent successfully:', data.Details);
-      // In test mode, OTP is returned in response
-      if (data.Otp) {
-        console.log('Test OTP:', data.Otp);
-      }
-      return data;
-    } else {
-      throw new Error(data.Details || 'Failed to send OTP');
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+  });
+
+  const data: OTPResponse = await response.json();
+
+  if (data.Status === 'Success') {
+    if (data.Details) {
+      sessionStorage.setItem(`otp_session_${phone}`, data.Details);
     }
-  } catch (error) {
-    console.error('Error sending OTP:', error);
-    throw error;
+    return data;
   }
+
+  throw new Error(data.Details || 'Failed to send OTP');
 };
 
-// Verify OTP
 export const verifyOTP = async (mobile: string, otp: string): Promise<VerifyResponse> => {
-  try {
-    // Format mobile number
-    const formattedMobile = mobile.startsWith('91') ? mobile : `91${mobile}`;
-    
-    const url = `${TWOFACTOR_BASE_URL}/${TWOFACTOR_API_KEY}/SMS/VERIFY3/${formattedMobile}/${otp}`;
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
+  const phone91 = to91(mobile);
+  const url = `${API_ROOT}/SMS/VERIFY3/${phone91}/${otp}`;
 
-    const data: VerifyResponse = await response.json();
-    
-    if (data.Status === 'Success') {
-      console.log('OTP verified successfully');
-      return data;
-    } else {
-      throw new Error(data.Details || 'Invalid OTP');
-    }
-  } catch (error) {
-    console.error('Error verifying OTP:', error);
-    throw error;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+  });
+
+  const data: VerifyResponse = await response.json();
+
+  if (data.Status === 'Success') {
+    return data;
   }
+
+  throw new Error(data.Details || 'Invalid OTP');
 };
 
-// Generate random OTP (for demo/testing)
-export const generateDemoOTP = (): string => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-};
+/** Demo fallback only when 2Factor API is unreachable */
+export const generateDemoOTP = (): string =>
+  Math.floor(100000 + Math.random() * 900000).toString();
 
-// Store OTP in localStorage (for demo purposes)
 export const storeDemoOTP = (mobile: string, otp: string) => {
-  localStorage.setItem(`otp_${mobile}`, otp);
-  localStorage.setItem(`otp_time_${mobile}`, Date.now().toString());
+  const phone = to10Digit(mobile);
+  localStorage.setItem(`otp_${phone}`, otp);
+  localStorage.setItem(`otp_time_${phone}`, Date.now().toString());
 };
 
-// Verify demo OTP
 export const verifyDemoOTP = (mobile: string, otp: string): boolean => {
-  const storedOTP = localStorage.getItem(`otp_${mobile}`);
-  const storedTime = localStorage.getItem(`otp_time_${mobile}`);
-  
-  if (!storedOTP || !storedTime) {
+  const phone = to10Digit(mobile);
+  const storedOTP = localStorage.getItem(`otp_${phone}`);
+  const storedTime = localStorage.getItem(`otp_time_${phone}`);
+
+  if (!storedOTP || !storedTime) return false;
+
+  if (Date.now() - parseInt(storedTime, 10) > 5 * 60 * 1000) {
+    clearDemoOTP(phone);
     return false;
   }
-  
-  // OTP expires after 5 minutes
-  const now = Date.now();
-  const otpTime = parseInt(storedTime);
-  if (now - otpTime > 5 * 60 * 1000) {
-    localStorage.removeItem(`otp_${mobile}`);
-    localStorage.removeItem(`otp_time_${mobile}`);
-    return false;
-  }
-  
+
   return storedOTP === otp;
 };
 
-// Clear stored OTP
 export const clearDemoOTP = (mobile: string) => {
-  localStorage.removeItem(`otp_${mobile}`);
-  localStorage.removeItem(`otp_time_${mobile}`);
+  const phone = to10Digit(mobile);
+  localStorage.removeItem(`otp_${phone}`);
+  localStorage.removeItem(`otp_time_${phone}`);
+  sessionStorage.removeItem(`otp_session_${phone}`);
 };
