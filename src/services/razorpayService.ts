@@ -1,7 +1,10 @@
-// Razorpay — order_id + poll + force-close stuck UPI QR
+// Razorpay Checkout — close on: success | X | Close button | 5 min timeout
 
 const RAZORPAY_KEY_ID =
   import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TwScjdiSaPmJyT';
+
+/** Auto-close unpaid checkout after this many ms */
+const CHECKOUT_IDLE_TIMEOUT_MS = 5 * 60 * 1000;
 
 declare global {
   interface Window {
@@ -83,38 +86,69 @@ function removeOverlayHelper() {
   document.getElementById('jb-rzp-paid-helper')?.remove();
 }
 
-/** Floating button above Razorpay iframe (z-index max) */
-function showOverlayHelper(orderId: string, onPaid: () => void) {
+function forceCloseRazorpayDom() {
+  try {
+    document.querySelectorAll('.razorpay-container').forEach(n => n.remove());
+    document.querySelectorAll('.razorpay-backdrop').forEach(n => n.remove());
+    document.querySelectorAll('[class*="razorpay"]').forEach(n => {
+      const c = n as HTMLElement;
+      if (c.className?.toString?.().includes('razorpay')) {
+        try {
+          c.remove();
+        } catch {
+          c.style.display = 'none';
+        }
+      }
+    });
+    document
+      .querySelectorAll('iframe[src*="razorpay"], iframe[src*="api.razorpay"]')
+      .forEach(n => {
+        n.parentElement?.remove();
+        n.remove();
+      });
+    document.body.style.overflow = '';
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Buttons ABOVE Razorpay iframe so user can always exit */
+function showOverlayHelper(opts: {
+  orderId: string;
+  onConfirmPaid: () => void;
+  onCloseWindow: () => void;
+}) {
   removeOverlayHelper();
   const el = document.createElement('div');
   el.id = 'jb-rzp-paid-helper';
   el.style.cssText = [
     'position:fixed',
     'left:50%',
-    'bottom:24px',
+    'bottom:20px',
     'transform:translateX(-50%)',
     'z-index:2147483647',
     'display:flex',
     'flex-direction:column',
-    'gap:8px',
-    'align-items:center',
+    'gap:10px',
+    'align-items:stretch',
     'font-family:system-ui,sans-serif',
-    'max-width:92vw',
+    'width:min(360px,92vw)',
+    'pointer-events:auto',
   ].join(';');
 
   const tip = document.createElement('div');
-  tip.textContent = 'Paid on UPI but window stuck? Tap below';
+  tip.textContent = 'Payment window open · closes on pay, Close, or after 5 min';
   tip.style.cssText =
     'background:#111827;color:#fde68a;padding:8px 12px;border-radius:10px;font-size:12px;text-align:center';
 
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.textContent = 'I have paid — continue';
-  btn.style.cssText = [
+  const paidBtn = document.createElement('button');
+  paidBtn.type = 'button';
+  paidBtn.textContent = 'I have paid — continue';
+  paidBtn.style.cssText = [
     'background:linear-gradient(90deg,#22c55e,#16a34a)',
     'color:#fff',
     'border:none',
-    'padding:14px 22px',
+    'padding:14px 18px',
     'border-radius:12px',
     'font-weight:700',
     'font-size:15px',
@@ -122,67 +156,82 @@ function showOverlayHelper(orderId: string, onPaid: () => void) {
     'box-shadow:0 8px 24px rgba(0,0,0,.35)',
   ].join(';');
 
-  btn.onclick = async () => {
-    btn.disabled = true;
-    btn.textContent = 'Checking payment…';
+  paidBtn.onclick = async () => {
+    paidBtn.disabled = true;
+    paidBtn.textContent = 'Checking…';
     try {
-      const st = await fetchRazorpayOrderStatus(orderId);
+      const st = await fetchRazorpayOrderStatus(opts.orderId);
       if (st.paid) {
-        onPaid();
+        opts.onConfirmPaid();
       } else {
-        btn.disabled = false;
-        btn.textContent = 'Not captured yet — tap again';
+        paidBtn.disabled = false;
+        paidBtn.textContent = 'Not paid yet — try again';
         tip.textContent =
-          'Razorpay me abhi paid nahi mila. 15 sec wait karke phir dabao. Ya Razorpay X se band karke dubara try.';
+          'Razorpay me payment abhi captured nahi hai. Thoda wait karke phir dabao, ya Close.';
       }
     } catch {
-      btn.disabled = false;
-      btn.textContent = 'Check failed — tap again';
+      paidBtn.disabled = false;
+      paidBtn.textContent = 'Check failed — try again';
     }
   };
 
-  el.appendChild(tip);
-  el.appendChild(btn);
-  document.body.appendChild(el);
-}
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.textContent = 'Close payment window';
+  closeBtn.style.cssText = [
+    'background:#fff',
+    'color:#111',
+    'border:2px solid #e5e7eb',
+    'padding:12px 18px',
+    'border-radius:12px',
+    'font-weight:700',
+    'font-size:14px',
+    'cursor:pointer',
+  ].join(';');
+  closeBtn.onclick = () => opts.onCloseWindow();
 
-function forceCloseRazorpayDom() {
-  try {
-    document.querySelectorAll('.razorpay-container').forEach(n => n.remove());
-    document.querySelectorAll('.razorpay-backdrop').forEach(n => n.remove());
-    document
-      .querySelectorAll('iframe[src*="razorpay"], iframe[src*="api.razorpay"]')
-      .forEach(n => n.parentElement?.remove());
-    document.body.style.overflow = '';
-  } catch {
-    /* ignore */
-  }
+  el.appendChild(tip);
+  el.appendChild(paidBtn);
+  el.appendChild(closeBtn);
+  document.body.appendChild(el);
 }
 
 export const initiatePayment = async (options: PaymentOptions) => {
   let pollTimer: ReturnType<typeof setInterval> | null = null;
+  let idleTimer: ReturnType<typeof setTimeout> | null = null;
   let finished = false;
   let rzp: any = null;
 
-  const finishSuccess = (response: any) => {
-    if (finished) return;
-    finished = true;
+  const cleanupTimers = () => {
     if (pollTimer) clearInterval(pollTimer);
-    removeOverlayHelper();
+    if (idleTimer) clearTimeout(idleTimer);
+    pollTimer = null;
+    idleTimer = null;
+  };
+
+  const hardCloseCheckout = () => {
     try {
       rzp?.close?.();
     } catch {
       /* ignore */
     }
     forceCloseRazorpayDom();
+    removeOverlayHelper();
+  };
+
+  const finishSuccess = (response: any) => {
+    if (finished) return;
+    finished = true;
+    cleanupTimers();
+    hardCloseCheckout();
     options.onSuccess(response);
   };
 
   const finishFailure = (error: any) => {
     if (finished) return;
     finished = true;
-    if (pollTimer) clearInterval(pollTimer);
-    removeOverlayHelper();
+    cleanupTimers();
+    hardCloseCheckout();
     options.onFailure(error);
   };
 
@@ -194,23 +243,38 @@ export const initiatePayment = async (options: PaymentOptions) => {
     options.onOrderCreated?.(order.id);
     const contact = (options.prefill?.contact || '').replace(/\D/g, '').slice(-10);
 
-    const onPaidFromHelper = () => {
-      finishSuccess({
-        razorpay_order_id: order.id,
-        razorpay_payment_id: `paid_${order.id}`,
-        via: 'overlay_helper',
+    const mountHelper = () => {
+      if (finished) return;
+      showOverlayHelper({
+        orderId: order.id,
+        onConfirmPaid: () => {
+          void fetchRazorpayOrderStatus(order.id).then(st => {
+            finishSuccess({
+              razorpay_order_id: order.id,
+              razorpay_payment_id: st.payment_id || `paid_${order.id}`,
+              via: 'overlay_paid',
+            });
+          });
+        },
+        onCloseWindow: () => {
+          void fetchRazorpayOrderStatus(order.id)
+            .then(st => {
+              if (st.paid) {
+                finishSuccess({
+                  razorpay_order_id: order.id,
+                  razorpay_payment_id: st.payment_id || `paid_${order.id}`,
+                  via: 'close_after_pay',
+                });
+              } else {
+                finishFailure({ message: 'Payment window closed', code: 'dismissed' });
+              }
+            })
+            .catch(() =>
+              finishFailure({ message: 'Payment window closed', code: 'dismissed' })
+            );
+        },
       });
     };
-
-    showOverlayHelper(order.id, () => {
-      void fetchRazorpayOrderStatus(order.id).then(st => {
-        finishSuccess({
-          razorpay_order_id: order.id,
-          razorpay_payment_id: st.payment_id || `paid_${order.id}`,
-          via: 'overlay_helper',
-        });
-      });
-    });
 
     pollTimer = setInterval(async () => {
       try {
@@ -227,9 +291,15 @@ export const initiatePayment = async (options: PaymentOptions) => {
       }
     }, 2500);
 
-    setTimeout(() => {
-      if (pollTimer) clearInterval(pollTimer);
-    }, 12 * 60 * 1000);
+    // NEVER leave Razorpay open forever — auto close after 5 minutes
+    idleTimer = setTimeout(() => {
+      if (!finished) {
+        finishFailure({
+          message: 'Payment timed out after 5 minutes',
+          code: 'timeout',
+        });
+      }
+    }, CHECKOUT_IDLE_TIMEOUT_MS);
 
     const razorpayOptions = {
       key: order.keyId || RAZORPAY_KEY_ID,
@@ -248,35 +318,26 @@ export const initiatePayment = async (options: PaymentOptions) => {
         contact: contact || undefined,
       },
       theme: { color: '#F59E0B' },
-      // Prefer UPI apps / collect over stuck QR where possible
-      config: {
-        display: {
-          preferences: {
-            show_default_blocks: true,
-          },
-        },
-      },
       modal: {
         ondismiss: function () {
-          removeOverlayHelper();
-          if (!finished) {
-            void fetchRazorpayOrderStatus(order.id)
-              .then(st => {
-                if (st.paid) {
-                  finishSuccess({
-                    razorpay_order_id: order.id,
-                    razorpay_payment_id: st.payment_id || `paid_${order.id}`,
-                    via: 'dismiss_after_pay',
-                  });
-                } else {
-                  finishFailure({ message: 'Payment cancelled', code: 'dismissed' });
-                }
-              })
-              .catch(() => finishFailure({ message: 'Payment cancelled', code: 'dismissed' }));
-          }
+          if (finished) return;
+          void fetchRazorpayOrderStatus(order.id)
+            .then(st => {
+              if (st.paid) {
+                finishSuccess({
+                  razorpay_order_id: order.id,
+                  razorpay_payment_id: st.payment_id || `paid_${order.id}`,
+                  via: 'dismiss_after_pay',
+                });
+              } else {
+                finishFailure({ message: 'Payment cancelled', code: 'dismissed' });
+              }
+            })
+            .catch(() => finishFailure({ message: 'Payment cancelled', code: 'dismissed' }));
         },
         escape: true,
-        confirm_close: true,
+        // Allow closing without extra confirm dialog stuck
+        confirm_close: false,
         animation: true,
       },
       retry: { enabled: true, max_count: 3 },
@@ -284,16 +345,13 @@ export const initiatePayment = async (options: PaymentOptions) => {
 
     rzp = new window.Razorpay(razorpayOptions);
     rzp.on('payment.failed', function (response: any) {
-      removeOverlayHelper();
       finishFailure(response?.error || response);
     });
 
     rzp.open();
-
-    // Re-show helper after open (Razorpay may steal focus)
-    setTimeout(() => {
-      if (!finished) showOverlayHelper(order.id, onPaidFromHelper);
-    }, 800);
+    mountHelper();
+    setTimeout(mountHelper, 600);
+    setTimeout(mountHelper, 1500);
 
     return rzp;
   } catch (error) {
