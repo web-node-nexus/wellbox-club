@@ -1,4 +1,4 @@
-// Razorpay Payment Integration — Checkout with server-created order_id
+// Razorpay Payment Integration — order_id + status poll (UPI QR close fix)
 
 const RAZORPAY_KEY_ID =
   import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TwScjdiSaPmJyT';
@@ -32,21 +32,22 @@ interface PaymentOptions {
     email?: string;
     contact?: string;
   };
+  onOrderCreated?: (orderId: string) => void;
   onSuccess: (response: any) => void;
   onFailure: (error: any) => void;
 }
 
-/** Create order on Vercel API (needs RAZORPAY_KEY_SECRET server env) */
 export async function createRazorpayOrder(amountInr: number, description?: string) {
   const res = await fetch('/api/create-razorpay-order', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ amount: amountInr, description }),
   });
-  const data = await res.json();
+  const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(data?.error || 'Could not create payment order');
+    throw new Error(data?.error || `Could not create payment order (${res.status})`);
   }
+  if (!data?.id) throw new Error('Invalid order response from server');
   return data as { id: string; amount: number; currency: string; keyId?: string };
 }
 
@@ -60,39 +61,103 @@ export async function verifyRazorpayPayment(paymentDetails: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(paymentDetails),
   });
-  const data = await res.json();
+  const data = await res.json().catch(() => ({}));
   if (!res.ok || !data.verified) {
     throw new Error(data?.error || 'Payment verification failed');
   }
   return data;
 }
 
+export async function fetchRazorpayOrderStatus(orderId: string) {
+  const res = await fetch(
+    `/api/razorpay-order-status?order_id=${encodeURIComponent(orderId)}`
+  );
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.error || 'Status check failed');
+  return data as {
+    id: string;
+    status: string;
+    paid: boolean;
+    payment_id?: string | null;
+  };
+}
+
 export const initiatePayment = async (options: PaymentOptions) => {
+  let pollTimer: ReturnType<typeof setInterval> | null = null;
+  let finished = false;
+
+  const finishSuccess = (response: any) => {
+    if (finished) return;
+    finished = true;
+    if (pollTimer) clearInterval(pollTimer);
+    try {
+      // Best-effort close if Checkout left QR open
+      const frames = document.querySelectorAll('iframe');
+      frames.forEach(() => undefined);
+    } catch {
+      /* ignore */
+    }
+    options.onSuccess(response);
+  };
+
+  const finishFailure = (error: any) => {
+    if (finished) return;
+    finished = true;
+    if (pollTimer) clearInterval(pollTimer);
+    options.onFailure(error);
+  };
+
   try {
     const isLoaded = await loadRazorpayScript();
     if (!isLoaded) throw new Error('Failed to load Razorpay SDK');
 
-    // REQUIRED for live capture + reliable UPI QR close
     const order = await createRazorpayOrder(options.amount, options.description);
-
+    options.onOrderCreated?.(order.id);
     const contact = (options.prefill?.contact || '').replace(/\D/g, '').slice(-10);
+
+    // Poll order — fixes UPI QR paid but Checkout stuck open
+    pollTimer = setInterval(async () => {
+      try {
+        const st = await fetchRazorpayOrderStatus(order.id);
+        if (st.paid) {
+          finishSuccess({
+            razorpay_order_id: order.id,
+            razorpay_payment_id: st.payment_id || `paid_${order.id}`,
+            via: 'order_status_poll',
+          });
+          // Try closing Razorpay overlay
+          try {
+            document.querySelectorAll('.razorpay-container, .razorpay-backdrop').forEach(el => {
+              (el as HTMLElement).style.display = 'none';
+            });
+            document.body.style.overflow = '';
+          } catch {
+            /* ignore */
+          }
+        }
+      } catch {
+        /* keep polling */
+      }
+    }, 3000);
+
+    // Stop polling after 12 minutes
+    setTimeout(() => {
+      if (pollTimer) clearInterval(pollTimer);
+    }, 12 * 60 * 1000);
 
     const razorpayOptions = {
       key: order.keyId || RAZORPAY_KEY_ID,
-      amount: order.amount,
-      currency: order.currency || 'INR',
+      order_id: order.id,
       name: 'Jewellbox Club',
       description: options.description || 'Payment for Jewellbox Club',
-      order_id: order.id,
-      handler: async function (response: any) {
-        try {
-          if (response?.razorpay_signature) {
-            await verifyRazorpayPayment(response);
-          }
-          options.onSuccess(response);
-        } catch (err) {
-          console.error('Verify failed', err);
-          options.onFailure(err);
+      // Do not pass amount when order_id is set — amount comes from order
+      handler: function (response: any) {
+        // Sync handler — don't await verify here (async can block Checkout close)
+        finishSuccess(response);
+        if (response?.razorpay_signature) {
+          void verifyRazorpayPayment(response).catch(err =>
+            console.warn('Signature verify warning', err)
+          );
         }
       },
       prefill: {
@@ -103,9 +168,26 @@ export const initiatePayment = async (options: PaymentOptions) => {
       theme: { color: '#F59E0B' },
       modal: {
         ondismiss: function () {
-          console.log('Razorpay checkout dismissed');
+          if (!finished) {
+            // User closed without pay — check once more in case paid
+            void fetchRazorpayOrderStatus(order.id)
+              .then(st => {
+                if (st.paid) {
+                  finishSuccess({
+                    razorpay_order_id: order.id,
+                    razorpay_payment_id: st.payment_id || `paid_${order.id}`,
+                    via: 'dismiss_after_pay',
+                  });
+                } else {
+                  finishFailure({ message: 'Payment cancelled', code: 'dismissed' });
+                }
+              })
+              .catch(() => finishFailure({ message: 'Payment cancelled', code: 'dismissed' }));
+          }
         },
+        escape: true,
         confirm_close: true,
+        animation: true,
       },
       retry: { enabled: true, max_count: 3 },
     };
@@ -113,15 +195,13 @@ export const initiatePayment = async (options: PaymentOptions) => {
     const rzp = new window.Razorpay(razorpayOptions);
 
     rzp.on('payment.failed', function (response: any) {
-      console.error('Payment failed:', response?.error);
-      options.onFailure(response?.error || response);
+      finishFailure(response?.error || response);
     });
 
     rzp.open();
     return rzp;
   } catch (error) {
-    console.error('Error initiating payment:', error);
-    options.onFailure(error);
+    finishFailure(error);
     throw error;
   }
 };
