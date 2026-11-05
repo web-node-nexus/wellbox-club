@@ -1,7 +1,8 @@
 // Razorpay Payment Integration Service
 
-// Razorpay API Key (Public key - safe to expose in frontend)
-const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_Ttz1VV7B9WjAtO';
+// Key ID only — safe in frontend. Key Secret must stay on server (never VITE_*).
+const RAZORPAY_KEY_ID =
+  import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TwScjdiSaPmJyT';
 
 // Load Razorpay script dynamically
 const loadRazorpayScript = (): Promise<boolean> => {
