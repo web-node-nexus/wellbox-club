@@ -1,5 +1,5 @@
 /**
- * Poll Razorpay order — used when UPI QR pays but Checkout UI does not close.
+ * Poll Razorpay order + payments.
  * Env: RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET
  */
 export default async function handler(req, res) {
@@ -23,9 +23,13 @@ export default async function handler(req, res) {
 
   try {
     const auth = Buffer.from(`${keyId}:${keySecret}`).toString('base64');
-    const orderRes = await fetch(`https://api.razorpay.com/v1/orders/${orderId}`, {
-      headers: { Authorization: `Basic ${auth}` },
-    });
+    const headers = { Authorization: `Basic ${auth}` };
+
+    const [orderRes, payRes] = await Promise.all([
+      fetch(`https://api.razorpay.com/v1/orders/${orderId}`, { headers }),
+      fetch(`https://api.razorpay.com/v1/orders/${orderId}/payments`, { headers }),
+    ]);
+
     const order = await orderRes.json();
     if (!orderRes.ok) {
       return res.status(orderRes.status).json({
@@ -33,25 +37,26 @@ export default async function handler(req, res) {
       });
     }
 
-    let paymentId = null;
-    if (order.status === 'paid') {
-      const payRes = await fetch(`https://api.razorpay.com/v1/orders/${orderId}/payments`, {
-        headers: { Authorization: `Basic ${auth}` },
-      });
-      const pays = await payRes.json();
-      const captured = (pays?.items || []).find(
-        p => p.status === 'captured' || p.status === 'authorized'
-      );
-      paymentId = captured?.id || pays?.items?.[0]?.id || null;
-    }
+    const pays = payRes.ok ? await payRes.json() : { items: [] };
+    const items = pays?.items || [];
+    const good = items.find(
+      p => p.status === 'captured' || p.status === 'authorized'
+    );
+    const anyPayment = good || items[0] || null;
+    const paid =
+      order.status === 'paid' ||
+      Number(order.amount_paid) > 0 ||
+      Boolean(good);
 
     return res.status(200).json({
       id: order.id,
       status: order.status,
       amount: order.amount,
       amount_paid: order.amount_paid,
-      payment_id: paymentId,
-      paid: order.status === 'paid',
+      payment_id: anyPayment?.id || null,
+      payment_status: anyPayment?.status || null,
+      paid,
+      payments_count: items.length,
     });
   } catch (e) {
     return res.status(500).json({ error: e?.message || 'Status check failed' });
