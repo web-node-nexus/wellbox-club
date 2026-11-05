@@ -1,14 +1,17 @@
 import { motion } from 'framer-motion';
-import { Gem, Phone, MessageCircle, Scale, Award, Filter, Sparkles } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Gem, Phone, MessageCircle, Scale, Award, Filter, Eye, ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
 import GoldBackground from '../components/GoldBackground';
 import { designImages } from '../data/goldImages';
 import { useLanguage } from '../context/LanguageContext';
+import ProductInquiryModal, { type ShowroomProduct } from '../components/ProductInquiryModal';
 interface PageProps { onJoinClick: () => void; }
 
 export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
   const { translate } = useLanguage();
   const [category, setCategory] = useState('all');
+  const [inquiryProduct, setInquiryProduct] = useState<ShowroomProduct | null>(null);
+  const [inquiryMode, setInquiryMode] = useState<'detail' | 'buy' | null>(null);
   
   // Default designs with real images
   const defaultDesigns = [
@@ -54,9 +57,9 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden luxury-bg">
+      <section className="relative pt-24 pb-10 sm:pt-28 sm:pb-14 lg:pt-32 lg:pb-20 overflow-hidden luxury-bg">
         <GoldBackground intensity="heavy" />
-        <div className="relative max-w-4xl mx-auto px-4 text-center">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
@@ -64,16 +67,16 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
               transition={{ type: 'spring', delay: 0.2, duration: 1 }}
               className="inline-block mb-8"
             >
-              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
-                <Gem className="w-16 h-16 text-purple-900" />
+              <div className="w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
+                <Gem className="w-9 h-9 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-purple-900" />
               </div>
             </motion.div>
             
-            <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6">
               <span className="text-white">{translate('goldShowroomPage.hero.title1')} </span>
               <span className="gold-text-shimmer">{translate('goldShowroomPage.hero.title2')}</span>
             </h1>
-            <p className="text-xl text-white/70 max-w-2xl mx-auto mb-6">
+            <p className="text-base sm:text-lg lg:text-xl text-white/70 max-w-2xl mx-auto mb-6">
               {translate('goldShowroomPage.hero.subtitle')}
             </p>
             <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-500/10 border-2 border-amber-500/30 rounded-full backdrop-blur-xl">
@@ -84,12 +87,12 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
         </div>
       </section>
 
-      <section className="py-20 max-w-7xl mx-auto px-4">
+      <section className="py-10 sm:py-14 lg:py-20 max-w-7xl mx-auto px-4 sm:px-6">
         {/* Category Filter */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-12">
           <div className="flex items-center gap-4 mb-6">
             <Filter className="w-6 h-6 text-amber-400" />
-            <h2 className="text-2xl font-bold">{translate('goldShowroomPage.filter.title')}</h2>
+            <h2 className="text-lg sm:text-2xl font-bold">{translate('goldShowroomPage.filter.title')}</h2>
           </div>
           <div className="flex flex-wrap gap-3">
             {categories.map(cat => (
@@ -111,18 +114,18 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
         </motion.div>
 
         {/* Designs Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {filtered.map((item, i) => (
             <motion.div
-              key={i}
+              key={`${item.name}-${i}`}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05 }}
-              whileHover={{ y: -15, scale: 1.05 }}
-              className="gold-card-premium rounded-3xl overflow-hidden group cursor-pointer"
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="gold-card-premium rounded-2xl sm:rounded-3xl overflow-hidden group"
             >
-              <div className="h-56 bg-gradient-to-br from-amber-900/30 to-purple-900/30 flex items-center justify-center relative overflow-hidden">
+              <div className="h-40 sm:h-56 bg-gradient-to-br from-amber-900/30 to-purple-900/30 flex items-center justify-center relative overflow-hidden">
                 {item.image ? (
                   <motion.img
                     src={item.image}
@@ -132,15 +135,8 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
                     transition={{ duration: 0.3 }}
                   />
                 ) : (
-                  <motion.div
-                    className="text-8xl"
-                    whileHover={{ scale: 1.2 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    💎
-                  </motion.div>
+                  <div className="text-5xl sm:text-8xl">💎</div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="absolute top-3 right-3 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full text-xs font-bold text-purple-900 shadow-lg">
                   {item.purity}
                 </div>
@@ -148,15 +144,37 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
                   {item.category}
                 </div>
               </div>
-              <div className="p-5">
-                <h3 className="font-bold text-lg mb-2 group-hover:text-amber-400 transition-colors">{item.name}</h3>
-                <p className="text-xs text-white/50 mb-3 line-clamp-2">{item.desc}</p>
-                <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                  <div className="flex items-center gap-2">
-                    <Scale className="w-5 h-5 text-amber-400" />
-                    <span className="text-base font-bold gold-text-shimmer">{item.weight}g</span>
+              <div className="p-3 sm:p-5">
+                <h3 className="font-bold text-sm sm:text-lg mb-1 sm:mb-2 group-hover:text-amber-400 transition-colors">{item.name}</h3>
+                <p className="text-[11px] sm:text-xs text-white/50 mb-3 line-clamp-2">{item.desc}</p>
+                <div className="flex items-center justify-between pt-2 sm:pt-3 border-t border-white/5 mb-3">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Scale className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+                    <span className="text-sm sm:text-base font-bold gold-text-shimmer">{item.weight}g</span>
                   </div>
-                    <span className="text-xs text-white/40">Call for price · {item.purity}</span>
+                  <span className="text-[10px] sm:text-xs text-white/40 hidden sm:inline">Call for price</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInquiryProduct(item);
+                      setInquiryMode('detail');
+                    }}
+                    className="w-full min-h-10 py-2 rounded-xl bg-white/10 border border-white/15 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5"
+                  >
+                    <Eye className="w-3.5 h-3.5" /> {translate('showroom.viewDetails')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInquiryProduct(item);
+                      setInquiryMode('buy');
+                    }}
+                    className="w-full min-h-10 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-950 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5"
+                  >
+                    <ShoppingCart className="w-3.5 h-3.5" /> {translate('showroom.buyNow')}
+                  </button>
                 </div>
               </div>
             </motion.div>
@@ -200,6 +218,16 @@ export default function GoldShowroomPublic({ onJoinClick }: PageProps) {
           </div>
         </motion.div>
       </section>
+
+      <ProductInquiryModal
+        product={inquiryProduct}
+        mode={inquiryMode}
+        onClose={() => {
+          setInquiryProduct(null);
+          setInquiryMode(null);
+        }}
+        onSwitchToBuy={() => setInquiryMode('buy')}
+      />
     </div>
   );
 }

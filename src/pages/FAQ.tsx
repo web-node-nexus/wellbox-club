@@ -23,9 +23,9 @@ export default function FAQ() {
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden luxury-bg">
+      <section className="relative pt-24 pb-10 sm:pt-28 sm:pb-14 lg:pt-32 lg:pb-20 overflow-hidden luxury-bg">
         <GoldBackground intensity="heavy" />
-        <div className="relative max-w-3xl mx-auto px-4 text-center">
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
@@ -33,21 +33,21 @@ export default function FAQ() {
               transition={{ type: 'spring', delay: 0.2, duration: 1 }}
               className="inline-block mb-8"
             >
-              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
+              <div className="w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
                 <span className="text-6xl">❓</span>
               </div>
             </motion.div>
             
-            <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6">
               <span className="text-white">Frequently Asked </span>
               <span className="gold-text-shimmer">Questions</span>
             </h1>
-            <p className="text-xl text-white/70">Everything you need to know about Jewellbox Club</p>
+            <p className="text-base sm:text-lg lg:text-xl text-white/70">Everything you need to know about Jewellbox Club</p>
           </motion.div>
         </div>
       </section>
 
-      <section className="py-20 max-w-3xl mx-auto px-4">
+      <section className="py-10 sm:py-14 lg:py-20 max-w-3xl mx-auto px-4 sm:px-6">
         <div className="space-y-3">
           {faqs.map((faq, i) => (
             <motion.div

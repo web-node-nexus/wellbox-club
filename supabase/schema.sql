@@ -1,5 +1,5 @@
 -- Jewellbox Club — Supabase schema (run once in SQL Editor)
--- Project: uaifqvhzjzpqiwhriieg
+-- Project: ijvjfrffozcyudxdagji
 
 create extension if not exists "pgcrypto";
 
@@ -40,22 +40,23 @@ create table if not exists public.investments (
 create index if not exists investments_user_id_idx on public.investments (user_id);
 create index if not exists investments_mobile_idx on public.investments (mobile);
 
--- Gold orders
+-- Gold orders (member + guest direct orders; no FK so guest_* ids work)
 create table if not exists public.gold_orders (
   id text primary key,
-  user_id text not null references public.members(id) on delete cascade,
+  user_id text not null,
   user_name text not null,
   user_mobile text not null,
   design_id text not null,
   design_name text not null,
   weight_grams numeric not null,
-  amount numeric not null,
+  amount numeric not null default 0,
   status text not null check (status in ('pending', 'confirmed', 'delivered')) default 'pending',
   created_at timestamptz not null default now(),
   investment_ids jsonb not null default '[]'::jsonb
 );
 
 create index if not exists gold_orders_user_id_idx on public.gold_orders (user_id);
+create index if not exists gold_orders_mobile_idx on public.gold_orders (user_mobile);
 
 -- Commission ledger (L1 / L2 / leader / gold)
 create table if not exists public.commissions (
@@ -76,43 +77,33 @@ create unique index if not exists commissions_dedupe_idx
   on public.commissions (user_id, type, source_investment_id)
   where source_investment_id is not null;
 
--- App uses custom 2Factor OTP (not Supabase Auth), so anon key needs CRUD.
+-- App uses custom 2Factor OTP (not Supabase Auth), so anon/authenticated need CRUD.
 alter table public.members enable row level security;
 alter table public.investments enable row level security;
 alter table public.gold_orders enable row level security;
+alter table public.commissions enable row level security;
 
 drop policy if exists "members_anon_all" on public.members;
 create policy "members_anon_all" on public.members
-  for all to anon, authenticated
+  for all to anon, authenticated, public
   using (true) with check (true);
 
 drop policy if exists "investments_anon_all" on public.investments;
 create policy "investments_anon_all" on public.investments
-  for all to anon, authenticated
+  for all to anon, authenticated, public
   using (true) with check (true);
 
 drop policy if exists "gold_orders_anon_all" on public.gold_orders;
 create policy "gold_orders_anon_all" on public.gold_orders
-  for all to anon, authenticated
+  for all to anon, authenticated, public
   using (true) with check (true);
 
-alter table public.commissions enable row level security;
 drop policy if exists "commissions_anon_all" on public.commissions;
 create policy "commissions_anon_all" on public.commissions
-  for all to anon, authenticated
+  for all to anon, authenticated, public
   using (true) with check (true);
 
--- Seed demo accounts (idempotent)
-insert into public.members (id, name, mobile, referral_code, referred_by, city, role, is_leader, team_size, join_date)
-values
-  ('1', 'Admin User', '9876543210', 'ADMIN001', '', 'Jaipur', 'admin', true, 250, '2023-01-01'),
-  ('2', 'Rajesh Kumar', '9876543211', 'RAJ002', '1', 'Delhi', 'leader', true, 120, '2023-03-15'),
-  ('3', 'Priya Sharma', '9876543212', 'PRI003', '2', 'Mumbai', 'member', false, 45, '2023-05-20'),
-  ('4', 'Amit Patel', '9876543213', '', '', 'Ahmedabad', 'individual', false, 0, '2024-01-15')
-on conflict (mobile) do update set
-  name = excluded.name,
-  role = excluded.role,
-  is_leader = excluded.is_leader,
-  team_size = excluded.team_size,
-  referral_code = excluded.referral_code,
-  city = excluded.city;
+-- Also grant table access for publishable key role
+grant usage on schema public to anon, authenticated, service_role;
+grant all on all tables in schema public to anon, authenticated, service_role;
+grant all on all sequences in schema public to anon, authenticated, service_role;

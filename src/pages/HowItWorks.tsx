@@ -19,10 +19,10 @@ export default function HowItWorks({ onJoinClick }: PageProps) {
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden luxury-bg">
+      <section className="relative pt-24 pb-10 sm:pt-28 sm:pb-14 lg:pt-32 lg:pb-20 overflow-hidden luxury-bg">
         <GoldBackground intensity="heavy" />
         
-        <div className="relative max-w-4xl mx-auto px-4 text-center">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
@@ -30,16 +30,16 @@ export default function HowItWorks({ onJoinClick }: PageProps) {
               transition={{ type: 'spring', delay: 0.2, duration: 1 }}
               className="inline-block mb-8"
             >
-              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
-                <Sparkles className="w-16 h-16 text-purple-900" />
+              <div className="w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
+                <Sparkles className="w-9 h-9 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-purple-900" />
               </div>
             </motion.div>
             
-            <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6">
               <span className="text-white">{translate('howItWorksPage.hero.title1')} </span>
               <span className="gold-text-shimmer">{translate('howItWorksPage.hero.title2')}</span>
             </h1>
-            <p className="text-xl text-white/70 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl text-white/70 max-w-2xl mx-auto">
               {translate('howItWorksPage.hero.subtitle')} 🚀
             </p>
           </motion.div>
@@ -47,7 +47,7 @@ export default function HowItWorks({ onJoinClick }: PageProps) {
       </section>
 
       {/* Steps */}
-      <section className="py-20 max-w-4xl mx-auto px-4">
+      <section className="py-10 sm:py-14 lg:py-20 max-w-4xl mx-auto px-4 sm:px-6">
         <div className="relative">
           {/* Vertical line */}
           <div className="absolute left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500 via-purple-500 to-emerald-500 hidden md:block shadow-lg shadow-amber-500/50" />
@@ -70,11 +70,11 @@ export default function HowItWorks({ onJoinClick }: PageProps) {
                 </motion.div>
                 <motion.div
                   whileHover={{ scale: 1.02, x: 10 }}
-                  className="card-inner-glow rounded-3xl p-8 flex-1"
+                  className="card-inner-glow rounded-2xl sm:rounded-3xl p-5 sm:p-8 flex-1"
                 >
                   <div className="flex items-center gap-3 mb-4">
                     <span className="gold-badge text-xs">STEP {i + 1}</span>
-                    <h3 className="text-2xl font-bold">{step.title}</h3>
+                    <h3 className="text-lg sm:text-2xl font-bold">{step.title}</h3>
                   </div>
                   <p className="text-white/70 leading-relaxed text-lg">{step.desc}</p>
                 </motion.div>
@@ -86,17 +86,17 @@ export default function HowItWorks({ onJoinClick }: PageProps) {
 
       <div className="gold-divider" />
 
-      <section className="py-20 text-center relative overflow-hidden">
+      <section className="py-10 sm:py-14 lg:py-20 text-center relative overflow-hidden">
         <GoldBackground intensity="medium" />
-        <div className="relative">
-          <Link to="/income-plan" className="inline-flex items-center gap-2 px-6 py-3 card-inner-glow rounded-xl text-sm font-medium mr-4 hover:scale-105 transition-transform">
+        <div className="relative px-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4">
+          <Link to="/income-plan" className="inline-flex min-h-12 items-center justify-center gap-2 px-6 py-3.5 card-inner-glow rounded-xl text-base font-medium hover:scale-105 transition-transform">
             View Income Plan <ArrowRight className="w-4 h-4" />
           </Link>
           <motion.button
             whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.95 }}
             onClick={onJoinClick}
-            className="btn-gold-premium px-8 py-4 text-lg rounded-2xl"
+            className="btn-gold-premium w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 text-base sm:text-lg rounded-xl sm:rounded-2xl"
           >
             Get Started Now ✨
           </motion.button>

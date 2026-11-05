@@ -199,12 +199,17 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
                   </motion.div>
                 ))}
                 <div className="pt-4 space-y-3">
-                  <Link to="/login" onClick={() => setMobileOpen(false)} className="block w-full text-center px-4 py-3 border border-amber-500/30 text-amber-300 rounded-xl font-medium whitespace-nowrap">
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex w-full min-h-12 items-center justify-center px-4 py-3.5 border border-amber-500/30 text-amber-300 rounded-xl font-medium text-base"
+                  >
                     {translate('common.signIn')}
                   </Link>
                   <button
+                    type="button"
                     onClick={() => { setMobileOpen(false); onJoinClick(); }}
-                    className="block w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 rounded-xl font-semibold text-center whitespace-nowrap"
+                    className="flex w-full min-h-12 items-center justify-center px-4 py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 rounded-xl font-semibold text-base"
                   >
                     {translate('common.joinNow')}
                   </button>

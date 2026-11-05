@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getMembershipByMobileAsync } from '../services/userStore';
-import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP } from '../services/otpService';
+import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP, isAdminMobile } from '../services/otpService';
 import { addInvestment } from '../services/investmentService';
 import PaymentModal from './PaymentModal';
 
@@ -59,6 +59,12 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     setErrors({});
 
     try {
+      if (isAdminMobile(formData.mobile)) {
+        setErrors({ mobile: 'Ye admin number hai — Login with OTP use karo.' });
+        setSendingOTP(false);
+        return;
+      }
+
       // Same number cannot join again — check Supabase
       const existing = await getMembershipByMobileAsync(formData.mobile);
       if (existing) {

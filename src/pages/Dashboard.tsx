@@ -12,14 +12,44 @@ import { BUSINESS_RULES, daysUntil, formatInr, nextLeaderPayoutDate } from '../d
 import {
   getLockedInvested,
   getUnlockedInvested,
+  fetchInvestmentsForUser,
+  fetchInvestmentsForUsers,
 } from '../services/investmentService';
+import {
+  fetchCommissions,
+  syncLeaderPayout,
+  getTeamTreeIds,
+} from '../services/commissionService';
 
 export default function Dashboard() {
   const { user, promoteToLeaderIfEligible } = useAuth();
   const { showToast } = useToast();
   const [copied, setCopied] = useState(false);
+  const [statsTick, setStatsTick] = useState(0);
 
-  const stats = useMemo(() => (user ? getDashboardStats(user) : null), [user]);
+  const stats = useMemo(
+    () => (user ? getDashboardStats(user) : null),
+    [user, statsTick]
+  );
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        await fetchCommissions(user.id);
+        await fetchInvestmentsForUser(user.id, user.mobile).catch(() => undefined);
+        const teamIds = getTeamTreeIds(user.id);
+        await fetchInvestmentsForUsers([user.id, ...teamIds]).catch(() => undefined);
+        await syncLeaderPayout(user).catch(() => undefined);
+      } finally {
+        if (!cancelled) setStatsTick(t => t + 1);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   useEffect(() => {
     if (stats) promoteToLeaderIfEligible(stats.teamSize);

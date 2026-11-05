@@ -4,11 +4,11 @@ import GoldBackground from '../components/GoldBackground';
 export default function Privacy() {
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
-      <section className="relative py-16 overflow-hidden luxury-bg">
+      <section className="relative pt-24 pb-10 sm:pt-28 sm:pb-14 lg:pt-32 lg:pb-16 overflow-hidden luxury-bg">
         <GoldBackground intensity="medium" />
-        <div className="relative max-w-3xl mx-auto px-4">
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-5xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[var(--font-heading)] mb-6">
               <span className="text-white">Privacy </span>
               <span className="gold-text-shimmer">Policy</span>
             </h1>
@@ -17,8 +17,8 @@ export default function Privacy() {
         </div>
       </section>
 
-      <section className="py-8 pb-20 max-w-3xl mx-auto px-4">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="card-inner-glow rounded-3xl p-8 space-y-6">
+      <section className="py-6 sm:py-8 pb-14 sm:pb-20 max-w-3xl mx-auto px-4 sm:px-6">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="card-inner-glow rounded-2xl sm:rounded-3xl p-5 sm:p-8 space-y-6">
           {[
             { title: '1. Information We Collect', content: 'We collect personal information you provide during registration: name, mobile number, email, city, and referral code. We also collect transaction data, wallet balances, and usage analytics.' },
             { title: '2. How We Use Your Information', content: 'Your information is used to: process transactions, calculate commissions, manage your wallet, communicate updates, improve our platform, and comply with legal requirements.' },

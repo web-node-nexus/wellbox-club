@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { Crown, Users, TrendingUp, Gem, Shield, Star, ChevronDown, Sparkles, ArrowRight, CheckCircle, Lock, Unlock, Phone, MessageCircle, Award, Zap, Heart, Target, Scale, Play, TrendingDown, ShoppingCart, Eye, DollarSign } from 'lucide-react';
 import { designImages } from '../data/goldImages';
 import { useLanguage } from '../context/LanguageContext';
+import OrderGoldModal from '../components/OrderGoldModal';
+import ProductInquiryModal, { type ShowroomProduct } from '../components/ProductInquiryModal';
 
 interface LandingProps {
   onJoinClick: (tab?: 'member' | 'leader') => void;
@@ -103,6 +105,9 @@ function AnimatedCounter({ target, suffix = '', prefix = '' }: { target: number;
 }
 
 export default function Landing({ onJoinClick }: LandingProps) {
+  const [orderGoldOpen, setOrderGoldOpen] = useState(false);
+  const [inquiryProduct, setInquiryProduct] = useState<ShowroomProduct | null>(null);
+  const [inquiryMode, setInquiryMode] = useState<'detail' | 'buy' | null>(null);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
   const [calcMembers, setCalcMembers] = useState(20);
   const [calcContribution, setCalcContribution] = useState(3000);
@@ -245,29 +250,42 @@ export default function Landing({ onJoinClick }: LandingProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.1 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-16"
+              className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 mb-16"
             >
               <motion.button
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => onJoinClick('member')}
-                className="w-full sm:w-auto px-12 py-6 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-bold text-xl rounded-2xl shadow-2xl shadow-amber-500/50 hover:shadow-amber-500/70 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
+                className="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-bold text-lg rounded-2xl shadow-2xl shadow-amber-500/50 hover:shadow-amber-500/70 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                <ShoppingCart className="w-7 h-7" />
+                <ShoppingCart className="w-6 h-6" />
                 <span className="relative">{translate('navbar.becomeMember')}</span>
-                <ArrowRight className="w-7 h-7 relative" />
+                <ArrowRight className="w-6 h-6 relative" />
               </motion.button>
-              
+
               <motion.button
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => onJoinClick('leader')}
-                className="w-full sm:w-auto px-12 py-6 bg-white/10 border-2 border-amber-400/50 text-white font-bold text-xl rounded-2xl hover:bg-amber-500/10 hover:border-amber-400 transition-all flex items-center justify-center gap-3 backdrop-blur-xl relative overflow-hidden group"
+                className="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-bold text-lg rounded-2xl shadow-2xl shadow-amber-500/50 hover:shadow-amber-500/70 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                <Crown className="w-7 h-7 text-amber-400 relative" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <Crown className="w-6 h-6 relative" />
                 <span className="relative">{translate('navbar.becomeLeader')}</span>
+                <ArrowRight className="w-6 h-6 relative" />
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setOrderGoldOpen(true)}
+                className="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-bold text-lg rounded-2xl shadow-2xl shadow-amber-500/50 hover:shadow-amber-500/70 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <Gem className="w-6 h-6 relative" />
+                <span className="relative">Order Gold</span>
+                <ArrowRight className="w-6 h-6 relative" />
               </motion.button>
             </motion.div>
           </motion.div>
@@ -414,14 +432,14 @@ export default function Landing({ onJoinClick }: LandingProps) {
           {/* Featured Designs Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
             {[
-              { name: 'Royal Necklace', weight: '45.5g', purity: '22K', image: designImages['Royal Necklace Set'], category: 'Necklace' },
-              { name: 'Diamond Ring', weight: '4.8g', purity: '24K', image: designImages['Minimalist Ring'], category: 'Ring' },
-              { name: 'Temple Set', weight: '120g', purity: '22K', image: designImages['Temple Jewelry Set'], category: 'Set' },
-              { name: 'Gold Coin', weight: '10g', purity: '24K', image: designImages['Gold Coin 10g'], category: 'Coins' },
-              { name: 'Jhumka Earrings', weight: '18.5g', purity: '22K', image: designImages['Jhumka Earrings'], category: 'Earrings' },
-              { name: 'Antique Bangles', weight: '28g', purity: '22K', image: designImages['Antique Bangles Pair'], category: 'Bangles' },
-              { name: 'Bridal Choker', weight: '85g', purity: '22K', image: designImages['Bridal Choker'], category: 'Necklace' },
-              { name: 'Gold Bar', weight: '50g', purity: '24K', image: designImages['Gold Bar 50g'], category: 'Coins' },
+              { name: 'Royal Necklace', weight: '45.5g', purity: '22K', image: designImages['Royal Necklace Set'], category: 'Necklace', desc: 'Exquisite traditional necklace with intricate kundan work.' },
+              { name: 'Diamond Ring', weight: '4.8g', purity: '24K', image: designImages['Minimalist Ring'], category: 'Ring', desc: 'Elegant minimalist ring in pure 24K gold.' },
+              { name: 'Temple Set', weight: '120g', purity: '22K', image: designImages['Temple Jewelry Set'], category: 'Set', desc: 'Complete temple set — necklace, earrings, maang tikka.' },
+              { name: 'Gold Coin', weight: '10g', purity: '24K', image: designImages['Gold Coin 10g'], category: 'Coins', desc: 'Pure 24K gold coin for investment and gifting.' },
+              { name: 'Jhumka Earrings', weight: '18.5g', purity: '22K', image: designImages['Jhumka Earrings'], category: 'Earrings', desc: 'Traditional jhumka earrings with pearl drops.' },
+              { name: 'Antique Bangles', weight: '28g', purity: '22K', image: designImages['Antique Bangles Pair'], category: 'Bangles', desc: 'Antique finish bangles with traditional motifs.' },
+              { name: 'Bridal Choker', weight: '85g', purity: '22K', image: designImages['Bridal Choker'], category: 'Necklace', desc: 'Bridal choker with precious stone embedding.' },
+              { name: 'Gold Bar', weight: '50g', purity: '24K', image: designImages['Gold Bar 50g'], category: 'Coins', desc: 'Investment-grade 24K gold bar.' },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -429,11 +447,11 @@ export default function Landing({ onJoinClick }: LandingProps) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -15, scale: 1.05 }}
-                className="group relative bg-white/5 backdrop-blur-xl rounded-3xl overflow-hidden border-2 border-white/10 hover:border-amber-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-amber-500/20 cursor-pointer"
+                whileHover={{ y: -8, scale: 1.02 }}
+                className="group relative bg-white/5 backdrop-blur-xl rounded-3xl overflow-hidden border-2 border-white/10 hover:border-amber-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-amber-500/20"
               >
                 {/* Image Area */}
-                <div className="h-56 bg-gradient-to-br from-amber-900/40 via-purple-900/40 to-amber-900/40 flex items-center justify-center relative overflow-hidden">
+                <div className="h-40 sm:h-56 bg-gradient-to-br from-amber-900/40 via-purple-900/40 to-amber-900/40 flex items-center justify-center relative overflow-hidden">
                   <motion.img
                     src={item.image}
                     alt={item.name}
@@ -442,21 +460,31 @@ export default function Landing({ onJoinClick }: LandingProps) {
                     transition={{ duration: 0.3 }}
                   />
                   
-                  {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {/* Overlay on hover (desktop) */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden sm:block" />
                   
-                  {/* Action buttons on hover */}
-                  <div className="absolute bottom-4 left-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  {/* Action buttons on hover (desktop) */}
+                  <div className="absolute bottom-4 left-4 right-4 hidden sm:flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      type="button"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setInquiryProduct(item);
+                        setInquiryMode('detail');
+                      }}
                       className="flex-1 py-2.5 bg-white/20 backdrop-blur-xl rounded-xl text-xs font-bold flex items-center justify-center gap-1 hover:bg-white/30 transition-colors"
                     >
                       <Eye className="w-4 h-4" /> {translate('showroom.viewDetails')}
                     </motion.button>
                     <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      type="button"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setInquiryProduct(item);
+                        setInquiryMode('buy');
+                      }}
                       className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 rounded-xl text-xs font-bold flex items-center justify-center gap-1"
                     >
                       <ShoppingCart className="w-4 h-4" /> {translate('showroom.buyNow')}
@@ -464,34 +492,50 @@ export default function Landing({ onJoinClick }: LandingProps) {
                   </div>
                   
                   {/* Purity Badge */}
-                  <div className="absolute top-3 right-3 px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full text-sm font-bold text-purple-900 shadow-lg">
+                  <div className="absolute top-3 right-3 px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full text-xs sm:text-sm font-bold text-purple-900 shadow-lg">
                     {item.purity}
                   </div>
                   
                   {/* Category Badge */}
-                  <div className="absolute top-3 left-3 px-4 py-2 bg-white/10 backdrop-blur-xl rounded-full text-sm font-semibold text-white border-2 border-white/20">
+                  <div className="absolute top-3 left-3 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/10 backdrop-blur-xl rounded-full text-xs sm:text-sm font-semibold text-white border-2 border-white/20">
                     {item.category}
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-5">
-                  <h3 className="font-bold text-lg mb-2 group-hover:text-amber-400 transition-colors">{item.name}</h3>
+                <div className="p-3 sm:p-5">
+                  <h3 className="font-bold text-sm sm:text-lg mb-2 group-hover:text-amber-400 transition-colors">{item.name}</h3>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <Scale className="w-5 h-5 text-amber-400" />
-                      <span className="text-base font-bold text-amber-400">{item.weight}</span>
+                      <Scale className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+                      <span className="text-sm sm:text-base font-bold text-amber-400">{item.weight}</span>
                     </div>
-                    <span className="text-xs text-white/50">{item.purity} · Weight only</span>
+                    <span className="text-[10px] sm:text-xs text-white/50 hidden sm:inline">{item.purity} · Weight only</span>
                   </div>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 text-sm font-bold rounded-xl shadow-lg hover:shadow-xl hover:shadow-amber-500/30 transition-all relative overflow-hidden group/btn"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
-                    <span className="relative">{translate('showroom.buyNow')} →</span>
-                  </motion.button>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setInquiryProduct(item);
+                        setInquiryMode('detail');
+                      }}
+                      className="w-full min-h-10 py-2 sm:py-2.5 bg-white/10 border border-white/15 text-white text-xs sm:text-sm font-bold rounded-xl flex items-center justify-center gap-1"
+                    >
+                      <Eye className="w-3.5 h-3.5" /> {translate('showroom.viewDetails')}
+                    </button>
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        setInquiryProduct(item);
+                        setInquiryMode('buy');
+                      }}
+                      className="w-full min-h-10 py-2 sm:py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 text-xs sm:text-sm font-bold rounded-xl shadow-lg"
+                    >
+                      {translate('showroom.buyNow')} →
+                    </motion.button>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -1125,6 +1169,17 @@ export default function Landing({ onJoinClick }: LandingProps) {
           </motion.div>
         </div>
       </section>
+
+      <OrderGoldModal isOpen={orderGoldOpen} onClose={() => setOrderGoldOpen(false)} />
+      <ProductInquiryModal
+        product={inquiryProduct}
+        mode={inquiryMode}
+        onClose={() => {
+          setInquiryProduct(null);
+          setInquiryMode(null);
+        }}
+        onSwitchToBuy={() => setInquiryMode('buy')}
+      />
     </div>
   );
 }

@@ -212,11 +212,34 @@ export async function creditReferralCommissionsOnInvestment(params: {
   amount: number;
   investmentId: string;
 }) {
+  // Always refresh roster so referrer lookup isn't blocked by a thin cache
+  if (isSupabaseConfigured) {
+    try {
+      const { fetchAllMembers } = await import('./memberDb');
+      await fetchAllMembers();
+    } catch {
+      /* use whatever cache we have */
+    }
+  }
+
   const all = getMembersCache();
-  const investor = all.find(u => u.id === params.investor.id) || params.investor;
+  const investor =
+    all.find(u => u.id === params.investor.id) ||
+    all.find(u => u.mobile && u.mobile === params.investor.mobile) ||
+    params.investor;
+
+  if (!investor.referredBy?.trim()) return;
 
   const l1 = findReferrer(investor, all);
-  if (!l1) return;
+  if (!l1) {
+    console.warn(
+      'L1 referrer not found for',
+      investor.mobile,
+      'referredBy=',
+      investor.referredBy
+    );
+    return;
+  }
 
   await addCommission({
     userId: l1.id,
@@ -228,7 +251,7 @@ export async function creditReferralCommissionsOnInvestment(params: {
   });
 
   const l2 = findReferrer(l1, all);
-  if (l2) {
+  if (l2 && l2.id !== l1.id) {
     await addCommission({
       userId: l2.id,
       type: 'commission_l2',
@@ -240,6 +263,15 @@ export async function creditReferralCommissionsOnInvestment(params: {
   }
 
   await refreshUplineTeamSizes(investor);
+
+  // Refresh leader payout for L1 / L2 if they are eligible leaders
+  for (const upline of [l1, l2].filter(Boolean) as RegisteredUser[]) {
+    try {
+      await syncLeaderPayout(upline);
+    } catch {
+      /* non-blocking */
+    }
+  }
 }
 
 export async function refreshUplineTeamSizes(member: RegisteredUser) {

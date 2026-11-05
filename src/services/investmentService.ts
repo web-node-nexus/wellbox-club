@@ -162,10 +162,29 @@ export async function addInvestment(
     setUserInvestments(userId, list);
   }
 
-  // Credit L1 / L2 to upline from this investment
-  const investor =
-    getMembersCache().find(u => u.id === userId) ||
-    ({
+  // Credit L1 / L2 to upline — resolve investor with real referredBy from cache/DB
+  let investor = getMembersCache().find(u => u.id === userId);
+  if (!investor && m) {
+    investor = getMembersCache().find(u => u.mobile === m);
+  }
+  if ((!investor || !investor.referredBy) && isSupabaseConfigured) {
+    try {
+      const { data } = await supabase
+        .from('members')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+      if (data) {
+        const { rowToUser, upsertMembersCache } = await import('./memberDb');
+        investor = rowToUser(data as import('../lib/supabase').DbMember);
+        upsertMembersCache(investor);
+      }
+    } catch {
+      /* fall through */
+    }
+  }
+  if (!investor) {
+    investor = {
       id: userId,
       name: 'Member',
       mobile: m,
@@ -176,7 +195,8 @@ export async function addInvestment(
       isLeader: false,
       teamSize: 0,
       joinDate: inv.date,
-    });
+    };
+  }
 
   try {
     await creditReferralCommissionsOnInvestment({

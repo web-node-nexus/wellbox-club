@@ -92,7 +92,7 @@ export const appSettings: Settings = {
 
 // Users
 export const users: User[] = [
-  { id: '1', name: 'Admin User', email: 'admin@jwellbox.com', phone: '+91 9876543210', referralCode: 'ADMIN001', referredBy: null, isLeader: true, teamSize: 250, joinDate: '2023-01-01' },
+  { id: '1', name: 'Admin User', email: 'admin@jwellbox.com', phone: '+91 9999999999', referralCode: 'ADMIN001', referredBy: null, isLeader: true, teamSize: 250, joinDate: '2023-01-01' },
   { id: '2', name: 'Rajesh Kumar', email: 'rajesh@example.com', phone: '+91 9876543211', referralCode: 'RAJ002', referredBy: '1', isLeader: true, teamSize: 120, joinDate: '2023-03-15' },
   { id: '3', name: 'Priya Sharma', email: 'priya@example.com', phone: '+91 9876543212', referralCode: 'PRI003', referredBy: '2', isLeader: false, teamSize: 45, joinDate: '2023-05-20' },
   { id: '4', name: 'Amit Patel', email: 'amit@example.com', phone: '+91 9876543213', referralCode: 'AMI004', referredBy: '2', isLeader: false, teamSize: 12, joinDate: '2023-06-10' },

@@ -145,12 +145,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           : data.name.substring(0, 3).toUpperCase() +
             Math.floor(100 + Math.random() * 900).toString();
 
+      // Normalize sponsor: store their referral CODE so L1/L2 lookup stays stable
+      const rawSponsor = (data.referralCode || '').trim().toUpperCase();
+      let referredBy = '';
+      if (rawSponsor) {
+        await fetchAllMembers().catch(() => undefined);
+        const sponsor = getMembersCache().find(
+          u =>
+            u.referralCode?.toUpperCase() === rawSponsor ||
+            u.id === rawSponsor ||
+            u.mobile === rawSponsor
+        );
+        if (sponsor?.referralCode) referredBy = sponsor.referralCode.toUpperCase();
+        else if (sponsor) referredBy = sponsor.id;
+        else referredBy = rawSponsor; // keep code even if sponsor not loaded yet
+      }
+
       const newUser: RegisteredUser = {
         id: String(Date.now()),
         name: data.name,
         mobile,
         referralCode,
-        referredBy: (data.referralCode || '').trim().toUpperCase(),
+        referredBy,
         city: data.city || '',
         role: data.role,
         isLeader: data.role === 'leader',

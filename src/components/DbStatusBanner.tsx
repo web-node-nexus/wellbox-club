@@ -2,7 +2,7 @@ import { useAuth } from '../context/AuthContext';
 import { AlertTriangle, ExternalLink } from 'lucide-react';
 
 const SQL_EDITOR =
-  'https://supabase.com/dashboard/project/uaifqvhzjzpqiwhriieg/sql/new';
+  'https://supabase.com/dashboard/project/ijvjfrffozcyudxdagji/sql/new';
 
 export default function DbStatusBanner() {
   const { dbError, authReady } = useAuth();

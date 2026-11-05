@@ -12,12 +12,12 @@ export default function Footer() {
       {/* Background glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 lg:pt-16 pb-8">
         {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 mb-10 sm:mb-12">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center gap-3 mb-4">
+            <Link to="/" onClick={() => window.scrollTo(0, 0)} className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-xl flex items-center justify-center">
                 <Crown className="w-6 h-6 text-purple-900" />
               </div>
@@ -56,7 +56,11 @@ export default function Footer() {
                 { label: 'Why Buy Gold', path: '/why-buy-gold' },
               ].map(link => (
                 <li key={link.path}>
-                  <Link to={link.path} className="text-sm text-white/60 hover:text-amber-400 transition-colors">
+                  <Link
+                    to={link.path}
+                    onClick={() => window.scrollTo(0, 0)}
+                    className="inline-flex min-h-11 items-center text-sm sm:text-sm text-white/60 hover:text-amber-400 transition-colors py-1.5"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -77,7 +81,11 @@ export default function Footer() {
                 { label: 'Contact Us', path: '/contact' },
               ].map(link => (
                 <li key={link.path}>
-                  <Link to={link.path} className="text-sm text-white/60 hover:text-amber-400 transition-colors">
+                  <Link
+                    to={link.path}
+                    onClick={() => window.scrollTo(0, 0)}
+                    className="inline-flex min-h-11 items-center text-sm text-white/60 hover:text-amber-400 transition-colors py-1.5"
+                  >
                     {link.label}
                   </Link>
                 </li>

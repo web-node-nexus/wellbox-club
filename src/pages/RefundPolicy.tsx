@@ -4,11 +4,11 @@ import GoldBackground from '../components/GoldBackground';
 export default function RefundPolicy() {
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
-      <section className="relative py-16 overflow-hidden luxury-bg">
+      <section className="relative pt-24 pb-10 sm:pt-28 sm:pb-14 lg:pt-32 lg:pb-16 overflow-hidden luxury-bg">
         <GoldBackground intensity="medium" />
-        <div className="relative max-w-3xl mx-auto px-4">
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-5xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[var(--font-heading)] mb-6">
               <span className="text-white">Refund & </span>
               <span className="gold-text-shimmer">Withdrawal Policy</span>
             </h1>
@@ -17,8 +17,8 @@ export default function RefundPolicy() {
         </div>
       </section>
 
-      <section className="py-8 pb-20 max-w-3xl mx-auto px-4">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="card-inner-glow rounded-3xl p-8 space-y-6">
+      <section className="py-6 sm:py-8 pb-14 sm:pb-20 max-w-3xl mx-auto px-4 sm:px-6">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="card-inner-glow rounded-2xl sm:rounded-3xl p-5 sm:p-8 space-y-6">
           {[
             { title: '1. Commission Wallet Withdrawals', content: 'Commission wallet balance can be withdrawn at any time. Submit a withdrawal request through the platform. Requests are reviewed and processed by admin within 24-48 hours. Amount is transferred directly to your registered bank account via NEFT/IMPS/UPI.' },
             { title: '2. Contribution Wallet - Lock Period', content: 'Monthly contributions are locked for 12 months from the date of each contribution. During this period, contributions cannot be withdrawn. This lock ensures disciplined gold savings.' },

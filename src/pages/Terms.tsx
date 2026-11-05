@@ -4,11 +4,11 @@ import GoldBackground from '../components/GoldBackground';
 export default function Terms() {
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
-      <section className="relative py-16 overflow-hidden luxury-bg">
+      <section className="relative pt-24 pb-10 sm:pt-28 sm:pb-14 lg:pt-32 lg:pb-16 overflow-hidden luxury-bg">
         <GoldBackground intensity="medium" />
-        <div className="relative max-w-3xl mx-auto px-4">
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-5xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[var(--font-heading)] mb-6">
               <span className="text-white">Terms & </span>
               <span className="gold-text-shimmer">Conditions</span>
             </h1>
@@ -17,8 +17,8 @@ export default function Terms() {
         </div>
       </section>
 
-      <section className="py-8 pb-20 max-w-3xl mx-auto px-4">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="card-inner-glow rounded-3xl p-8 space-y-6">
+      <section className="py-6 sm:py-8 pb-14 sm:pb-20 max-w-3xl mx-auto px-4 sm:px-6">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="card-inner-glow rounded-2xl sm:rounded-3xl p-5 sm:p-8 space-y-6">
           {[
             { title: '1. Acceptance of Terms', content: 'By registering with Jewellbox Club ("the Platform"), you agree to be bound by these Terms & Conditions. If you do not agree, please do not use our services.' },
             { title: '2. Eligibility', content: 'You must be 18 years or older and a resident of India to register. You must provide accurate and complete information during registration.' },

@@ -9,9 +9,9 @@ export default function LeaderProgram({ onJoinClick }: PageProps) {
   
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
-      <section className="relative pt-32 pb-20 overflow-hidden luxury-bg">
+      <section className="relative pt-24 pb-10 sm:pt-28 sm:pb-14 lg:pt-32 lg:pb-20 overflow-hidden luxury-bg">
         <GoldBackground intensity="heavy" />
-        <div className="relative max-w-4xl mx-auto px-4 text-center">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
             <motion.div
               animate={{ rotate: [0, 5, -5, 0] }}
@@ -20,21 +20,21 @@ export default function LeaderProgram({ onJoinClick }: PageProps) {
             >
               <Crown className="w-20 h-20 text-purple-900" />
             </motion.div>
-            <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6">
               <span className="text-white">{translate('leaderProgramPage.hero.title1')} </span>
               <span className="gold-text-shimmer">{translate('leaderProgramPage.hero.title2')}</span>
             </h1>
-            <p className="text-xl text-white/70 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl text-white/70 max-w-2xl mx-auto">
               {translate('leaderProgramPage.hero.subtitle')}
             </p>
           </motion.div>
         </div>
       </section>
 
-      <section className="py-20 max-w-6xl mx-auto px-4">
+      <section className="py-10 sm:py-14 lg:py-20 max-w-6xl mx-auto px-4 sm:px-6">
         <div className="grid md:grid-cols-2 gap-8">
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-            <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-6">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-[var(--font-heading)] mb-6">
               {translate('leaderProgramPage.whatMakes.title1')} <span className="gold-text-shimmer">{translate('leaderProgramPage.whatMakes.title2')}</span>?
             </h2>
             <div className="space-y-6">
@@ -65,7 +65,7 @@ export default function LeaderProgram({ onJoinClick }: PageProps) {
             </div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="card-inner-glow rounded-3xl p-8 border-2 border-amber-500/30">
+          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="card-inner-glow rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-amber-500/30">
             <h3 className="text-3xl font-bold mb-6 text-center gold-text-shimmer">{translate('leaderProgramPage.benefits.title')}</h3>
             <div className="space-y-3">
               {[
@@ -101,14 +101,14 @@ export default function LeaderProgram({ onJoinClick }: PageProps) {
         </div>
       </section>
 
-      <section className="py-20 text-center relative overflow-hidden">
+      <section className="py-10 sm:py-14 lg:py-20 text-center relative overflow-hidden">
         <GoldBackground intensity="medium" />
         <div className="relative">
           <motion.button
             whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.95 }}
             onClick={onJoinClick}
-            className="btn-gold-premium px-12 py-6 text-2xl rounded-2xl"
+            className="btn-gold-premium w-full max-w-sm sm:w-auto mx-auto px-6 sm:px-10 py-3.5 sm:py-4 text-base sm:text-lg rounded-xl sm:rounded-2xl"
           >
             {translate('leaderProgramPage.cta.button')} 👑
           </motion.button>

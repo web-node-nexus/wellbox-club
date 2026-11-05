@@ -125,10 +125,10 @@ export default function About({ onJoinClick }: PageProps) {
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden luxury-bg">
+      <section className="relative pt-24 pb-10 sm:pt-28 sm:pb-14 lg:pt-32 lg:pb-20 overflow-hidden luxury-bg">
         <GoldBackground intensity="heavy" />
         
-        <div className="relative max-w-5xl mx-auto px-4 text-center">
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
@@ -136,8 +136,8 @@ export default function About({ onJoinClick }: PageProps) {
               transition={{ type: 'spring', delay: 0.2, duration: 1 }}
               className="inline-block mb-8"
             >
-              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
-                <Crown className="w-16 h-16 text-purple-900" />
+              <div className="w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
+                <Crown className="w-9 h-9 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-purple-900" />
               </div>
             </motion.div>
             
@@ -152,12 +152,12 @@ export default function About({ onJoinClick }: PageProps) {
               <Sparkles className="w-5 h-5 text-amber-400" />
             </motion.div>
             
-            <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6">
               <span className="text-white">{translate('about.hero.title1')} </span>
               <span className="gold-text-shimmer">Jewellbox Club</span>
             </h1>
             
-            <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg lg:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
               {translate('about.hero.subtitle')}
             </p>
           </motion.div>
@@ -165,7 +165,7 @@ export default function About({ onJoinClick }: PageProps) {
       </section>
 
       {/* Stats */}
-      <section className="py-20 max-w-6xl mx-auto px-4 relative">
+      <section className="py-10 sm:py-14 lg:py-20 max-w-6xl mx-auto px-4 sm:px-6 relative">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((item, i) => (
             <motion.div
@@ -175,16 +175,16 @@ export default function About({ onJoinClick }: PageProps) {
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, type: 'spring' }}
               whileHover={{ y: -10, scale: 1.05 }}
-              className="card-inner-glow rounded-3xl p-8 text-center"
+              className="card-inner-glow rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-center"
             >
               <motion.div
                 animate={{ rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 4, repeat: Infinity, delay: i * 0.5 }}
-                className="text-6xl mb-4"
+                className="text-3xl sm:text-5xl lg:text-6xl mb-4"
               >
                 {item.emoji}
               </motion.div>
-              <p className="text-5xl font-bold gold-text-shimmer mb-2">{item.value}</p>
+              <p className="text-2xl sm:text-4xl lg:text-5xl font-bold gold-text-shimmer mb-2">{item.value}</p>
               <p className="text-sm text-white/60 font-medium">{item.label}</p>
             </motion.div>
           ))}
@@ -194,10 +194,10 @@ export default function About({ onJoinClick }: PageProps) {
       <div className="gold-divider" />
 
       {/* Mission */}
-      <section className="py-20 max-w-6xl mx-auto px-4">
+      <section className="py-10 sm:py-14 lg:py-20 max-w-6xl mx-auto px-4 sm:px-6">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-            <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-6">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-[var(--font-heading)] mb-6">
               {translate('about.mission.title1')} <span className="gold-text-shimmer">{translate('about.mission.title2')}</span>
             </h2>
             <p className="text-white/80 leading-relaxed mb-6 text-lg">
@@ -255,9 +255,9 @@ export default function About({ onJoinClick }: PageProps) {
       <div className="gold-divider" />
 
       {/* Values */}
-      <section className="py-20 max-w-6xl mx-auto px-4">
+      <section className="py-10 sm:py-14 lg:py-20 max-w-6xl mx-auto px-4 sm:px-6">
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-          <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-[var(--font-heading)] mb-4">
             {translate('about.values.title1')} <span className="gold-text-shimmer">{translate('about.values.title2')}</span>
           </h2>
           <p className="text-white/60 text-lg">{translate('about.values.subtitle')}</p>
@@ -272,12 +272,12 @@ export default function About({ onJoinClick }: PageProps) {
               viewport={{ once: true }}
               transition={{ delay: i * 0.15 }}
               whileHover={{ y: -15, scale: 1.03 }}
-              className="gold-card-premium rounded-3xl p-8"
+              className="gold-card-premium rounded-2xl sm:rounded-3xl p-5 sm:p-8"
             >
               <motion.div
                 animate={{ rotate: [0, 360] }}
                 transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                className="text-7xl mb-4 inline-block"
+                className="text-4xl sm:text-6xl lg:text-7xl mb-4 inline-block"
               >
                 {item.emoji}
               </motion.div>
@@ -291,9 +291,9 @@ export default function About({ onJoinClick }: PageProps) {
       <div className="gold-divider" />
 
       {/* Journey Timeline */}
-      <section className="py-20 max-w-5xl mx-auto px-4">
+      <section className="py-10 sm:py-14 lg:py-20 max-w-5xl mx-auto px-4 sm:px-6">
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-          <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-[var(--font-heading)] mb-4">
             {translate('about.journey.title1')} <span className="gold-text-shimmer">{translate('about.journey.title2')}</span>
           </h2>
           <p className="text-white/60 text-lg">{translate('about.journey.subtitle')}</p>
@@ -316,7 +316,7 @@ export default function About({ onJoinClick }: PageProps) {
               >
                 {item.emoji}
               </motion.div>
-              <div className="flex-1 card-inner-glow rounded-3xl p-8">
+              <div className="flex-1 card-inner-glow rounded-2xl sm:rounded-3xl p-5 sm:p-8">
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-4xl font-bold gold-text-shimmer">{item.year}</span>
                   <span className="gold-badge text-xs">{translate('about.journey.milestone')}</span>
@@ -332,13 +332,13 @@ export default function About({ onJoinClick }: PageProps) {
       <div className="gold-divider" />
 
       {/* Company Documents — Member / Leader only */}
-      <section className="py-20 max-w-6xl mx-auto px-4">
+      <section className="py-10 sm:py-14 lg:py-20 max-w-6xl mx-auto px-4 sm:px-6">
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-sm font-medium mb-4">
             <Lock className="w-4 h-4" />
             Members & Leaders only
           </div>
-          <h2 className="text-4xl lg:text-5xl font-bold font-[var(--font-heading)] mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-[var(--font-heading)] mb-4">
             Company <span className="gold-text-shimmer">Documents</span>
           </h2>
           <p className="text-white/60 text-lg max-w-2xl mx-auto">
@@ -378,24 +378,24 @@ export default function About({ onJoinClick }: PageProps) {
       </section>
 
       {/* CTA */}
-      <section className="py-20 text-center relative overflow-hidden">
+      <section className="py-10 sm:py-14 lg:py-20 text-center relative overflow-hidden">
         <GoldBackground intensity="medium" />
-        <div className="relative max-w-3xl mx-auto px-4">
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="card-inner-glow rounded-3xl p-12"
           >
-            <h2 className="text-5xl font-bold font-[var(--font-heading)] mb-6">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-[var(--font-heading)] mb-6">
               {translate('about.cta.title1')} <span className="gold-text-shimmer">{translate('about.cta.title2')}</span>?
             </h2>
-            <p className="text-white/70 text-xl mb-10">{translate('about.cta.subtitle')}</p>
+            <p className="text-white/70 text-base sm:text-lg lg:text-xl mb-10">{translate('about.cta.subtitle')}</p>
             <motion.button
               whileHover={{ scale: 1.05, y: -5 }}
               whileTap={{ scale: 0.95 }}
               onClick={onJoinClick}
-              className="btn-gold-premium px-12 py-6 text-2xl rounded-2xl"
+              className="btn-gold-premium w-full max-w-sm sm:w-auto mx-auto px-6 sm:px-10 py-3.5 sm:py-4 text-base sm:text-lg rounded-xl sm:rounded-2xl"
             >
               {translate('about.cta.button')} ✨
             </motion.button>

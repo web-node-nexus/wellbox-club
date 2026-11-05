@@ -26,10 +26,10 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden luxury-bg">
+      <section className="relative pt-24 pb-10 sm:pt-28 sm:pb-14 lg:pt-32 lg:pb-20 overflow-hidden luxury-bg">
         <GoldBackground intensity="heavy" />
         
-        <div className="relative max-w-4xl mx-auto px-4 text-center">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
@@ -37,16 +37,16 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
               transition={{ type: 'spring', delay: 0.2, duration: 1 }}
               className="inline-block mb-8"
             >
-              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
-                <TrendingUp className="w-16 h-16 text-purple-900" />
+              <div className="w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
+                <TrendingUp className="w-9 h-9 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-purple-900" />
               </div>
             </motion.div>
             
-            <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6">
               <span className="text-white">{translate('incomePlanPage.hero.title1')} </span>
               <span className="gold-text-shimmer">{translate('incomePlanPage.hero.title2')}</span>
             </h1>
-            <p className="text-xl text-white/70 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl text-white/70 max-w-2xl mx-auto">
               {translate('incomePlanPage.hero.subtitle')}
             </p>
           </motion.div>
@@ -54,7 +54,7 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
       </section>
 
       {/* Commission Cards */}
-      <section className="py-20 max-w-6xl mx-auto px-4">
+      <section className="py-10 sm:py-14 lg:py-20 max-w-6xl mx-auto px-4 sm:px-6">
         <div className="grid md:grid-cols-2 gap-6 mb-16">
           {commissions.map((item, i) => (
             <motion.div
@@ -64,18 +64,18 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
               whileHover={{ y: -15, scale: 1.03 }}
-              className="gold-card-premium rounded-3xl p-8"
+              className="gold-card-premium rounded-2xl sm:rounded-3xl p-5 sm:p-8"
             >
               <div className="flex items-center gap-4 mb-6">
                 <motion.div
                   whileHover={{ scale: 1.2, rotate: 10 }}
-                  className={`w-20 h-20 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center shadow-xl`}
+                  className={`w-14 h-14 sm:w-20 sm:h-20 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center shadow-xl`}
                 >
-                  <span className="text-5xl">{item.emoji}</span>
+                  <span className="text-3xl sm:text-5xl">{item.emoji}</span>
                 </motion.div>
                 <div>
-                  <h3 className="text-2xl font-bold">{item.title}</h3>
-                  <p className="text-5xl font-bold gold-text-shimmer">{item.rate}</p>
+                  <h3 className="text-lg sm:text-2xl font-bold">{item.title}</h3>
+                  <p className="text-2xl sm:text-4xl lg:text-5xl font-bold gold-text-shimmer">{item.rate}</p>
                 </div>
               </div>
               <p className="text-white/70 mb-4 leading-relaxed">{item.desc}</p>
@@ -106,7 +106,7 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="card-inner-glow rounded-3xl p-10"
+          className="card-inner-glow rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-10"
         >
           <div className="flex items-center gap-4 mb-8">
             <motion.div
@@ -117,7 +117,7 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
               <Calculator className="w-8 h-8 text-purple-900" />
             </motion.div>
             <div>
-              <h3 className="text-3xl font-bold">Income Calculator</h3>
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold">Income Calculator</h3>
               <p className="text-white/50">Estimate your potential monthly earnings</p>
             </div>
           </div>
@@ -127,7 +127,7 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
               <div>
                 <label className="flex justify-between text-sm text-white/70 mb-3">
                   <span className="font-semibold">Team Members</span>
-                  <span className="text-amber-400 font-bold text-3xl gold-text-shimmer">{members}</span>
+                  <span className="text-amber-400 font-bold text-xl sm:text-3xl gold-text-shimmer">{members}</span>
                 </label>
                 <input
                   type="range"
@@ -135,13 +135,13 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
                   max={200}
                   value={members}
                   onChange={e => setMembers(Number(e.target.value))}
-                  className="w-full h-3 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-8 [&::-webkit-slider-thumb]:h-8 [&::-webkit-slider-thumb]:bg-gradient-to-br [&::-webkit-slider-thumb]:from-amber-400 [&::-webkit-slider-thumb]:to-yellow-600 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer"
+                  className="w-full h-3 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 sm:[&::-webkit-slider-thumb]:w-8 sm:[&::-webkit-slider-thumb]:h-8 [&::-webkit-slider-thumb]:bg-gradient-to-br [&::-webkit-slider-thumb]:from-amber-400 [&::-webkit-slider-thumb]:to-yellow-600 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer"
                 />
               </div>
               <div>
                 <label className="flex justify-between text-sm text-white/70 mb-3">
                   <span className="font-semibold">Monthly Contribution (₹)</span>
-                  <span className="text-amber-400 font-bold text-3xl gold-text-shimmer">₹{contribution.toLocaleString()}</span>
+                  <span className="text-amber-400 font-bold text-xl sm:text-3xl gold-text-shimmer">₹{contribution.toLocaleString()}</span>
                 </label>
                 <input
                   type="range"
@@ -150,34 +150,34 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
                   step={500}
                   value={contribution}
                   onChange={e => setContribution(Number(e.target.value))}
-                  className="w-full h-3 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-8 [&::-webkit-slider-thumb]:h-8 [&::-webkit-slider-thumb]:bg-gradient-to-br [&::-webkit-slider-thumb]:from-amber-400 [&::-webkit-slider-thumb]:to-yellow-600 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer"
+                  className="w-full h-3 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 sm:[&::-webkit-slider-thumb]:w-8 sm:[&::-webkit-slider-thumb]:h-8 [&::-webkit-slider-thumb]:bg-gradient-to-br [&::-webkit-slider-thumb]:from-amber-400 [&::-webkit-slider-thumb]:to-yellow-600 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer"
                 />
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-amber-500/10 to-purple-500/10 rounded-2xl p-8 border-2 border-amber-500/30">
+            <div className="bg-gradient-to-br from-amber-500/10 to-purple-500/10 rounded-xl sm:rounded-2xl p-5 sm:p-8 border-2 border-amber-500/30">
               <p className="text-sm text-white/50 mb-4 font-semibold">Estimated Monthly Earnings</p>
               <div className="space-y-4">
                 <div className="flex justify-between items-center pb-3 border-b border-white/10">
                   <span className="text-white/70 font-medium">Level 1 (10%)</span>
-                  <span className="font-bold text-green-400 text-2xl">₹{l1.toLocaleString()}</span>
+                  <span className="font-bold text-green-400 text-lg sm:text-2xl">₹{l1.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center pb-3 border-b border-white/10">
                   <span className="text-white/70 font-medium">Level 2 (5%)</span>
-                  <span className="font-bold text-blue-400 text-2xl">₹{l2.toLocaleString()}</span>
+                  <span className="font-bold text-blue-400 text-lg sm:text-2xl">₹{l2.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center pb-3 border-b border-white/10">
                   <span className="text-white/70 font-medium">Leader (5%)</span>
-                  <span className="font-bold text-amber-400 text-2xl">₹{leader.toLocaleString()}</span>
+                  <span className="font-bold text-amber-400 text-lg sm:text-2xl">₹{leader.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center pb-3 border-b border-white/10">
                   <span className="text-white/70 font-medium">Gold Bonus (4%)</span>
-                  <span className="font-bold text-purple-400 text-2xl">₹{goldBonus.toLocaleString()}</span>
+                  <span className="font-bold text-purple-400 text-lg sm:text-2xl">₹{goldBonus.toLocaleString()}</span>
                 </div>
                 <div className="pt-4">
                   <div className="flex justify-between items-center">
-                    <span className="font-bold text-2xl">Total Monthly</span>
-                    <span className="text-5xl font-bold gold-text-shimmer">₹{total.toLocaleString()}</span>
+                    <span className="font-bold text-base sm:text-2xl">Total Monthly</span>
+                    <span className="text-2xl sm:text-4xl lg:text-5xl font-bold gold-text-shimmer">₹{total.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -187,14 +187,14 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
       </section>
 
       {/* CTA */}
-      <section className="py-20 text-center relative overflow-hidden">
+      <section className="py-10 sm:py-14 lg:py-20 text-center relative overflow-hidden">
         <GoldBackground intensity="medium" />
         <div className="relative">
           <motion.button
             whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.95 }}
             onClick={onJoinClick}
-            className="btn-gold-premium px-12 py-6 text-2xl rounded-2xl inline-flex items-center gap-3"
+            className="btn-gold-premium w-full max-w-sm sm:w-auto mx-auto px-6 sm:px-10 py-3.5 sm:py-4 text-base sm:text-lg rounded-xl sm:rounded-2xl inline-flex items-center gap-3"
           >
             Start Earning Today
             <ArrowRight className="w-7 h-7" />

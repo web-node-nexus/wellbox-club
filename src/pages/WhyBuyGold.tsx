@@ -7,9 +7,9 @@ export default function WhyBuyGold({ onJoinClick }: PageProps) {
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden luxury-bg">
+      <section className="relative pt-24 pb-10 sm:pt-28 sm:pb-14 lg:pt-32 lg:pb-20 overflow-hidden luxury-bg">
         <GoldBackground intensity="heavy" />
-        <div className="relative max-w-4xl mx-auto px-4 text-center">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
@@ -17,24 +17,24 @@ export default function WhyBuyGold({ onJoinClick }: PageProps) {
               transition={{ type: 'spring', delay: 0.2, duration: 1 }}
               className="inline-block mb-8"
             >
-              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
+              <div className="w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
                 <span className="text-6xl">🪙</span>
               </div>
             </motion.div>
             
-            <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6">
               <span className="text-white">Why Buy </span>
               <span className="gold-text-shimmer">Gold</span>
               <span className="text-white">?</span>
             </h1>
-            <p className="text-xl text-white/70 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl text-white/70 max-w-2xl mx-auto">
               Gold isn't just metal — it's security, tradition, and wealth combined. Here's why smart Indians choose gold.
             </p>
           </motion.div>
         </div>
       </section>
 
-      <section className="py-20 max-w-6xl mx-auto px-4">
+      <section className="py-10 sm:py-14 lg:py-20 max-w-6xl mx-auto px-4 sm:px-6">
         <div className="grid md:grid-cols-2 gap-6 mb-12">
           {[
             { icon: TrendingUp, title: 'Always Appreciates', desc: 'Gold has consistently increased in value over decades. Unlike stocks or crypto, gold never goes to zero. It\'s the ultimate safe-haven asset.', emoji: '📈' },
@@ -51,13 +51,13 @@ export default function WhyBuyGold({ onJoinClick }: PageProps) {
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
               whileHover={{ y: -15, scale: 1.03 }}
-              className="gold-card-premium rounded-3xl p-8"
+              className="gold-card-premium rounded-2xl sm:rounded-3xl p-5 sm:p-8"
             >
               <motion.div
                 whileHover={{ scale: 1.2, rotate: 10 }}
-                className="w-20 h-20 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center mb-4 border-2 border-amber-500/30"
+                className="w-14 h-14 sm:w-20 sm:h-20 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center mb-4 border-2 border-amber-500/30"
               >
-                <span className="text-5xl">{item.emoji}</span>
+                <span className="text-3xl sm:text-5xl">{item.emoji}</span>
               </motion.div>
               <h3 className="text-2xl font-bold mb-3">{item.title}</h3>
               <p className="text-white/70 leading-relaxed">{item.desc}</p>
@@ -81,7 +81,7 @@ export default function WhyBuyGold({ onJoinClick }: PageProps) {
             whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.95 }}
             onClick={onJoinClick}
-            className="btn-gold-premium px-12 py-6 text-2xl rounded-2xl"
+            className="btn-gold-premium w-full max-w-sm sm:w-auto mx-auto px-6 sm:px-10 py-3.5 sm:py-4 text-base sm:text-lg rounded-xl sm:rounded-2xl"
           >
             Start Saving in Gold ✨
           </motion.button>

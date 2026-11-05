@@ -33,13 +33,19 @@ export default function WalletPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(0);
 
+  const [ledgerTick, setLedgerTick] = useState(0);
+
   useEffect(() => {
     if (!user) return;
-    fetchCommissions(user.id).catch(() => undefined);
+    fetchCommissions(user.id)
+      .then(() => setLedgerTick(t => t + 1))
+      .catch(() => setLedgerTick(t => t + 1));
   }, [user]);
 
   if (!user) return null;
 
+  // ledgerTick forces re-read after async fetch fills commission cache
+  void ledgerTick;
   const commissionBalance = getCommissionBalance(user.id);
   const monthlyInvestments = getInvestments(user.id);
   const totalInvested = getTotalInvested(user.id);

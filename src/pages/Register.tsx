@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, User, Phone, Tag, AlertCircle, CheckCircle, Loader2, CreditCard, ArrowRight, ArrowLeft } from 'lucide-react';
-import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP } from '../services/otpService';
+import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP, isAdminMobile } from '../services/otpService';
 import { addInvestment } from '../services/investmentService';
 import { getMembershipByMobileAsync } from '../services/userStore';
 import PaymentModal from '../components/PaymentModal';
@@ -37,6 +37,10 @@ export default function Register() {
     }
     if (!/^[6-9]\d{9}$/.test(formData.mobile)) {
       setError('Please enter a valid 10-digit mobile number');
+      return;
+    }
+    if (isAdminMobile(formData.mobile)) {
+      setError('Ye admin number hai — Login with OTP use karo.');
       return;
     }
     if (!formData.investmentAmount || Number(formData.investmentAmount) < 1000) {

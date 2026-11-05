@@ -17,9 +17,9 @@ export default function Contact() {
   return (
     <div className="min-h-screen bg-[#0f0520] text-white">
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden luxury-bg">
+      <section className="relative pt-24 pb-10 sm:pt-28 sm:pb-14 lg:pt-32 lg:pb-20 overflow-hidden luxury-bg">
         <GoldBackground intensity="heavy" />
-        <div className="relative max-w-4xl mx-auto px-4 text-center">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
@@ -27,25 +27,25 @@ export default function Contact() {
               transition={{ type: 'spring', delay: 0.2, duration: 1 }}
               className="inline-block mb-8"
             >
-              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
-                <MessageCircle className="w-16 h-16 text-purple-900" />
+              <div className="w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 mx-auto bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 gold-ring">
+                <MessageCircle className="w-9 h-9 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-purple-900" />
               </div>
             </motion.div>
             
-            <h1 className="text-5xl lg:text-7xl font-bold font-[var(--font-heading)] mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-[var(--font-heading)] mb-6">
               <span className="text-white">Contact </span>
               <span className="gold-text-shimmer">Us</span>
             </h1>
-            <p className="text-xl text-white/70">We'd love to hear from you. Reach out anytime!</p>
+            <p className="text-base sm:text-lg lg:text-xl text-white/70">We'd love to hear from you. Reach out anytime!</p>
           </motion.div>
         </div>
       </section>
 
-      <section className="py-20 max-w-5xl mx-auto px-4">
+      <section className="py-10 sm:py-14 lg:py-20 max-w-5xl mx-auto px-4 sm:px-6">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Contact Info */}
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-            <h2 className="text-3xl font-bold font-[var(--font-heading)] mb-6">Get in Touch</h2>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold font-[var(--font-heading)] mb-6">Get in Touch</h2>
             <div className="space-y-4 mb-8">
               {[
                 { icon: Phone, label: 'Phone', value: '+91 98765 43210', sub: 'Mon-Sat, 10AM-7PM', emoji: '📞' },
@@ -83,7 +83,7 @@ export default function Contact() {
 
           {/* Contact Form */}
           <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-            <div className="card-inner-glow rounded-3xl p-8 border-2 border-amber-500/30">
+            <div className="card-inner-glow rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-amber-500/30">
               <h2 className="text-2xl font-bold mb-6">Send a Message</h2>
               {submitted ? (
                 <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-12">
@@ -91,7 +91,7 @@ export default function Contact() {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: 'spring', delay: 0.2 }}
-                    className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/30"
+                    className="w-14 h-14 sm:w-20 sm:h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/30"
                   >
                     <Send className="w-10 h-10 text-white" />
                   </motion.div>

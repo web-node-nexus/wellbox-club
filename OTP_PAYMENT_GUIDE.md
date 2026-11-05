@@ -37,11 +37,11 @@
 
 ## Demo Credentials
 
-For testing, use these mobile numbers with any 6-digit OTP:
-- Admin: 9876543210
-- Leader: 9876543211
-- Member: 9876543212
-- Individual: 9876543213
+For testing:
+- Admin: 9999999999 — OTP always `000000` (hardcoded, admin only)
+- Leader: 9876543211 (normal / demo OTP)
+- Member: 9876543212 (normal / demo OTP)
+- Individual: 9876543213 (normal / demo OTP)
 
 ## API Keys
 

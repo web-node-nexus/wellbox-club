@@ -10,6 +10,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import JoinModal from './components/JoinModal';
 import DbStatusBanner from './components/DbStatusBanner';
+import ScrollToTop from './components/ScrollToTop';
 
 // Public Pages
 import Landing from './pages/Landing';
@@ -100,6 +101,7 @@ function AppRoutes() {
 
   return (
     <>
+      <ScrollToTop />
       <Navbar onJoinClick={() => openJoin('member')} />
       <Routes>
         {/* Public Pages */}

@@ -701,6 +701,39 @@ export const translations = {
     cms: { en: 'Content Management', hi: 'सामग्री प्रबंधन', kn: 'ವಿಷಯ ನಿರ್ವಹಣೆ' },
   },
 
+  // Public Gold Showroom page
+  goldShowroomPage: {
+    hero: {
+      title1: { en: 'Digital Gold', hi: 'डिजिटल गोल्ड', kn: 'ಡಿಜಿಟಲ್ ಚಿನ್ನ' },
+      title2: { en: 'Showroom', hi: 'शोरूम', kn: 'ಶೋರೂಮ್' },
+      subtitle: {
+        en: 'Browse BIS-hallmarked designs by weight. Call for manufacturer live rate — no middlemen.',
+        hi: 'BIS हॉलमार्क डिज़ाइन वजन के साथ देखें। निर्माता की लाइव रेट के लिए कॉल करें — कोई बिचौलिया नहीं।',
+        kn: 'BIS ಹಾಲ್‌ಮಾರ್ಕ್ ವಿನ್ಯಾಸಗಳನ್ನು ತೂಕದೊಂದಿಗೆ ನೋಡಿ. ತಯಾರಕರ ಲೈವ್ ದರಕ್ಕಾಗಿ ಕರೆ ಮಾಡಿ — ಮಧ್ಯವರ್ತಿಗಳಿಲ್ಲ.',
+      },
+      badge: {
+        en: 'Wholesale · Direct from Manufacturer',
+        hi: 'थोक · सीधे निर्माता से',
+        kn: 'ಸಗಟು · ನೇರವಾಗಿ ತಯಾರಕರಿಂದ',
+      },
+    },
+    filter: {
+      title: { en: 'Filter by Category', hi: 'श्रेणी से फ़िल्टर करें', kn: 'ವರ್ಗದಿಂದ ಫಿಲ್ಟರ್ ಮಾಡಿ' },
+      allDesigns: { en: 'All Designs', hi: 'सभी डिज़ाइन', kn: 'ಎಲ್ಲಾ ವಿನ್ಯಾಸಗಳು' },
+    },
+    contact: {
+      title1: { en: 'Ready to', hi: 'तैयार हैं', kn: 'ಸಿದ್ಧರಿದ್ದೀರಾ' },
+      title2: { en: 'Buy Gold', hi: 'सोना खरीदने', kn: 'ಚಿನ್ನ ಖರೀದಿಸಲು' },
+      subtitle: {
+        en: 'Share your interest — our team confirms weight, purity and live rate on call.',
+        hi: 'रुचि बताएं — हमारी टीम कॉल पर वजन, शुद्धता और लाइव रेट कन्फर्म करेगी।',
+        kn: 'ನಿಮ್ಮ ಆಸಕ್ತಿಯನ್ನು ಹಂಚಿಕೊಳ್ಳಿ — ನಮ್ಮ ತಂಡ ಕರೆಯಲ್ಲಿ ತೂಕ, ಶುದ್ಧತೆ ಮತ್ತು ಲೈವ್ ದರವನ್ನು ದೃಢೀಕರಿಸುತ್ತದೆ.',
+      },
+      callNow: { en: 'Call Now', hi: 'अभी कॉल करें', kn: 'ಈಗ ಕರೆ ಮಾಡಿ' },
+      whatsappUs: { en: 'WhatsApp Us', hi: 'व्हाट्सएप करें', kn: 'ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ' },
+    },
+  },
+
   // Individual Dashboard
   individual: {
     welcome: { en: 'Welcome', hi: 'स्वागत है', kn: 'ಸ್ವಾಗತ' },

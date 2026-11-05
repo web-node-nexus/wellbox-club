@@ -13,7 +13,7 @@ interface GoldDesign {
   name: string;
   category: string;
   weightGrams: number;
-  purity: '22K' | '24K';
+  purity: string;
   makingCharges: string;
   description: string;
   images: string[];
@@ -23,6 +23,8 @@ interface GoldDesign {
   createdAt: string;
   updatedAt: string;
 }
+
+const PURITY_OPTIONS = ['24K', '22K', '21K', '20K', '18K', '16K', '14K', '12K', '10K', '9K'];
 
 export default function AdminGoldShowroom() {
   const { showToast } = useToast();
@@ -58,7 +60,7 @@ export default function AdminGoldShowroom() {
     name: '',
     category: 'Necklace',
     weightGrams: 0,
-    purity: '22K' as '22K' | '24K',
+    purity: '22K',
     makingCharges: '',
     description: '',
     images: [] as string[],
@@ -160,7 +162,7 @@ export default function AdminGoldShowroom() {
 
   const handleSaveDesign = () => {
     if (!formData.name.trim()) {
-      showToast('error', 'Design name is required');
+      showToast('error', 'Product name is required');
       return;
     }
     if (formData.weightGrams <= 0) {
@@ -171,28 +173,33 @@ export default function AdminGoldShowroom() {
       showToast('error', 'Making charges are required');
       return;
     }
-    if (formData.images.length === 0) {
-      showToast('error', 'Please upload at least one image');
-      return;
-    }
+
+    const images =
+      formData.images.length > 0
+        ? formData.images
+        : [
+            'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80',
+          ];
+
+    const payload = { ...formData, images };
 
     if (editingDesign) {
       setDesigns(designs.map(d => 
         d.id === editingDesign.id 
-          ? { ...d, ...formData, updatedAt: new Date().toISOString() } 
+          ? { ...d, ...payload, updatedAt: new Date().toISOString() } 
           : d
       ));
-      showToast('success', 'Design updated successfully');
+      showToast('success', 'Product updated — live on showroom');
     } else {
       const newDesign: GoldDesign = {
         id: String(Date.now()),
-        ...formData,
+        ...payload,
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
       setDesigns([...designs, newDesign]);
-      showToast('success', 'Design added successfully');
+      showToast('success', 'Product added — visible on public showroom');
     }
     setShowModal(false);
   };
@@ -312,8 +319,8 @@ export default function AdminGoldShowroom() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Gold Showroom Management</h1>
-          <p className="text-white/50 mt-1">Manage your gold designs inventory</p>
+          <h1 className="text-3xl font-bold">Gold Showroom / Products</h1>
+          <p className="text-white/50 mt-1">Add products — they appear on public showroom. Buy Now requests go to Gold Orders.</p>
         </div>
         <div className="flex gap-3">
           <motion.button 
@@ -329,10 +336,10 @@ export default function AdminGoldShowroom() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleAddDesign}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold rounded-xl shadow-lg"
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold rounded-xl shadow-lg"
           >
-            <Plus className="w-4 h-4" />
-            Add Design
+            <Plus className="w-5 h-5" />
+            Add Product
           </motion.button>
         </div>
       </div>
@@ -423,8 +430,9 @@ export default function AdminGoldShowroom() {
             className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm focus:border-amber-500/50"
           >
             <option value="all">All Purity</option>
-            <option value="22K">22K</option>
-            <option value="24K">24K</option>
+            {PURITY_OPTIONS.map(p => (
+              <option key={p} value={p}>{p}</option>
+            ))}
           </select>
           <select
             value={filterStatus}
@@ -626,7 +634,7 @@ export default function AdminGoldShowroom() {
               onClick={e => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold">{editingDesign ? 'Edit Design' : 'Add New Design'}</h3>
+                <h3 className="text-xl font-bold">{editingDesign ? 'Edit Product' : 'Add New Product'}</h3>
                 <button onClick={() => setShowModal(false)} className="p-2 hover:bg-white/10 rounded-lg">
                   <X className="w-5 h-5" />
                 </button>
@@ -665,11 +673,12 @@ export default function AdminGoldShowroom() {
                     <label className="block text-sm text-white/60 mb-1">Purity</label>
                     <select
                       value={formData.purity}
-                      onChange={e => setFormData({ ...formData, purity: e.target.value as '22K' | '24K' })}
+                      onChange={e => setFormData({ ...formData, purity: e.target.value })}
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-amber-500/50"
                     >
-                      <option value="22K">22K</option>
-                      <option value="24K">24K</option>
+                      {PURITY_OPTIONS.map(p => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
