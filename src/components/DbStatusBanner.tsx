@@ -21,12 +21,12 @@ export default function DbStatusBanner() {
         <div className="space-y-2 text-sm text-amber-950">
           <p className="font-semibold">
             {missingTable
-              ? 'Supabase tables abhi setup nahi hain'
+              ? 'Supabase tables are not set up yet'
               : 'Supabase connection issue'}
           </p>
           <p className="text-amber-800">
             {missingTable
-              ? 'SQL Editor me project file supabase/schema.sql ek baar Run karo — uske baad members kisi bhi browser se login kar payenge.'
+              ? 'Run supabase/schema.sql once in the SQL Editor — then members can login from any browser.'
               : dbError}
           </p>
           <a

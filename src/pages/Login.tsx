@@ -273,14 +273,14 @@ export default function Login() {
                 to="/register"
                 className="inline-flex items-center justify-center w-full py-3 rounded-xl border border-amber-300 bg-amber-50 text-amber-800 text-sm font-semibold"
               >
-                Join Now — pehle member bano (₹1,000+)
+                Join Now — become a member (₹1,000+)
               </Link>
             )}
           </div>
 
           <div className="mt-6 p-4 bg-amber-50 rounded-xl border border-amber-100">
             <p className="text-xs text-amber-700">
-              Pehle se account nahi hai? <Link to="/register" className="font-semibold underline">Join Now</Link> se OTP + payment ke baad member bano.
+              Don't have an account? <Link to="/register" className="font-semibold underline">Join Now</Link> — complete OTP + payment to become a member.
             </p>
           </div>
         </div>

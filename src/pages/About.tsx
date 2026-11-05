@@ -342,7 +342,7 @@ export default function About({ onJoinClick }: PageProps) {
             Company <span className="gold-text-shimmer">Documents</span>
           </h2>
           <p className="text-white/60 text-lg max-w-2xl mx-auto">
-            GST, Trade License & Udyam certificates. Open pe mobile number verify hoga — number DB me registered member/leader hona chahiye.
+            GST, Trade License & Udyam certificates. Opening requires mobile verification — the number must be a registered member/leader.
           </p>
         </motion.div>
 
@@ -484,7 +484,7 @@ export default function About({ onJoinClick }: PageProps) {
                 </button>
 
                 <p className="text-[11px] text-center text-white/40">
-                  Agar number DB me nahi hai, ya role buyer/individual hai, document open nahi hoga.
+                  If the number is not in the database, or the role is buyer/individual, the document will not open.
                 </p>
               </form>
             </motion.div>

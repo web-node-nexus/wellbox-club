@@ -31,7 +31,7 @@ export default function Footer() {
               India's premium gold investment & referral platform. Earn together, grow together, own gold directly from manufacturers.
             </p>
             <p className="text-xs text-amber-400/70 italic">
-              "Sone ka sapna, ab hoga poora!" 💛
+              "Your gold dream, fulfilled." 💛
             </p>
             {/* Social Links */}
             <div className="flex items-center gap-3 mt-6">

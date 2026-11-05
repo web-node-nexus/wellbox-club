@@ -260,7 +260,7 @@ export default function ProductInquiryModal({
                     </div>
 
                     <p className="text-xs text-amber-200/70">
-                      Confirm karke request Admin ko chali jayegi. Team call pe rate batayegi.
+                      On confirm, this request is shared with Admin. Our team will call you with the live rate.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-2 pt-1">

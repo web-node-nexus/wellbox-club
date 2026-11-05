@@ -136,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 : 'member';
         return {
           success: false,
-          message: `Ye number pehle se hi ${roleLabel} hai. Dobara member nahi ban sakte — Login with OTP use karo.`,
+          message: `This number is already registered as ${roleLabel}. Please use Login with OTP.`,
         };
       }
 
@@ -184,7 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         success: false,
         message:
           e?.message?.includes('Could not find the table') || e?.code === 'PGRST205'
-            ? 'Database tables missing. Supabase SQL Editor me supabase/schema.sql run karo.'
+            ? 'Database tables missing. Run supabase/schema.sql in the Supabase SQL Editor.'
             : e?.message || 'Registration failed. Please try again.',
       };
     }
@@ -231,7 +231,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return {
             success: false,
             message:
-              'Server se connect nahi ho paya. Vercel pe VITE_SUPABASE_URL aur VITE_SUPABASE_ANON_KEY set karke redeploy karo.',
+              'Could not reach the server. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY on Vercel, then redeploy.',
           };
         }
         throw lookupErr;
@@ -250,7 +250,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return {
           success: false,
           message:
-            'Is number ka membership Supabase me nahi mila. Pehle Join Now se register + pay karo — phir kisi bhi browser se login chalega.',
+            'No membership found for this number. Please Join Now (register + pay), then login from any browser.',
         };
       }
 
@@ -263,9 +263,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         success: false,
         message:
           e?.message?.includes('Could not find the table') || e?.code === 'PGRST205'
-            ? 'Database tables missing. Supabase SQL Editor me supabase/schema.sql run karo.'
+            ? 'Database tables missing. Run supabase/schema.sql in the Supabase SQL Editor.'
             : /failed to fetch/i.test(e?.message || '')
-              ? 'Server se connect nahi ho paya. Vercel env me Supabase keys check karo.'
+              ? 'Could not reach the server. Check Supabase keys in Vercel environment variables.'
               : e?.message || 'Login failed. Please try again.',
       };
     }

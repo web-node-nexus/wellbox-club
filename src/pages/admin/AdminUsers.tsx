@@ -1,8 +1,14 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, Eye, Crown, UserX, Download, Edit, Trash2, Plus, X, Save, Users as UsersIcon, Shield, TrendingUp, ChevronRight, ChevronDown, Mail, Phone, Calendar, MapPin, Copy, CheckCircle, MoreVertical, Ban, Check, AlertCircle } from 'lucide-react';
-import { users as initialUsers } from '../../data/mockData';
+import { Search, Filter, Eye, Crown, UserX, Download, Edit, Trash2, Plus, X, Save, Users as UsersIcon, Shield, TrendingUp, ChevronRight, ChevronDown, Mail, Phone, Calendar, MapPin, Copy, CheckCircle, MoreVertical, Ban, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext';
+import {
+  fetchAllMembers,
+  normalizeMobile,
+  upsertMember,
+} from '../../services/memberDb';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+import type { RegisteredUser } from '../../context/AuthContext';
 
 interface User {
   id: string;
@@ -16,14 +22,31 @@ interface User {
   joinDate: string;
   status: 'active' | 'blocked';
   city?: string;
+  role?: RegisteredUser['role'];
+}
+
+function toAdminUser(m: RegisteredUser): User {
+  return {
+    id: m.id,
+    name: m.name,
+    email: m.email || '',
+    phone: normalizeMobile(m.mobile || m.phone || ''),
+    referralCode: m.referralCode || '',
+    referredBy: m.referredBy || null,
+    isLeader: m.isLeader || m.role === 'leader' || m.role === 'admin',
+    teamSize: m.teamSize || 0,
+    joinDate: m.joinDate,
+    status: 'active',
+    city: m.city || '',
+    role: m.role,
+  };
 }
 
 export default function AdminUsers() {
   const { showToast } = useToast();
-  const [users, setUsers] = useState<User[]>(() => {
-    const stored = localStorage.getItem('admin_users');
-    return stored ? JSON.parse(stored) : initialUsers.map(u => ({ ...u, status: 'active' as const }));
-  });
+  const [users, setUsers] = useState<User[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
@@ -42,9 +65,23 @@ export default function AdminUsers() {
     city: '',
   });
 
+  const loadUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const members = await fetchAllMembers();
+      setUsers(members.map(toAdminUser));
+    } catch (e: any) {
+      console.error(e);
+      showToast('error', e?.message || 'Could not load members from database');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
   useEffect(() => {
-    localStorage.setItem('admin_users', JSON.stringify(users));
-  }, [users]);
+    void loadUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filteredUsers = users.filter(u => {
     const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase()) || 
@@ -86,34 +123,79 @@ export default function AdminUsers() {
     setShowModal(true);
   };
 
-  const handleSaveUser = () => {
-    if (!formData.name || !formData.email || !formData.phone) {
-      showToast('error', 'Please fill all required fields');
+  const handleSaveUser = async () => {
+    if (!formData.name.trim() || !formData.phone.trim()) {
+      showToast('error', 'Name and mobile number are required');
       return;
     }
 
-    if (editingUser) {
-      setUsers(users.map(u => u.id === editingUser.id ? { ...u, ...formData } : u));
-      showToast('success', 'User updated successfully');
-    } else {
-      const newUser: User = {
-        id: String(Date.now()),
-        ...formData,
-        referredBy: null,
-        teamSize: 0,
-        joinDate: new Date().toISOString().split('T')[0],
-        status: 'active',
-      };
-      setUsers([...users, newUser]);
-      showToast('success', 'User added successfully');
+    const mobile = normalizeMobile(formData.phone);
+    if (!/^[6-9]\d{9}$/.test(mobile)) {
+      showToast('error', 'Enter a valid 10-digit mobile number');
+      return;
     }
-    setShowModal(false);
+
+    if (!isSupabaseConfigured) {
+      showToast('error', 'Supabase is not configured');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const referralCode =
+        (formData.referralCode || '').trim().toUpperCase() ||
+        formData.name.substring(0, 3).toUpperCase() +
+          Math.floor(100 + Math.random() * 900).toString();
+
+      const role: RegisteredUser['role'] = formData.isLeader ? 'leader' : 'member';
+      const payload: RegisteredUser = {
+        id: editingUser?.id || String(Date.now()),
+        name: formData.name.trim(),
+        mobile,
+        email: formData.email.trim() || undefined,
+        phone: `+91 ${mobile}`,
+        referralCode,
+        referredBy: editingUser?.referredBy || '',
+        city: formData.city.trim(),
+        role: editingUser?.role === 'admin' ? 'admin' : role,
+        isLeader: formData.isLeader || editingUser?.role === 'admin',
+        teamSize: editingUser?.teamSize || 0,
+        joinDate: editingUser?.joinDate || new Date().toISOString().split('T')[0],
+      };
+
+      const saved = await upsertMember(payload);
+      const adminRow = toAdminUser(saved);
+
+      if (editingUser) {
+        setUsers(users.map(u => (u.id === editingUser.id || u.phone === mobile ? adminRow : u)));
+        showToast('success', 'Member updated in database — they can login with OTP');
+      } else {
+        setUsers(prev => {
+          const withoutDup = prev.filter(u => u.phone !== mobile && u.id !== adminRow.id);
+          return [...withoutDup, adminRow];
+        });
+        showToast('success', `Member added. They can login with mobile ${mobile} + OTP`);
+      }
+      setShowModal(false);
+      await loadUsers();
+    } catch (e: any) {
+      showToast('error', e?.message || 'Could not save member to database');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleDeleteUser = (id: string) => {
-    if (confirm('Are you sure you want to delete this user?')) {
+  const handleDeleteUser = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this user from the database?')) return;
+    try {
+      if (isSupabaseConfigured) {
+        const { error } = await supabase.from('members').delete().eq('id', id);
+        if (error) throw error;
+      }
       setUsers(users.filter(u => u.id !== id));
-      showToast('success', 'User deleted successfully');
+      showToast('success', 'User deleted from database');
+    } catch (e: any) {
+      showToast('error', e?.message || 'Could not delete user');
     }
   };
 
@@ -121,20 +203,38 @@ export default function AdminUsers() {
     setUsers(users.map(u => 
       u.id === id ? { ...u, status: u.status === 'active' ? 'blocked' : 'active' } : u
     ));
-    showToast('success', 'User status updated');
+    showToast('success', 'User status updated locally (block flag is UI-only for now)');
   };
 
-  const handlePromoteToLeader = (id: string) => {
+  const handlePromoteToLeader = async (id: string) => {
     const user = users.find(u => u.id === id);
-    if (user && user.teamSize < 100) {
+    if (!user) return;
+    if (user.teamSize < 100) {
       if (!confirm(`This user has only ${user.teamSize} team members. Leader status requires 100+ members. Continue anyway?`)) {
         return;
       }
     }
-    setUsers(users.map(u => 
-      u.id === id ? { ...u, isLeader: true } : u
-    ));
-    showToast('success', 'User promoted to Leader');
+    try {
+      const saved = await upsertMember({
+        id: user.id,
+        name: user.name,
+        mobile: normalizeMobile(user.phone),
+        email: user.email || undefined,
+        phone: user.phone,
+        referralCode: user.referralCode,
+        referredBy: user.referredBy || '',
+        city: user.city || '',
+        role: 'leader',
+        isLeader: true,
+        teamSize: user.teamSize,
+        joinDate: user.joinDate,
+      });
+      const row = toAdminUser(saved);
+      setUsers(users.map(u => (u.id === id ? row : u)));
+      showToast('success', 'User promoted to Leader in database');
+    } catch (e: any) {
+      showToast('error', e?.message || 'Could not promote user');
+    }
   };
 
   const handleBulkAction = (action: 'block' | 'unblock' | 'delete' | 'promote') => {
@@ -287,7 +387,11 @@ export default function AdminUsers() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Users Management</h1>
-          <p className="text-white/50 mt-1">Manage all platform users and leaders</p>
+          <p className="text-white/50 mt-1">
+            {loadingUsers
+              ? 'Loading members from database…'
+              : 'Saved to Supabase — members can login with mobile + OTP'}
+          </p>
         </div>
         <div className="flex gap-3">
           <motion.button 
@@ -575,7 +679,7 @@ export default function AdminUsers() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-white/60 mb-1">Email *</label>
+                  <label className="block text-sm text-white/60 mb-1">Email</label>
                   <input
                     type="email"
                     value={formData.email}
@@ -585,14 +689,15 @@ export default function AdminUsers() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-white/60 mb-1">Phone *</label>
+                  <label className="block text-sm text-white/60 mb-1">Mobile *</label>
                   <input
                     type="tel"
                     value={formData.phone}
-                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-amber-500/50"
-                    placeholder="Enter phone number"
+                    placeholder="10-digit mobile (for OTP login)"
                   />
+                  <p className="text-[11px] text-white/40 mt-1">Saved to Supabase — member can login with this number + OTP</p>
                 </div>
                 <div>
                   <label className="block text-sm text-white/60 mb-1">City</label>
@@ -632,10 +737,12 @@ export default function AdminUsers() {
                     Cancel
                   </button>
                   <button
-                    onClick={handleSaveUser}
-                    className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold rounded-xl flex items-center justify-center gap-2"
+                    type="button"
+                    disabled={saving}
+                    onClick={() => void handleSaveUser()}
+                    className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 font-bold rounded-xl flex items-center justify-center gap-2 disabled:opacity-60"
                   >
-                    <Save className="w-5 h-5" />
+                    {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                     {editingUser ? 'Update' : 'Add'} User
                   </button>
                 </div>

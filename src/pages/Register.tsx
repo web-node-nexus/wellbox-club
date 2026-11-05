@@ -40,7 +40,7 @@ export default function Register() {
       return;
     }
     if (isAdminMobile(formData.mobile)) {
-      setError('Ye admin number hai — Login with OTP use karo.');
+      setError('This is the admin number — use Login with OTP.');
       return;
     }
     if (!formData.investmentAmount || Number(formData.investmentAmount) < 1000) {
@@ -61,7 +61,7 @@ export default function Register() {
               : existing.role === 'individual'
                 ? 'Buyer'
                 : 'Member';
-        setError(`Ye number pehle se hi ${label} hai. Dobara member nahi ban sakte — Login with OTP use karo.`);
+        setError(`This number is already registered as ${label}. Please use Login with OTP.`);
         setSendingOTP(false);
         return;
       }

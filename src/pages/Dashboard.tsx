@@ -292,7 +292,7 @@ export default function Dashboard() {
         <div>
           <p className="font-semibold">Manufacturer gold — very low price</p>
           <p className="text-amber-800/80 mt-0.5">
-            Showroom me sirf weight (gram) dikhega, price nahi. Customer call karega. Order aaye to referrer ko gold amount ka {BUSINESS_RULES.goldOrderPercent}% milta hai.
+            Showroom shows weight (grams) only — no price. Customers call to order. Referrers earn {BUSINESS_RULES.goldOrderPercent}% of the gold order amount.
           </p>
         </div>
       </div>

@@ -60,7 +60,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
 
     try {
       if (isAdminMobile(formData.mobile)) {
-        setErrors({ mobile: 'Ye admin number hai — Login with OTP use karo.' });
+        setErrors({ mobile: 'This is the admin number — use Login with OTP.' });
         setSendingOTP(false);
         return;
       }
@@ -77,7 +77,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                 ? 'Buyer'
                 : 'Member';
         setErrors({
-          mobile: `Ye number pehle se hi ${label} hai. Dobara join nahi ho sakta — Login with OTP use karo.`,
+          mobile: `This number is already registered as ${label}. Please use Login with OTP.`,
         });
         setSendingOTP(false);
         return;

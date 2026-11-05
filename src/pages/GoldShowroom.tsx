@@ -118,7 +118,7 @@ export default function GoldShowroom() {
               <Gem className="w-5 h-5" /> Manufacturer price — no middlemen
             </p>
             <p className="text-sm opacity-80 mt-1">
-              Price screen pe nahi dikhega. User design + weight dekhe, phir call/WhatsApp kare. Order pe referrer ko {BUSINESS_RULES.goldOrderPercent}% milta hai.
+              Price is not shown on screen. Members view design + weight, then call/WhatsApp. Referrers earn {BUSINESS_RULES.goldOrderPercent}% on the order.
             </p>
           </div>
           <div className="flex gap-2 shrink-0">

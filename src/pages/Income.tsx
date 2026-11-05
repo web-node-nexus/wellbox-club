@@ -150,7 +150,7 @@ export default function Income() {
           <div className="text-center py-12 text-gray-500">
             <p className="font-medium">No {incomeType.label} income yet</p>
             <p className="text-sm mt-1">
-              Jab aapka referral invest karega, yahan {incomeType.label} commission dikhega.
+              When your referral invests, {incomeType.label} commission will appear here.
             </p>
           </div>
         ) : (

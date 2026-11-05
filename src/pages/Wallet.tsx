@@ -472,7 +472,7 @@ export default function WalletPage() {
           <div className="space-y-2">
             {myTransactions.length === 0 ? (
               <p className="text-sm text-gray-500 text-center py-8">
-                Abhi koi commission nahi. Jab aapka referral invest karega, L1/L2 yahan credit hoga.
+                No commission yet. When your referral invests, L1/L2 will credit here.
               </p>
             ) : (
               myTransactions.slice(0, 10).map(tx => (

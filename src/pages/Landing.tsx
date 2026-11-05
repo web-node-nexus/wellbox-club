@@ -118,9 +118,9 @@ export default function Landing({ onJoinClick }: LandingProps) {
   const { translate } = useLanguage();
 
   const testimonials = [
-    { name: 'Rajesh Kumar', city: 'Jaipur', text: 'Jewellbox Club ne meri zindagi badal di! 6 months mein 50 members ki team banayi aur ab leader hoon. Monthly income ₹45,000+ hai!', rating: 5, earning: '₹45,000/mo' },
-    { name: 'Priya Sharma', city: 'Delhi', text: 'Digital gold showroom se directly manufacturer se gold mila - bahut kam price mein! Aur referral se extra income. Win-win situation!', rating: 5, earning: '₹28,000/mo' },
-    { name: 'Amit Patel', city: 'Mumbai', text: 'Best platform for digital gold investment. Monthly contribution lock karke 12 months baad gold le sakti hoon. Commission bhi milta hai!', rating: 5, earning: '₹62,000/mo' },
+    { name: 'Rajesh Kumar', city: 'Jaipur', text: 'Jewellbox Club changed my life! In 6 months I built a 50-member team and became a Leader. Monthly income is ₹45,000+!', rating: 5, earning: '₹45,000/mo' },
+    { name: 'Priya Sharma', city: 'Delhi', text: 'I bought gold directly from the manufacturer via the digital showroom — much lower price! Plus extra income from referrals. Win-win!', rating: 5, earning: '₹28,000/mo' },
+    { name: 'Amit Patel', city: 'Mumbai', text: 'Best platform for digital gold investment. After the 12-month lock I can convert contributions to gold. Commissions credit too!', rating: 5, earning: '₹62,000/mo' },
   ];
 
   const incomeL1 = calcMembers * calcContribution * 0.10;
