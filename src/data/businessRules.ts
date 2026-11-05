@@ -15,8 +15,8 @@ export const BUSINESS_RULES = {
   leaderPayoutDay: 3,
   /** Contribution / investment lock months */
   lockMonths: 12,
-  /** Minimum first / monthly contribution (₹1 for live payment testing; set back to 1000 before full launch) */
-  minJoinInvestment: 1,
+  /** Minimum first / monthly contribution to become a member */
+  minJoinInvestment: 1000,
 } as const;
 
 export function formatInr(amount: number) {
