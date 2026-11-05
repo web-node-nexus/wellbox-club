@@ -8,7 +8,7 @@ import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clear
 import { addInvestment } from '../services/investmentService';
 import { getMembershipByMobileAsync } from '../services/userStore';
 import { BUSINESS_RULES } from '../data/businessRules';
-import { savePendingPayment } from '../services/paymentPending';
+import { clearPendingPayment, savePendingPayment } from '../services/paymentPending';
 import PaymentModal from '../components/PaymentModal';
 
 export default function Register() {
@@ -119,6 +119,7 @@ export default function Register() {
 
   const handlePaymentSuccess = async (response?: any) => {
     // Payment required — without pay, user is NOT a member
+    clearPendingPayment();
     setLoading(true);
     setError('');
     try {

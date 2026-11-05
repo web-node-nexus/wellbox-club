@@ -1,5 +1,5 @@
 /**
- * Poll Razorpay order + payments.
+ * Fetch Razorpay order + payments. Client polls this while Checkout is open.
  * Env: RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET
  */
 export default async function handler(req, res) {
@@ -39,14 +39,14 @@ export default async function handler(req, res) {
 
     const pays = payRes.ok ? await payRes.json() : { items: [] };
     const items = pays?.items || [];
-    const good = items.find(
+    const successPay = items.find(
       p => p.status === 'captured' || p.status === 'authorized'
     );
-    const anyPayment = good || items[0] || null;
+    const anyPayment = successPay || items[0] || null;
     const paid =
       order.status === 'paid' ||
       Number(order.amount_paid) > 0 ||
-      Boolean(good);
+      Boolean(successPay);
 
     return res.status(200).json({
       id: order.id,
@@ -57,6 +57,7 @@ export default async function handler(req, res) {
       payment_status: anyPayment?.status || null,
       paid,
       payments_count: items.length,
+      payments: items.map(p => ({ id: p.id, status: p.status, amount: p.amount })),
     });
   } catch (e) {
     return res.status(500).json({ error: e?.message || 'Status check failed' });

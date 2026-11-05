@@ -10,7 +10,7 @@ import { getMembershipByMobileAsync } from '../services/userStore';
 import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP, isAdminMobile } from '../services/otpService';
 import { addInvestment } from '../services/investmentService';
 import { BUSINESS_RULES } from '../data/businessRules';
-import { savePendingPayment } from '../services/paymentPending';
+import { clearPendingPayment, savePendingPayment } from '../services/paymentPending';
 import PaymentModal from './PaymentModal';
 
 interface JoinModalProps {
@@ -199,7 +199,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
   };
 
   const handlePaymentSuccess = (response: any) => {
-    // Demo pay / rare non-redirect path
+    clearPendingPayment();
     setShowPayment(false);
     void finishRegistration(response?.razorpay_payment_id);
   };

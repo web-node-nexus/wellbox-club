@@ -3,14 +3,17 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { addInvestment } from '../services/investmentService';
-import { verifyRazorpayPayment, fetchRazorpayOrderStatus } from '../services/razorpayService';
+import {
+  verifyRazorpayPayment,
+  waitUntilOrderPaid,
+} from '../services/razorpayService';
 import {
   clearPendingPayment,
   loadPendingPayment,
 } from '../services/paymentPending';
 
 /**
- * Razorpay redirect lands here after successful pay — completes join/invest automatically.
+ * Razorpay redirect / recovery landing — confirms pay then finishes join/invest.
  */
 export default function PaymentCallback() {
   const [params] = useSearchParams();
@@ -35,7 +38,6 @@ export default function PaymentCallback() {
           throw new Error('Payment details missing. Please try again from Join.');
         }
 
-        // Prefer signature verify; else confirm order is paid on Razorpay
         if (paymentId && orderId && signature) {
           await verifyRazorpayPayment({
             razorpay_payment_id: paymentId,
@@ -43,15 +45,20 @@ export default function PaymentCallback() {
             razorpay_signature: signature,
           });
         } else if (orderId) {
-          const st = await fetchRazorpayOrderStatus(orderId);
-          if (!st.paid) {
-            throw new Error('Payment not completed yet. If money was deducted, contact support.');
+          setMessage('Waiting for bank confirmation…');
+          const st = await waitUntilOrderPaid(orderId, {
+            attempts: 20,
+            gapMs: 2000,
+          });
+          if (!st?.paid) {
+            throw new Error(
+              'Payment not confirmed yet. If money was deducted, wait 2 minutes and open this page again, or contact support with your UPI reference.'
+            );
           }
         }
 
         const pending = loadPendingPayment();
         if (!pending) {
-          // Payment ok but no pending action — send to dashboard/login
           if (!cancelled) {
             setStatus('ok');
             setMessage('Payment successful!');
@@ -147,7 +154,8 @@ export default function PaymentCallback() {
             <h1 className="text-xl font-bold text-gray-900">Something went wrong</h1>
             <p className="text-gray-600 mt-2 text-sm">{message}</p>
             <p className="text-xs text-gray-400 mt-3">
-              If money was deducted, it will reflect / refund per Razorpay. You can login or contact support.
+              If money was deducted, it usually reflects in Razorpay within a few minutes or is
+              auto-refunded. Keep your UPI reference and contact support.
             </p>
             <div className="mt-6 flex gap-3 justify-center">
               <Link

@@ -17,7 +17,7 @@ import {
   type Investment,
 } from '../services/investmentService';
 import { BUSINESS_RULES } from '../data/businessRules';
-import { savePendingPayment } from '../services/paymentPending';
+import { clearPendingPayment, savePendingPayment } from '../services/paymentPending';
 
 export default function Contributions() {
   const { user } = useAuth();
@@ -81,6 +81,7 @@ export default function Contributions() {
 
   const handlePaymentSuccess = async (response?: { razorpay_payment_id?: string }) => {
     try {
+      clearPendingPayment();
       await addInvestment(
         user.id,
         Number(investAmount),

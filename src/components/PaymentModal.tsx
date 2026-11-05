@@ -169,7 +169,7 @@ export default function PaymentModal({
                 </div>
 
                 <p className="text-xs text-white/50 mb-4 text-center">
-                  Razorpay will open. After you pay, this closes automatically and you return here.
+                  Pay on Razorpay / UPI. Window closes automatically when payment is confirmed — no extra button.
                 </p>
 
                 <button
