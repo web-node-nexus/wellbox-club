@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { getMembershipByMobileAsync } from '../services/userStore';
 import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP, isAdminMobile } from '../services/otpService';
 import { addInvestment } from '../services/investmentService';
+import { BUSINESS_RULES } from '../data/businessRules';
 import PaymentModal from './PaymentModal';
 
 interface JoinModalProps {
@@ -27,7 +28,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     mobile: '',
     referralCode: '',
     city: '',
-    investmentAmount: '1000',
+    investmentAmount: String(BUSINESS_RULES.minJoinInvestment),
   });
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,7 +46,9 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     }
     if (activeTab === 'member') {
       const amt = Number(formData.investmentAmount);
-      if (!amt || amt < 1000) newErrors.investmentAmount = 'Minimum first investment is ₹1,000';
+      if (!amt || amt < BUSINESS_RULES.minJoinInvestment) {
+        newErrors.investmentAmount = `Minimum first investment is ₹${BUSINESS_RULES.minJoinInvestment}`;
+      }
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -200,7 +203,13 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
 
   const handleClose = () => {
     setStep('form');
-    setFormData({ name: '', mobile: '', referralCode: '', city: '', investmentAmount: '1000' });
+    setFormData({
+      name: '',
+      mobile: '',
+      referralCode: '',
+      city: '',
+      investmentAmount: String(BUSINESS_RULES.minJoinInvestment),
+    });
     setOtp('');
     setErrors({});
     setShowPayment(false);
@@ -291,10 +300,10 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                         <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
                         <input
                           type="number"
-                          min={1000}
+                          min={BUSINESS_RULES.minJoinInvestment}
                           value={formData.investmentAmount}
                           onChange={e => setFormData(p => ({ ...p, investmentAmount: e.target.value }))}
-                          placeholder="Minimum ₹1,000"
+                          placeholder={`Minimum ₹${BUSINESS_RULES.minJoinInvestment}`}
                           className={`w-full pl-10 pr-4 py-3.5 bg-white/5 border ${errors.investmentAmount ? 'border-red-500' : 'border-white/10'} rounded-xl text-white placeholder-white/30 focus:border-amber-500/50 text-base`}
                         />
                       </div>
@@ -423,10 +432,12 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-white/60 mb-1.5">Adjust amount (min ₹1,000)</label>
+                    <label className="block text-xs font-medium text-white/60 mb-1.5">
+                      Adjust amount (min ₹{BUSINESS_RULES.minJoinInvestment})
+                    </label>
                     <input
                       type="number"
-                      min={1000}
+                      min={BUSINESS_RULES.minJoinInvestment}
                       value={formData.investmentAmount}
                       onChange={e => setFormData(p => ({ ...p, investmentAmount: e.target.value }))}
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-amber-500/50"
@@ -435,7 +446,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
 
                   <button
                     type="button"
-                    disabled={Number(formData.investmentAmount) < 1000}
+                    disabled={Number(formData.investmentAmount) < BUSINESS_RULES.minJoinInvestment}
                     onClick={() => setShowPayment(true)}
                     className="w-full py-4 rounded-xl font-semibold bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
                   >

@@ -223,7 +223,7 @@ export default function WalletPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {
-                  setPaymentAmount(1000);
+                  setPaymentAmount(BUSINESS_RULES.minJoinInvestment);
                   setActiveTab('investment');
                 }}
                 className="flex-1 py-4 bg-white/30 hover:bg-white/40 rounded-xl font-semibold text-lg transition-colors backdrop-blur flex items-center justify-center gap-2"
@@ -458,7 +458,7 @@ export default function WalletPage() {
             <div className="mt-4 p-4 bg-white/10 rounded-xl">
               <p className="text-xs text-blue-100 mb-2 font-semibold">Investment Rules:</p>
               <ul className="text-xs text-blue-100 space-y-1">
-                <li>✓ Minimum ₹1,000 first payment to become member</li>
+                <li>✓ Minimum ₹{BUSINESS_RULES.minJoinInvestment} first payment to become member</li>
                 <li>✓ Locked for 12 months from payment date</li>
                 <li>✓ After 12 months: order gold of unlocked amount</li>
                 <li>✗ Cannot withdraw invested amount as cash</li>
@@ -625,13 +625,13 @@ export default function WalletPage() {
       <PaymentModal
         isOpen={showPaymentModal}
         onClose={() => setShowPaymentModal(false)}
-        amount={paymentAmount || 1000}
+        amount={paymentAmount || BUSINESS_RULES.minJoinInvestment}
         description="Additional investment — Jewellbox Club"
         onSuccess={async (response) => {
           try {
             await addInvestment(
               user.id,
-              paymentAmount || 1000,
+              paymentAmount || BUSINESS_RULES.minJoinInvestment,
               response?.razorpay_payment_id,
               user.mobile
             );

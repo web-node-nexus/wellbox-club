@@ -16,6 +16,7 @@ import {
   getUnlockedInvested,
   type Investment,
 } from '../services/investmentService';
+import { BUSINESS_RULES } from '../data/businessRules';
 
 export default function Contributions() {
   const { user } = useAuth();
@@ -61,8 +62,8 @@ export default function Contributions() {
 
   const openPayment = () => {
     const amount = Number(investAmount);
-    if (amount < 1000) {
-      setInvestError('Minimum investment is ₹1,000 per month');
+    if (amount < BUSINESS_RULES.minJoinInvestment) {
+      setInvestError(`Minimum investment is ₹${BUSINESS_RULES.minJoinInvestment}`);
       return;
     }
     setInvestError('');
@@ -187,8 +188,12 @@ export default function Contributions() {
               <div className="flex items-start gap-2">
                 <IndianRupee className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-blue-900">Minimum ₹1,000/month</p>
-                  <p className="text-xs text-blue-700">Invest at least ₹1,000 every month</p>
+                  <p className="text-sm font-semibold text-blue-900">
+                    Minimum ₹{BUSINESS_RULES.minJoinInvestment}
+                  </p>
+                  <p className="text-xs text-blue-700">
+                    Invest at least ₹{BUSINESS_RULES.minJoinInvestment} per payment
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-2">
@@ -332,13 +337,13 @@ export default function Contributions() {
                     setInvestAmount(e.target.value);
                     setInvestError('');
                   }}
-                  min={1000}
-                  placeholder="Minimum ₹1,000"
+                  min={BUSINESS_RULES.minJoinInvestment}
+                  placeholder={`Minimum ₹${BUSINESS_RULES.minJoinInvestment}`}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                 />
                 {investError && <p className="text-sm text-red-600 mt-1">{investError}</p>}
                 <div className="flex gap-2 mt-2">
-                  {[1000, 3000, 5000, 10000].map(val => (
+                  {[BUSINESS_RULES.minJoinInvestment, 100, 500, 1000].map(val => (
                     <button
                       key={val}
                       type="button"
@@ -378,7 +383,7 @@ export default function Contributions() {
       <PaymentModal
         isOpen={showPayment}
         onClose={() => setShowPayment(false)}
-        amount={Number(investAmount) || 1000}
+        amount={Number(investAmount) || BUSINESS_RULES.minJoinInvestment}
         description="Monthly investment — Jewellbox Club"
         onSuccess={handlePaymentSuccess}
         onFailure={() => showToast('error', 'Payment failed. Please try again.', 'Error')}

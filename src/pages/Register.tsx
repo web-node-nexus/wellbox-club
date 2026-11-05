@@ -7,6 +7,7 @@ import { Crown, User, Phone, Tag, AlertCircle, CheckCircle, Loader2, CreditCard,
 import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP, isAdminMobile } from '../services/otpService';
 import { addInvestment } from '../services/investmentService';
 import { getMembershipByMobileAsync } from '../services/userStore';
+import { BUSINESS_RULES } from '../data/businessRules';
 import PaymentModal from '../components/PaymentModal';
 
 export default function Register() {
@@ -43,8 +44,11 @@ export default function Register() {
       setError('This is the admin number — use Login with OTP.');
       return;
     }
-    if (!formData.investmentAmount || Number(formData.investmentAmount) < 1000) {
-      setError('First installment must be at least ₹1,000');
+    if (
+      !formData.investmentAmount ||
+      Number(formData.investmentAmount) < BUSINESS_RULES.minJoinInvestment
+    ) {
+      setError(`First installment must be at least ₹${BUSINESS_RULES.minJoinInvestment}`);
       return;
     }
 
@@ -274,14 +278,14 @@ export default function Register() {
                       type="number"
                       value={formData.investmentAmount}
                       onChange={e => setFormData({ ...formData, investmentAmount: e.target.value })}
-                      placeholder="Minimum ₹1,000"
-                      min="1000"
+                      placeholder={`Minimum ₹${BUSINESS_RULES.minJoinInvestment}`}
+                      min={BUSINESS_RULES.minJoinInvestment}
                       className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                       required
                     />
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    Minimum ₹1,000 required. This will be locked for 12 months for gold purchase.
+                    Minimum ₹{BUSINESS_RULES.minJoinInvestment} required. Locked for 12 months for gold purchase.
                   </p>
                 </div>
 
