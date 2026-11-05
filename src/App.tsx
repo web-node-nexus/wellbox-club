@@ -16,6 +16,7 @@ import ScrollToTop from './components/ScrollToTop';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import PaymentCallback from './pages/PaymentCallback';
 import About from './pages/About';
 import HowItWorks from './pages/HowItWorks';
 import IncomePlan from './pages/IncomePlan';
@@ -122,6 +123,7 @@ function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/register/:referralCode" element={<Register />} />
+        <Route path="/payment/callback" element={<PaymentCallback />} />
 
         {/* Dashboard Pages */}
         <Route path="/dashboard" element={<ProtectedRoute><SmartRedirect /></ProtectedRoute>} />

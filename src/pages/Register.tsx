@@ -8,6 +8,7 @@ import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clear
 import { addInvestment } from '../services/investmentService';
 import { getMembershipByMobileAsync } from '../services/userStore';
 import { BUSINESS_RULES } from '../data/businessRules';
+import { savePendingPayment } from '../services/paymentPending';
 import PaymentModal from '../components/PaymentModal';
 
 export default function Register() {
@@ -415,7 +416,16 @@ export default function Register() {
                 </div>
 
                 <button
-                  onClick={() => setShowPayment(true)}
+                  onClick={() => {
+                    savePendingPayment({
+                      kind: 'register',
+                      name: formData.name,
+                      mobile: formData.mobile,
+                      referralCode: formData.referralCode,
+                      amount: Number(formData.investmentAmount) || 0,
+                    });
+                    setShowPayment(true);
+                  }}
                   className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg shadow-green-200 flex items-center justify-center gap-2"
                 >
                   <CreditCard className="w-5 h-5" />

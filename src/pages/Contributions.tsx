@@ -17,6 +17,7 @@ import {
   type Investment,
 } from '../services/investmentService';
 import { BUSINESS_RULES } from '../data/businessRules';
+import { savePendingPayment } from '../services/paymentPending';
 
 export default function Contributions() {
   const { user } = useAuth();
@@ -68,6 +69,13 @@ export default function Contributions() {
     }
     setInvestError('');
     setShowInvestModal(false);
+    savePendingPayment({
+      kind: 'invest',
+      userId: user.id,
+      mobile: user.mobile,
+      amount,
+      returnTo: '/contributions',
+    });
     setShowPayment(true);
   };
 

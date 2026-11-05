@@ -10,6 +10,7 @@ import { getMembershipByMobileAsync } from '../services/userStore';
 import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP, isAdminMobile } from '../services/otpService';
 import { addInvestment } from '../services/investmentService';
 import { BUSINESS_RULES } from '../data/businessRules';
+import { savePendingPayment } from '../services/paymentPending';
 import PaymentModal from './PaymentModal';
 
 interface JoinModalProps {
@@ -184,7 +185,21 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     }
   };
 
+  const openRazorpayCheckout = () => {
+    savePendingPayment({
+      kind: 'join',
+      name: formData.name,
+      mobile: formData.mobile,
+      referralCode: formData.referralCode,
+      city: formData.city,
+      role: activeTab,
+      amount: Number(formData.investmentAmount) || 0,
+    });
+    setShowPayment(true);
+  };
+
   const handlePaymentSuccess = (response: any) => {
+    // Demo pay / rare non-redirect path
     setShowPayment(false);
     void finishRegistration(response?.razorpay_payment_id);
   };
@@ -447,7 +462,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                   <button
                     type="button"
                     disabled={Number(formData.investmentAmount) < BUSINESS_RULES.minJoinInvestment}
-                    onClick={() => setShowPayment(true)}
+                    onClick={openRazorpayCheckout}
                     className="w-full py-4 rounded-xl font-semibold bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     <CreditCard className="w-5 h-5" />
