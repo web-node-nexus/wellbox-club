@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, Eye, Crown, UserX, Download, Edit, Trash2, Plus, X, Save, Users as UsersIcon, Shield, TrendingUp, ChevronRight, ChevronDown, Mail, Phone, Calendar, MapPin, Copy, CheckCircle, MoreVertical, Ban, Check, AlertCircle, Loader2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Search, Filter, Eye, Crown, UserX, Download, Edit, Trash2, Plus, X, Save, Users as UsersIcon, Shield, TrendingUp, ChevronRight, ChevronDown, Mail, Phone, Calendar, MapPin, Copy, CheckCircle, MoreVertical, Ban, Check, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '../../context/ToastContext';
 import {
   fetchAllMembers,
@@ -65,23 +65,31 @@ export default function AdminUsers() {
     city: '',
   });
 
-  const loadUsers = async () => {
-    setLoadingUsers(true);
+  const loadUsers = useCallback(async (quiet = false) => {
+    if (!quiet) setLoadingUsers(true);
     try {
       const members = await fetchAllMembers();
       setUsers(members.map(toAdminUser));
     } catch (e: any) {
       console.error(e);
-      showToast('error', e?.message || 'Could not load members from database');
+      if (!quiet) showToast('error', e?.message || 'Could not load members from database');
     } finally {
       setLoadingUsers(false);
     }
-  };
+  }, [showToast]);
 
   useEffect(() => {
     void loadUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void loadUsers(true);
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    const interval = window.setInterval(() => void loadUsers(true), 20000);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.clearInterval(interval);
+    };
+  }, [loadUsers]);
 
   const filteredUsers = users.filter(u => {
     const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase()) || 
@@ -294,8 +302,17 @@ export default function AdminUsers() {
     setExpandedUsers(newExpanded);
   };
 
-  const getReferrals = (userId: string): User[] => {
-    return users.filter(u => u.referredBy === userId);
+  const getReferrals = (sponsor: User): User[] => {
+    const code = (sponsor.referralCode || '').trim().toUpperCase();
+    return users.filter(u => {
+      if (u.id === sponsor.id) return false;
+      const by = (u.referredBy || '').trim();
+      if (!by) return false;
+      return (
+        by === sponsor.id ||
+        (!!code && by.toUpperCase() === code)
+      );
+    });
   };
 
   const exportCSV = () => {
@@ -316,7 +333,7 @@ export default function AdminUsers() {
   };
 
   const ReferralTreeNode = ({ user, level = 0 }: { user: User; level?: number }) => {
-    const referrals = getReferrals(user.id);
+    const referrals = getReferrals(user);
     const isExpanded = expandedUsers.has(user.id);
 
     return (
@@ -394,6 +411,15 @@ export default function AdminUsers() {
           </p>
         </div>
         <div className="flex gap-3">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => void loadUsers()}
+            className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm hover:bg-white/10 transition-colors"
+          >
+            {loadingUsers ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            Refresh
+          </motion.button>
           <motion.button 
             whileHover={{ scale: 1.05 }} 
             whileTap={{ scale: 0.95 }} 

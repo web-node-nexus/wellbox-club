@@ -60,15 +60,19 @@ export function findReferrer(member: RegisteredUser, all = getMembersCache()): R
   );
 }
 
-/** Direct referrals by id OR referral code */
+/** Direct referrals by id OR referral code (referredBy stores sponsor code or id) */
 export function getDirectReferrals(userId: string, all = getMembersCache()) {
   const me = all.find(u => u.id === userId);
-  return all.filter(
-    u =>
-      u.id !== userId &&
-      (u.referredBy === userId ||
-        (!!me?.referralCode && u.referredBy?.toUpperCase() === me.referralCode.toUpperCase()))
-  );
+  const myCode = (me?.referralCode || '').trim().toUpperCase();
+  return all.filter(u => {
+    if (u.id === userId) return false;
+    const by = (u.referredBy || '').trim();
+    if (!by) return false;
+    return (
+      by === userId ||
+      (!!myCode && by.toUpperCase() === myCode)
+    );
+  });
 }
 
 export function getTeamTreeIds(userId: string, all = getMembersCache()): string[] {

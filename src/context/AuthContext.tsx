@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import {
   fetchAllMembers,
   fetchMemberByMobile,
@@ -36,6 +36,8 @@ interface AuthContextType {
   user: RegisteredUser | null;
   authReady: boolean;
   dbError: string | null;
+  /** Bumps when members cache is reloaded — use as React dependency for team lists */
+  membersTick: number;
   /** OTP must already be verified by the caller — passwordless login */
   login: (mobile: string) => Promise<{ success: boolean; message: string }>;
   register: (data: {
@@ -60,11 +62,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<RegisteredUser | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
+  const [membersTick, setMembersTick] = useState(0);
 
-  const refreshUsers = async () => {
+  const bumpMembers = useCallback(() => setMembersTick(t => t + 1), []);
+
+  const refreshUsers = useCallback(async () => {
     try {
       await fetchAllMembers();
       setDbError(null);
+      bumpMembers();
     } catch (e: any) {
       const msg =
         e?.message ||
@@ -73,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setDbError(msg);
       throw e;
     }
-  };
+  }, [bumpMembers]);
 
   useEffect(() => {
     let cancelled = false;
@@ -112,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getAllUsers = (): RegisteredUser[] => getMembersCache();
+  const getAllUsers = useCallback((): RegisteredUser[] => getMembersCache(), []);
 
   const register = async (data: {
     name: string;
@@ -176,8 +182,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
 
       const saved = await upsertMember(newUser);
+      bumpMembers();
       // Grow upline team size / leader eligibility immediately on join
       await refreshUplineTeamSizes(saved).catch(() => undefined);
+      bumpMembers();
       return { success: true, message: 'Registration successful!', user: saved };
     } catch (e: any) {
       return {
@@ -202,6 +210,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           clean = user;
         }
       }
+      // Reload full roster so My Team / admin lists see referrals signed up elsewhere
+      await fetchAllMembers().catch(() => undefined);
+      bumpMembers();
       await fetchInvestmentsForUser(clean.id, m).catch(() => undefined);
       await fetchCommissions().catch(() => undefined);
       await backfillCommissionsFromInvestments().catch(() => undefined);
@@ -305,6 +316,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         authReady,
         dbError,
+        membersTick,
         login,
         register,
         logout,

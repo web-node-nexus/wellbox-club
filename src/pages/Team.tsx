@@ -1,7 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { Users, ChevronRight, Search, Crown, Calendar } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { Users, ChevronRight, Search, Crown, Calendar, RefreshCw, Loader2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { getDirectMembers, getTeamTree } from '../services/incomeService';
 import { getTotalInvested } from '../services/investmentService';
 import { BUSINESS_RULES, formatInr } from '../data/businessRules';
@@ -10,12 +10,38 @@ import type { RegisteredUser } from '../context/AuthContext';
 type TreeNodeData = { user: RegisteredUser; children: TreeNodeData[] };
 
 export default function Team() {
-  const { user, getAllUsers } = useAuth();
+  const { user, getAllUsers, refreshUsers, membersTick } = useAuth();
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [viewingMember, setViewingMember] = useState<RegisteredUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const all = getAllUsers();
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        await refreshUsers();
+      } catch {
+        /* dbError surfaced in banner */
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        void refreshUsers().catch(() => undefined);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      cancelled = true;
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [refreshUsers]);
+
+  const all = useMemo(() => getAllUsers(), [membersTick, getAllUsers]);
 
   const buildTree = (parentId: string): TreeNodeData[] => {
     return getDirectMembers(parentId, all)
@@ -97,13 +123,28 @@ export default function Team() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <Users className="w-7 h-7 text-amber-500" /> My Team
-        </h1>
-        <p className="text-gray-500 mt-1">
-          Direct + downline · Leader at {BUSINESS_RULES.leaderTeamRequirement} members
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <Users className="w-7 h-7 text-amber-500" /> My Team
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Direct + downline · Leader at {BUSINESS_RULES.leaderTeamRequirement} members
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setLoading(true);
+            void refreshUsers()
+              .catch(() => undefined)
+              .finally(() => setLoading(false));
+          }}
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 hover:bg-gray-50"
+        >
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          Refresh
+        </button>
       </div>
 
       <div className="grid sm:grid-cols-3 gap-4">
@@ -136,7 +177,11 @@ export default function Team() {
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-        {tree.length === 0 ? (
+        {loading && tree.length === 0 ? (
+          <div className="flex justify-center py-12 text-gray-400">
+            <Loader2 className="w-6 h-6 animate-spin" />
+          </div>
+        ) : tree.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <p className="font-medium">No referrals yet</p>
             <p className="text-sm mt-1">

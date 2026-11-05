@@ -1,15 +1,41 @@
 import { motion } from 'framer-motion';
-import { Users, Crown, Coins, DollarSign, Wallet, ShoppingBag, TrendingUp, Activity, Bell, ArrowUpRight, ArrowDownRight, Eye, Settings, AlertTriangle, CheckCircle, Clock, Zap, Target, Gift } from 'lucide-react';
-import { users, contributions, walletTransactions, withdrawals, goldLeads, goldOrders } from '../../data/mockData';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { useState } from 'react';
+import { Users, Crown, Coins, DollarSign, Wallet, ShoppingBag, TrendingUp, Activity, Bell, ArrowUpRight, ArrowDownRight, Eye, Settings, AlertTriangle, CheckCircle, Gift } from 'lucide-react';
+import { contributions, walletTransactions, withdrawals, goldLeads, goldOrders } from '../../data/mockData';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { fetchAllMembers } from '../../services/memberDb';
+import type { RegisteredUser } from '../../context/AuthContext';
 
 export default function AdminDashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
-  
-  const totalMembers = users.length;
-  const totalLeaders = users.filter(u => u.isLeader).length;
+  const [dbUsers, setDbUsers] = useState<RegisteredUser[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const members = await fetchAllMembers();
+        if (!cancelled) setDbUsers(members);
+      } catch {
+        /* keep empty — Users page shows DB error toast */
+      }
+    };
+    void load();
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void load();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    const interval = window.setInterval(() => void load(), 20000);
+    return () => {
+      cancelled = true;
+      document.removeEventListener('visibilitychange', onVisible);
+      window.clearInterval(interval);
+    };
+  }, []);
+
+  const totalMembers = dbUsers.length;
+  const totalLeaders = dbUsers.filter(u => u.isLeader || u.role === 'leader' || u.role === 'admin').length;
   const totalContributions = contributions.reduce((sum, c) => sum + c.amount, 0);
   const totalCommissions = walletTransactions.filter(t => t.type.includes('commission') || t.type === 'leader_payout').reduce((sum, t) => sum + t.amount, 0);
   const pendingWithdrawals = withdrawals.filter(w => w.status === 'pending').length;
@@ -17,8 +43,8 @@ export default function AdminDashboard() {
   const totalGoldOrders = goldOrders.length;
 
   const stats = [
-    { label: 'Total Members', value: totalMembers, icon: Users, color: 'from-blue-500 to-cyan-600', change: '+12%', trend: 'up' },
-    { label: 'Active Leaders', value: totalLeaders, icon: Crown, color: 'from-amber-500 to-orange-600', change: '+8%', trend: 'up' },
+    { label: 'Total Members', value: totalMembers, icon: Users, color: 'from-blue-500 to-cyan-600', change: 'Live', trend: 'up' },
+    { label: 'Active Leaders', value: totalLeaders, icon: Crown, color: 'from-amber-500 to-orange-600', change: 'Live', trend: 'up' },
     { label: 'Total Contributions', value: `₹${(totalContributions / 1000).toFixed(0)}K`, icon: Coins, color: 'from-green-500 to-emerald-600', change: '+15%', trend: 'up' },
     { label: 'Commissions Paid', value: `₹${(totalCommissions / 1000).toFixed(0)}K`, icon: DollarSign, color: 'from-purple-500 to-pink-600', change: '+22%', trend: 'up' },
     { label: 'Pending Withdrawals', value: pendingWithdrawals, icon: Wallet, color: 'from-red-500 to-rose-600', change: '-5%', trend: 'down' },
@@ -41,17 +67,28 @@ export default function AdminDashboard() {
     { name: 'Gold Orders', value: 10, color: '#8b5cf6' },
   ];
 
-  const recentActivities = [
-    { id: 1, action: 'New member registered', user: 'Deepak Verma', time: '2 hours ago', icon: Users, color: 'bg-blue-500' },
-    { id: 2, action: 'Withdrawal approved', user: 'Rajesh Kumar', time: '5 hours ago', icon: CheckCircle, color: 'bg-green-500' },
-    { id: 3, action: 'Leader payout processed', user: 'Priya Sharma', time: '1 day ago', icon: Crown, color: 'bg-amber-500' },
-    { id: 4, action: 'Gold order completed', user: 'Amit Patel', time: '2 days ago', icon: ShoppingBag, color: 'bg-purple-500' },
-    { id: 5, action: 'New gold design added', user: 'Admin', time: '3 days ago', icon: Gift, color: 'bg-pink-500' },
-  ];
+  const recentJoins = [...dbUsers]
+    .sort((a, b) => String(b.joinDate).localeCompare(String(a.joinDate)))
+    .slice(0, 5)
+    .map((u, i) => ({
+      id: u.id || String(i),
+      action: 'New member registered',
+      user: `${u.name} · ${u.mobile}`,
+      time: u.joinDate,
+      icon: Users,
+      color: 'bg-blue-500',
+    }));
 
-  const topPerformers = users
-    .filter(u => u.teamSize > 0)
-    .sort((a, b) => b.teamSize - a.teamSize)
+  const recentActivities =
+    recentJoins.length > 0
+      ? recentJoins
+      : [
+          { id: '1', action: 'No new members yet', user: 'Waiting for registrations', time: '—', icon: Users, color: 'bg-blue-500' },
+        ];
+
+  const topPerformers = [...dbUsers]
+    .filter(u => (u.teamSize || 0) > 0)
+    .sort((a, b) => (b.teamSize || 0) - (a.teamSize || 0))
     .slice(0, 5);
 
   return (
@@ -256,7 +293,7 @@ export default function AdminDashboard() {
               <p className="text-xs text-white/60 mt-1">Pending Withdrawals</p>
             </div>
             <div className="bg-white/5 rounded-xl p-4">
-              <p className="text-2xl font-bold text-blue-400">{users.filter(u => !u.isLeader && u.teamSize >= 100).length}</p>
+              <p className="text-2xl font-bold text-blue-400">{dbUsers.filter(u => !u.isLeader && u.role !== 'leader' && u.role !== 'admin' && (u.teamSize || 0) >= 100).length}</p>
               <p className="text-xs text-white/60 mt-1">Ready for Leader Promotion</p>
             </div>
             <div className="bg-white/5 rounded-xl p-4">

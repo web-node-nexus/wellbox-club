@@ -22,14 +22,14 @@ import {
 } from '../services/commissionService';
 
 export default function Dashboard() {
-  const { user, promoteToLeaderIfEligible } = useAuth();
+  const { user, promoteToLeaderIfEligible, refreshUsers, membersTick } = useAuth();
   const { showToast } = useToast();
   const [copied, setCopied] = useState(false);
   const [statsTick, setStatsTick] = useState(0);
 
   const stats = useMemo(
     () => (user ? getDashboardStats(user) : null),
-    [user, statsTick]
+    [user, statsTick, membersTick]
   );
 
   useEffect(() => {
@@ -37,6 +37,7 @@ export default function Dashboard() {
     let cancelled = false;
     (async () => {
       try {
+        await refreshUsers().catch(() => undefined);
         await fetchCommissions(user.id);
         await fetchInvestmentsForUser(user.id, user.mobile).catch(() => undefined);
         const teamIds = getTeamTreeIds(user.id);
@@ -49,7 +50,7 @@ export default function Dashboard() {
     return () => {
       cancelled = true;
     };
-  }, [user]);
+  }, [user, refreshUsers]);
 
   useEffect(() => {
     if (stats) promoteToLeaderIfEligible(stats.teamSize);
