@@ -15,6 +15,7 @@ import {
   isAdminMobile,
   ADMIN_OTP,
 } from '../services/otpService';
+import { fetchMemberByMobile } from '../services/memberDb';
 
 export default function Login() {
   const [mobile, setMobile] = useState('');
@@ -28,6 +29,12 @@ export default function Login() {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
+  const ensureRegisteredMember = async (phone: string) => {
+    if (isAdminMobile(phone)) return true;
+    const member = await fetchMemberByMobile(phone);
+    return Boolean(member);
+  };
+
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -40,6 +47,29 @@ export default function Login() {
     setSendingOTP(true);
 
     try {
+      // Never send OTP for numbers that are not in the members DB
+      try {
+        const exists = await ensureRegisteredMember(mobile);
+        if (!exists) {
+          setError(
+            'This number is not registered. Please Join Now (register + pay), then login.'
+          );
+          return;
+        }
+      } catch (lookupErr: any) {
+        const msg = lookupErr?.message || '';
+        if (/failed to fetch|networkerror|fetch/i.test(msg)) {
+          setError(
+            'Could not reach the server. Check your connection and try again.'
+          );
+        } else if (msg.includes('Could not find the table') || lookupErr?.code === 'PGRST205') {
+          setError('Database tables missing. Contact support.');
+        } else {
+          setError(msg || 'Could not verify membership. Please try again.');
+        }
+        return;
+      }
+
       if (isAdminMobile(mobile)) {
         await sendOTP(mobile);
         showToast('info', `Admin OTP: ${ADMIN_OTP}`, 'Admin Login');
@@ -118,6 +148,14 @@ export default function Login() {
     setOtp('');
     setError('');
     try {
+      const exists = await ensureRegisteredMember(mobile);
+      if (!exists) {
+        setError(
+          'This number is not registered. Please Join Now (register + pay), then login.'
+        );
+        setOtpSent(false);
+        return;
+      }
       if (isAdminMobile(mobile)) {
         await sendOTP(mobile);
         showToast('info', `Admin OTP: ${ADMIN_OTP}`, 'Admin Login');
