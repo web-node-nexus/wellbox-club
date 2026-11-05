@@ -430,7 +430,7 @@ export default function Landing({ onJoinClick }: LandingProps) {
           </motion.div>
 
           {/* Featured Designs Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 mb-12">
             {[
               { name: 'Royal Necklace', weight: '45.5g', purity: '22K', image: designImages['Royal Necklace Set'], category: 'Necklace', desc: 'Exquisite traditional necklace with intricate kundan work.' },
               { name: 'Diamond Ring', weight: '4.8g', purity: '24K', image: designImages['Minimalist Ring'], category: 'Ring', desc: 'Elegant minimalist ring in pure 24K gold.' },

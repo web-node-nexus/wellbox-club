@@ -391,26 +391,35 @@ input[type="number"] { -moz-appearance: textfield; }
   animation: gold-stack 4s ease-in-out infinite;
 }
 
-/* Premium gold card */
+/* Premium gold card — opaque body so hover border never washes out text */
 .gold-card-premium {
   position: relative;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
-  border: 2px solid transparent;
-  background-clip: padding-box;
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  isolation: isolate;
+  background: linear-gradient(145deg, #24143c 0%, #1a0f2e 55%, #201234 100%);
+  border: 1px solid rgba(255, 215, 0, 0.22);
+  transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
 }
 
 .gold-card-premium::before {
   content: '';
   position: absolute;
-  inset: -2px;
+  inset: 0;
   border-radius: inherit;
+  padding: 1.5px;
   background: linear-gradient(135deg, #FFD700, #FFA500, #FFD700, #FF8C00);
   background-size: 300% 300%;
   animation: border-dance 4s ease infinite;
-  z-index: -1;
   opacity: 0;
-  transition: opacity 0.5s;
+  transition: opacity 0.35s;
+  pointer-events: none;
+  z-index: 0;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
 }
 
 .gold-card-premium:hover::before {
@@ -418,11 +427,16 @@ input[type="number"] { -moz-appearance: textfield; }
 }
 
 .gold-card-premium:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 
-    0 20px 60px rgba(255, 215, 0, 0.3),
-    0 0 80px rgba(255, 215, 0, 0.15),
-    inset 0 0 40px rgba(255, 215, 0, 0.05);
+  transform: translateY(-6px);
+  border-color: rgba(255, 215, 0, 0.55);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.35),
+    0 0 28px rgba(255, 215, 0, 0.18);
+}
+
+.gold-card-premium > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Gold text with shimmer */
