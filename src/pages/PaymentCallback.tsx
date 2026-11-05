@@ -78,26 +78,35 @@ export default function PaymentCallback() {
             city: pending.kind === 'join' ? pending.city : undefined,
             role,
           });
-          if (!result.success || !result.user) {
+
+          if (result.success && result.user) {
+            if (role === 'member' && pending.amount > 0) {
+              await addInvestment(
+                result.user.id,
+                pending.amount,
+                payRef,
+                pending.mobile
+              );
+            }
+          } else if (!/already registered/i.test(result.message || '')) {
             throw new Error(result.message || 'Registration failed after payment');
           }
-          if (role === 'member' && pending.amount > 0) {
-            await addInvestment(
-              result.user.id,
-              pending.amount,
-              payRef,
-              pending.mobile
+
+          const logged = await login(pending.mobile);
+          if (!logged.success) {
+            throw new Error(
+              logged.message || 'Payment ok but login failed. Please login with OTP.'
             );
           }
-          await login(pending.mobile);
+
           clearPendingPayment();
           sessionStorage.removeItem('jb_rzp_order_id');
           if (!cancelled) {
             setStatus('ok');
             setMessage('Payment successful! Opening your dashboard…');
-            setTimeout(() => {
-              navigate(role === 'individual' ? '/individual-dashboard' : '/dashboard');
-            }, 1000);
+            window.location.assign(
+              role === 'individual' ? '/individual-dashboard' : '/dashboard'
+            );
           }
           return;
         }

@@ -144,6 +144,13 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     }
   };
 
+  const goDashboard = (role: 'member' | 'leader' | 'individual') => {
+    const path = role === 'individual' ? '/individual-dashboard' : '/dashboard';
+    handleClose();
+    // Hard navigate so dashboard always opens after pay (SPA navigate can miss)
+    window.location.assign(path);
+  };
+
   const finishRegistration = async (paymentId?: string) => {
     setLoading(true);
     try {
@@ -155,7 +162,17 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
         role: activeTab,
       });
 
+      // Already registered (retry after paid) → just login + dashboard
       if (!result.success || !result.user) {
+        const already = /already registered/i.test(result.message || '');
+        if (already) {
+          const logged = await login(formData.mobile);
+          if (logged.success) {
+            setStep('success');
+            goDashboard(activeTab);
+            return;
+          }
+        }
         setErrors({ otp: result.message });
         setLoading(false);
         return;
@@ -173,12 +190,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
       await login(formData.mobile);
       setStep('success');
       setLoading(false);
-
-      setTimeout(() => {
-        handleClose();
-        if (activeTab === 'individual') navigate('/individual-dashboard');
-        else navigate('/dashboard');
-      }, 1500);
+      goDashboard(activeTab);
     } catch (e: any) {
       setErrors({ otp: e?.message || 'Registration failed' });
       setLoading(false);

@@ -139,10 +139,19 @@ export default function Register() {
         );
         await login(formData.mobile);
         setStep('success');
-        setTimeout(() => navigate('/dashboard'), 1500);
-      } else {
-        setError(result.message || 'Registration failed');
+        window.location.assign('/dashboard');
+        return;
       }
+
+      // Paid but number already exists → login and open dashboard
+      if (/already registered/i.test(result.message || '')) {
+        const logged = await login(formData.mobile);
+        if (logged.success) {
+          window.location.assign('/dashboard');
+          return;
+        }
+      }
+      setError(result.message || 'Registration failed');
     } catch (e: any) {
       setError(e?.message || 'Registration failed');
     } finally {
