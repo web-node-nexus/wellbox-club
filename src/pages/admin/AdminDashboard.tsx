@@ -1,22 +1,35 @@
 import { motion } from 'framer-motion';
 import { Users, Crown, Coins, DollarSign, Wallet, ShoppingBag, TrendingUp, Activity, Bell, ArrowUpRight, ArrowDownRight, Eye, Settings, AlertTriangle, CheckCircle, Gift } from 'lucide-react';
-import { contributions, walletTransactions, withdrawals, goldLeads, goldOrders } from '../../data/mockData';
+import { withdrawals, goldLeads, goldOrders } from '../../data/mockData';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchAllMembers } from '../../services/memberDb';
+import { fetchAllInvestments } from '../../services/investmentService';
+import { fetchCommissions } from '../../services/commissionService';
 import type { RegisteredUser } from '../../context/AuthContext';
 
 export default function AdminDashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [dbUsers, setDbUsers] = useState<RegisteredUser[]>([]);
+  const [totalContributions, setTotalContributions] = useState(0);
+  const [totalCommissions, setTotalCommissions] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
       try {
-        const members = await fetchAllMembers();
-        if (!cancelled) setDbUsers(members);
+        const [members, invs, commissions] = await Promise.all([
+          fetchAllMembers(),
+          fetchAllInvestments().catch(() => []),
+          fetchCommissions().catch(() => []),
+        ]);
+        if (cancelled) return;
+        setDbUsers(members);
+        setTotalContributions(invs.reduce((s, i) => s + i.amount, 0));
+        setTotalCommissions(
+          commissions.filter(c => c.status === 'completed').reduce((s, c) => s + c.amount, 0)
+        );
       } catch {
         /* keep empty — Users page shows DB error toast */
       }
@@ -36,8 +49,6 @@ export default function AdminDashboard() {
 
   const totalMembers = dbUsers.length;
   const totalLeaders = dbUsers.filter(u => u.isLeader || u.role === 'leader' || u.role === 'admin').length;
-  const totalContributions = contributions.reduce((sum, c) => sum + c.amount, 0);
-  const totalCommissions = walletTransactions.filter(t => t.type.includes('commission') || t.type === 'leader_payout').reduce((sum, t) => sum + t.amount, 0);
   const pendingWithdrawals = withdrawals.filter(w => w.status === 'pending').length;
   const totalGoldLeads = goldLeads.length;
   const totalGoldOrders = goldOrders.length;
@@ -45,8 +56,8 @@ export default function AdminDashboard() {
   const stats = [
     { label: 'Total Members', value: totalMembers, icon: Users, color: 'from-blue-500 to-cyan-600', change: 'Live', trend: 'up' },
     { label: 'Active Leaders', value: totalLeaders, icon: Crown, color: 'from-amber-500 to-orange-600', change: 'Live', trend: 'up' },
-    { label: 'Total Contributions', value: `₹${(totalContributions / 1000).toFixed(0)}K`, icon: Coins, color: 'from-green-500 to-emerald-600', change: '+15%', trend: 'up' },
-    { label: 'Commissions Paid', value: `₹${(totalCommissions / 1000).toFixed(0)}K`, icon: DollarSign, color: 'from-purple-500 to-pink-600', change: '+22%', trend: 'up' },
+    { label: 'Total Contributions', value: `₹${(totalContributions / 1000).toFixed(0)}K`, icon: Coins, color: 'from-green-500 to-emerald-600', change: 'Live', trend: 'up' },
+    { label: 'Commissions Paid', value: `₹${(totalCommissions / 1000).toFixed(0)}K`, icon: DollarSign, color: 'from-purple-500 to-pink-600', change: 'Live', trend: 'up' },
     { label: 'Pending Withdrawals', value: pendingWithdrawals, icon: Wallet, color: 'from-red-500 to-rose-600', change: '-5%', trend: 'down' },
     { label: 'Gold Orders', value: totalGoldOrders, icon: ShoppingBag, color: 'from-indigo-500 to-violet-600', change: '+18%', trend: 'up' },
   ];

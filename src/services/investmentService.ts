@@ -163,52 +163,75 @@ export async function addInvestment(
   }
 
   // Credit L1 / L2 to upline — resolve investor with real referredBy from cache/DB
+  const { fetchMemberByMobile, rowToUser, upsertMembersCache } = await import('./memberDb');
   let investor = getMembersCache().find(u => u.id === userId);
   if (!investor && m) {
     investor = getMembersCache().find(u => u.mobile === m);
   }
-  if ((!investor || !investor.referredBy) && isSupabaseConfigured) {
+  if ((!investor || !investor.referredBy?.trim()) && isSupabaseConfigured) {
     try {
-      const { data } = await supabase
-        .from('members')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle();
-      if (data) {
-        const { rowToUser, upsertMembersCache } = await import('./memberDb');
-        investor = rowToUser(data as import('../lib/supabase').DbMember);
-        upsertMembersCache(investor);
+      if (m) {
+        const byMobile = await fetchMemberByMobile(m).catch(() => null);
+        if (byMobile) investor = byMobile;
+      }
+      if ((!investor || !investor.referredBy?.trim()) && userId) {
+        const { data } = await supabase.from('members').select('*').eq('id', userId).maybeSingle();
+        if (data) {
+          investor = rowToUser(data as import('../lib/supabase').DbMember);
+          upsertMembersCache(investor);
+        }
       }
     } catch {
       /* fall through */
     }
   }
   if (!investor) {
-    investor = {
-      id: userId,
-      name: 'Member',
-      mobile: m,
-      referralCode: '',
-      referredBy: '',
-      city: '',
-      role: 'member' as const,
-      isLeader: false,
-      teamSize: 0,
-      joinDate: inv.date,
-    };
-  }
-
-  try {
-    await creditReferralCommissionsOnInvestment({
-      investor,
-      amount: saved.amount,
-      investmentId: saved.id,
-    });
-  } catch (e) {
-    console.error('Commission credit failed', e);
+    console.warn('addInvestment: member not found for commission credit', userId, m);
+  } else if (!investor.referredBy?.trim()) {
+    console.warn('addInvestment: member has no referredBy — no L1/L2', investor.mobile);
+  } else {
+    try {
+      await creditReferralCommissionsOnInvestment({
+        investor,
+        amount: saved.amount,
+        investmentId: saved.id,
+      });
+    } catch (e) {
+      // Investment already saved — don't roll back membership payment
+      console.error('Commission credit failed (investment kept)', e);
+    }
   }
 
   return saved;
+}
+
+/** All investments for admin panels */
+export async function fetchAllInvestments(): Promise<Investment[]> {
+  if (!isSupabaseConfigured) {
+    const all: Investment[] = [];
+    byUser.forEach(list => all.push(...list.map(refreshStatus)));
+    return all.sort((a, b) => b.date.localeCompare(a.date));
+  }
+
+  const { data, error } = await supabase
+    .from('investments')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('fetchAllInvestments failed:', error.message);
+    throw error;
+  }
+
+  const list = (data as DbInvestment[]).map(rowToInvestment);
+  const grouped = new Map<string, Investment[]>();
+  list.forEach(inv => {
+    const g = grouped.get(inv.userId) || [];
+    g.push(inv);
+    grouped.set(inv.userId, g);
+  });
+  grouped.forEach((g, id) => setUserInvestments(id, g));
+  return list;
 }
 
 /** Prefetch investments for many users (team income calc) */

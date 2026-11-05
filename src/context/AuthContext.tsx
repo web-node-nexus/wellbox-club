@@ -165,7 +165,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         );
         if (sponsor?.referralCode) referredBy = sponsor.referralCode.toUpperCase();
         else if (sponsor) referredBy = sponsor.id;
-        else referredBy = rawSponsor; // keep code even if sponsor not loaded yet
+        else {
+          // Invalid / unknown code — refuse so orphan referrals don't silently lose L1
+          return {
+            success: false,
+            message: `Referral code "${rawSponsor}" not found. Check the code or leave it blank.`,
+          };
+        }
       }
 
       const newUser: RegisteredUser = {
