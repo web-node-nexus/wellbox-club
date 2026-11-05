@@ -30,6 +30,12 @@ export interface RegisteredUser {
   isLeader: boolean;
   teamSize: number;
   joinDate: string;
+  /** Saved payout details for commission withdrawals */
+  bankName?: string;
+  accountNumber?: string;
+  ifscCode?: string;
+  accountHolder?: string;
+  upiId?: string;
 }
 
 interface AuthContextType {
@@ -52,6 +58,8 @@ interface AuthContextType {
   refreshUsers: () => Promise<void>;
   /** Promote to leader when team hits 100 (leader remains a member too) */
   promoteToLeaderIfEligible: (teamSize: number) => void;
+  /** Persist profile / bank-UPI payout details */
+  updateProfile: (patch: Partial<RegisteredUser>) => Promise<{ success: boolean; message: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -316,6 +324,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(SESSION_KEY, JSON.stringify(updated));
   };
 
+  const updateProfile = async (patch: Partial<RegisteredUser>) => {
+    if (!user) return { success: false, message: 'Not logged in' };
+    try {
+      const saved = await upsertMember({ ...user, ...patch, mobile: user.mobile, id: user.id });
+      setUser(saved);
+      localStorage.setItem(SESSION_KEY, JSON.stringify(saved));
+      bumpMembers();
+      return { success: true, message: 'Profile saved' };
+    } catch (e: any) {
+      return {
+        success: false,
+        message:
+          e?.message?.includes('bank_name') || /column.*does not exist/i.test(e?.message || '')
+            ? 'Payout columns missing. Run supabase/withdrawals_migration.sql in Supabase SQL Editor.'
+            : e?.message || 'Could not save profile',
+      };
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -329,6 +356,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         getAllUsers,
         refreshUsers,
         promoteToLeaderIfEligible,
+        updateProfile,
       }}
     >
       {children}

@@ -19,6 +19,11 @@ export function rowToUser(row: DbMember): RegisteredUser {
     isLeader: Boolean(row.is_leader),
     teamSize: Number(row.team_size) || 0,
     joinDate: row.join_date,
+    bankName: row.bank_name || '',
+    accountNumber: row.account_number || '',
+    ifscCode: row.ifsc_code || '',
+    accountHolder: row.account_holder || '',
+    upiId: row.upi_id || '',
   };
 }
 
@@ -36,6 +41,11 @@ export function userToRow(user: RegisteredUser): DbMember {
     is_leader: user.isLeader || user.role === 'leader' || user.role === 'admin',
     team_size: user.teamSize || 0,
     join_date: user.joinDate,
+    bank_name: user.bankName || '',
+    account_number: user.accountNumber || '',
+    ifsc_code: user.ifscCode || '',
+    account_holder: user.accountHolder || '',
+    upi_id: user.upiId || '',
   };
 }
 

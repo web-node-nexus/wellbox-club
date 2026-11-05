@@ -35,8 +35,31 @@ export type DbMember = {
   is_leader: boolean;
   team_size: number;
   join_date: string;
+  bank_name?: string | null;
+  account_number?: string | null;
+  ifsc_code?: string | null;
+  account_holder?: string | null;
+  upi_id?: string | null;
   created_at?: string;
   updated_at?: string;
+};
+
+export type DbWithdrawal = {
+  id: string;
+  user_id: string;
+  user_mobile: string;
+  amount: number;
+  method: 'bank' | 'upi';
+  status: 'pending' | 'approved' | 'rejected' | 'paid';
+  bank_name: string;
+  account_number: string;
+  ifsc_code: string;
+  account_holder: string;
+  upi_id: string;
+  admin_note: string;
+  razorpay_payout_id: string | null;
+  created_at: string;
+  processed_at: string | null;
 };
 
 export type DbInvestment = {

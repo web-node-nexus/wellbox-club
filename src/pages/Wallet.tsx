@@ -1,7 +1,6 @@
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wallet, ArrowDownRight, ArrowUpRight, Send, CheckCircle, Clock, XCircle, Calendar, CreditCard, Building2, Smartphone, Download, Eye, X, Lock, Unlock, Gem, IndianRupee, AlertCircle, Plus } from 'lucide-react';
-import { withdrawals } from '../data/mockData';
+import { Wallet, ArrowDownRight, ArrowUpRight, Send, CheckCircle, Clock, XCircle, Calendar, CreditCard, Building2, Smartphone, Download, Eye, X, Lock, Unlock, Gem, IndianRupee, AlertCircle, Plus, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
@@ -12,14 +11,20 @@ import {
   getCommissionBalance,
   getCommissionsCache,
 } from '../services/commissionService';
+import {
+  fetchWithdrawals,
+  getAvailableToWithdraw,
+  requestWithdrawal,
+  type WithdrawalRecord,
+} from '../services/withdrawalService';
 import { BUSINESS_RULES } from '../data/businessRules';
 
 export default function WalletPage() {
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const { showToast } = useToast();
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [amount, setAmount] = useState('');
-  const [method, setMethod] = useState('bank');
+  const [method, setMethod] = useState<'bank' | 'upi'>('bank');
   const [bankDetails, setBankDetails] = useState({
     bankName: '',
     accountNumber: '',
@@ -27,19 +32,31 @@ export default function WalletPage() {
     accountHolder: '',
   });
   const [upiId, setUpiId] = useState('');
-  const [showHistory, setShowHistory] = useState(false);
+  const [showHistory, setShowHistory] = useState(true);
   const [viewingTransaction, setViewingTransaction] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'commission' | 'investment'>('commission');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [myWithdrawals, setMyWithdrawals] = useState<WithdrawalRecord[]>([]);
 
   const [ledgerTick, setLedgerTick] = useState(0);
 
   useEffect(() => {
     if (!user) return;
-    fetchCommissions(user.id)
-      .then(() => setLedgerTick(t => t + 1))
-      .catch(() => setLedgerTick(t => t + 1));
+    setBankDetails({
+      bankName: user.bankName || '',
+      accountNumber: user.accountNumber || '',
+      ifscCode: user.ifscCode || '',
+      accountHolder: user.accountHolder || user.name || '',
+    });
+    setUpiId(user.upiId || '');
+    Promise.all([
+      fetchCommissions(user.id).catch(() => undefined),
+      fetchWithdrawals(user.id)
+        .then(setMyWithdrawals)
+        .catch(() => setMyWithdrawals([])),
+    ]).finally(() => setLedgerTick(t => t + 1));
   }, [user]);
 
   if (!user) return null;
@@ -47,16 +64,16 @@ export default function WalletPage() {
   // ledgerTick forces re-read after async fetch fills commission cache
   void ledgerTick;
   const commissionBalance = getCommissionBalance(user.id);
+  const availableToWithdraw = getAvailableToWithdraw(user.id);
   const monthlyInvestments = getInvestments(user.id);
   const totalInvested = getTotalInvested(user.id);
 
   const myTransactions = getCommissionsCache(user.id);
-  const myWithdrawals = withdrawals.filter(w => w.userId === user.id);
 
-  const handleWithdraw = (e: React.FormEvent) => {
+  const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (Number(amount) > commissionBalance) {
-      showToast('error', 'Insufficient commission balance', 'Error');
+    if (Number(amount) > availableToWithdraw) {
+      showToast('error', `Insufficient available balance (₹${availableToWithdraw.toLocaleString()})`, 'Error');
       return;
     }
     if (Number(amount) < 100) {
@@ -72,11 +89,40 @@ export default function WalletPage() {
       return;
     }
 
-    showToast('success', 'Withdrawal request submitted successfully!', 'Success');
-    setShowWithdraw(false);
-    setAmount('');
-    setBankDetails({ bankName: '', accountNumber: '', ifscCode: '', accountHolder: '' });
-    setUpiId('');
+    setSubmitting(true);
+    try {
+      const saved = await requestWithdrawal({
+        user,
+        amount: Number(amount),
+        method,
+        bankName: bankDetails.bankName,
+        accountNumber: bankDetails.accountNumber,
+        ifscCode: bankDetails.ifscCode,
+        accountHolder: bankDetails.accountHolder,
+        upiId,
+      });
+      // Refresh session user with saved payout details
+      await updateProfile({
+        bankName: bankDetails.bankName,
+        accountNumber: bankDetails.accountNumber,
+        ifscCode: bankDetails.ifscCode,
+        accountHolder: bankDetails.accountHolder,
+        upiId,
+      });
+      setMyWithdrawals(prev => [saved, ...prev.filter(w => w.id !== saved.id)]);
+      setLedgerTick(t => t + 1);
+      showToast(
+        'success',
+        'Withdrawal request submitted. Admin will pay to your bank/UPI within 24–48 hours.',
+        'Success'
+      );
+      setShowWithdraw(false);
+      setAmount('');
+    } catch (err: any) {
+      showToast('error', err?.message || 'Could not submit withdrawal', 'Error');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const exportTransactions = () => {
@@ -148,7 +194,10 @@ export default function WalletPage() {
               <span className="text-sm bg-white/20 px-4 py-2 rounded-full backdrop-blur">Withdrawable</span>
             </div>
             <p className="text-sm text-green-100 font-medium">Available Commission Balance</p>
-            <p className="text-5xl font-bold mt-2">₹{commissionBalance.toLocaleString()}</p>
+            <p className="text-5xl font-bold mt-2">₹{availableToWithdraw.toLocaleString()}</p>
+            <p className="text-sm text-green-100 mt-1">
+              Earned ₹{commissionBalance.toLocaleString()} · available after pending withdrawals
+            </p>
             <p className="text-sm text-green-200 mt-3">💰 Withdraw anytime • Min ₹100 • Processed in 24-48 hrs</p>
             
             <div className="mt-4 p-4 bg-white/10 rounded-xl">
@@ -202,18 +251,18 @@ export default function WalletPage() {
                       type="number"
                       value={amount}
                       onChange={e => setAmount(e.target.value)}
-                      max={commissionBalance}
+                      max={availableToWithdraw}
                       min={100}
-                      placeholder={`Min: ₹100 | Max: ₹${commissionBalance.toLocaleString()}`}
+                      placeholder={`Min: ₹100 | Max: ₹${availableToWithdraw.toLocaleString()}`}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                       required
                     />
                     <div className="flex gap-2 mt-2">
-                      {[1000, 5000, 10000, commissionBalance].map(val => (
+                      {[1000, 5000, 10000, availableToWithdraw].filter(v => v > 0).map(val => (
                         <button
                           key={val}
                           type="button"
-                          onClick={() => setAmount(String(Math.min(val, commissionBalance)))}
+                          onClick={() => setAmount(String(Math.min(val, availableToWithdraw)))}
                           className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-medium transition-colors"
                         >
                           ₹{val.toLocaleString()}
@@ -313,9 +362,13 @@ export default function WalletPage() {
                     </motion.div>
                   )}
 
-                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
                     <p className="text-sm text-amber-800">
-                      <strong>Note:</strong> Withdrawal requests are processed within 24-48 hours. Amount will be transferred to your {method === 'bank' ? 'bank account' : 'UPI ID'}.
+                      <strong>Note:</strong> Request goes to admin. After approval, amount is paid to your{' '}
+                      {method === 'bank' ? 'bank account' : 'UPI ID'} (usually 24–48 hours).
+                    </p>
+                    <p className="text-xs text-amber-700">
+                      Razorpay Checkout is used when you pay into the club. Payouts to your account are processed by admin (RazorpayX / bank transfer).
                     </p>
                   </div>
 
@@ -323,14 +376,17 @@ export default function WalletPage() {
                     <button
                       type="button"
                       onClick={() => setShowWithdraw(false)}
+                      disabled={submitting}
                       className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg"
+                      disabled={submitting || availableToWithdraw < 100}
+                      className="flex-1 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
                     >
+                      {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                       Submit Request
                     </button>
                   </div>
@@ -363,16 +419,21 @@ export default function WalletPage() {
                       <p className="font-semibold text-gray-900">₹{w.amount.toLocaleString()}</p>
                       <p className="text-sm text-gray-500">{w.createdAt}</p>
                     </div>
-                    <span className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium ${
-                      w.status === 'approved' ? 'bg-green-100 text-green-700' :
-                      w.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {w.status === 'approved' ? <CheckCircle className="w-3 h-3" /> :
-                       w.status === 'pending' ? <Clock className="w-3 h-3" /> :
-                       <XCircle className="w-3 h-3" />}
-                      {w.status}
-                    </span>
+                    <div className="text-right">
+                      <span className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium ${
+                        w.status === 'paid' || w.status === 'approved' ? 'bg-green-100 text-green-700' :
+                        w.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {w.status === 'paid' || w.status === 'approved' ? <CheckCircle className="w-3 h-3" /> :
+                         w.status === 'pending' ? <Clock className="w-3 h-3" /> :
+                         <XCircle className="w-3 h-3" />}
+                        {w.status}
+                      </span>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {w.method === 'upi' ? w.upiId : `••••${w.accountNumber.slice(-4)}`}
+                      </p>
+                    </div>
                   </motion.div>
                 ))}
               </div>
