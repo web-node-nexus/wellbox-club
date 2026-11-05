@@ -35,6 +35,22 @@ const to91 = (mobile: string) => `91${to10Digit(mobile)}`;
 
 export const isAdminMobile = (mobile: string) => to10Digit(mobile) === ADMIN_MOBILE;
 
+/** Offline/admin bootstrap when Supabase is unreachable on production */
+export const ADMIN_FALLBACK_USER = {
+  id: '1',
+  name: 'Admin User',
+  mobile: ADMIN_MOBILE,
+  email: 'admin@jwellbox.com',
+  phone: `+91 ${ADMIN_MOBILE}`,
+  referralCode: 'ADMIN001',
+  referredBy: '',
+  city: '',
+  role: 'admin' as const,
+  isLeader: true,
+  teamSize: 0,
+  joinDate: '2023-01-01',
+};
+
 export const sendOTP = async (mobile: string): Promise<OTPResponse> => {
   const phone = to10Digit(mobile);
 

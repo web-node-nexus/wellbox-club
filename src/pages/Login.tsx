@@ -68,15 +68,25 @@ export default function Login() {
 
     try {
       let verified = false;
-      try {
-        await verifyOTP(mobile, otp);
-        verified = true;
-      } catch {
-        verified = verifyDemoOTP(mobile, otp);
+
+      // Admin: never hit 2Factor / network for OTP check
+      if (isAdminMobile(mobile)) {
+        verified = otp === ADMIN_OTP;
+      } else {
+        try {
+          await verifyOTP(mobile, otp);
+          verified = true;
+        } catch {
+          verified = verifyDemoOTP(mobile, otp);
+        }
       }
 
       if (!verified) {
-        setError('Invalid OTP. Please try again.');
+        setError(
+          isAdminMobile(mobile)
+            ? `Invalid admin OTP. Use ${ADMIN_OTP}`
+            : 'Invalid OTP. Please try again.'
+        );
         setLoading(false);
         return;
       }
@@ -97,8 +107,8 @@ export default function Login() {
             'OTP verified, but membership not found. Use Join Now to continue.'
         );
       }
-    } catch {
-      setError('Verification failed. Please try again.');
+    } catch (err: any) {
+      setError(err?.message || 'Verification failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -189,7 +199,9 @@ export default function Login() {
               <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
                 <p className="text-sm text-green-700 flex items-center gap-2">
                   <CheckCircle className="w-4 h-4" />
-                  OTP sent to +91 {mobile}
+                  {isAdminMobile(mobile)
+                    ? `Admin login — OTP is ${ADMIN_OTP}`
+                    : `OTP sent to +91 ${mobile}`}
                 </p>
               </div>
 

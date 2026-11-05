@@ -15,6 +15,7 @@ import {
   refreshUplineTeamSizes,
   syncLeaderPayout,
 } from '../services/commissionService';
+import { ADMIN_FALLBACK_USER, isAdminMobile } from '../services/otpService';
 
 export interface RegisteredUser {
   id: string;
@@ -192,17 +193,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (mobile: string) => {
     const m = normalizeMobile(mobile);
 
-    try {
-      const found = await fetchMemberByMobile(m);
-      if (!found) {
-        return {
-          success: false,
-          message:
-            'Is number ka membership Supabase me nahi mila. Pehle Join Now se register + pay karo — phir kisi bhi browser se login chalega.',
-        };
+    const finishLogin = async (user: RegisteredUser, soft = false) => {
+      let clean = user;
+      if (!soft) {
+        try {
+          clean = await upsertMember(user);
+        } catch {
+          clean = user;
+        }
       }
-
-      const clean = await upsertMember(found);
       await fetchInvestmentsForUser(clean.id, m).catch(() => undefined);
       await fetchCommissions().catch(() => undefined);
       await backfillCommissionsFromInvestments().catch(() => undefined);
@@ -210,18 +209,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const teamIds = getTeamTreeIds(clean.id);
       await fetchInvestmentsForUsers([clean.id, ...teamIds]).catch(() => undefined);
       await syncLeaderPayout(clean).catch(() => undefined);
-      // refresh user in case team/leader fields updated
-      const refreshed = (await fetchMemberByMobile(m)) || clean;
+      const refreshed = soft
+        ? clean
+        : (await fetchMemberByMobile(m).catch(() => null)) || clean;
       setUser(refreshed);
       localStorage.setItem(SESSION_KEY, JSON.stringify(refreshed));
-      return { success: true, message: 'Login successful!' };
+      return { success: true as const, message: 'Login successful!' };
+    };
+
+    try {
+      let found: RegisteredUser | null = null;
+      try {
+        found = await fetchMemberByMobile(m);
+      } catch (lookupErr: any) {
+        // Production often fails if Vercel env missing — admin can still enter
+        if (isAdminMobile(m)) {
+          return finishLogin({ ...ADMIN_FALLBACK_USER }, true);
+        }
+        const msg = lookupErr?.message || '';
+        if (/failed to fetch|networkerror|fetch/i.test(msg)) {
+          return {
+            success: false,
+            message:
+              'Server se connect nahi ho paya. Vercel pe VITE_SUPABASE_URL aur VITE_SUPABASE_ANON_KEY set karke redeploy karo.',
+          };
+        }
+        throw lookupErr;
+      }
+
+      if (!found) {
+        if (isAdminMobile(m)) {
+          // Ensure admin row exists when DB is reachable but empty
+          try {
+            const seeded = await upsertMember({ ...ADMIN_FALLBACK_USER });
+            return finishLogin(seeded);
+          } catch {
+            return finishLogin({ ...ADMIN_FALLBACK_USER }, true);
+          }
+        }
+        return {
+          success: false,
+          message:
+            'Is number ka membership Supabase me nahi mila. Pehle Join Now se register + pay karo — phir kisi bhi browser se login chalega.',
+        };
+      }
+
+      return finishLogin(found);
     } catch (e: any) {
+      if (isAdminMobile(m)) {
+        return finishLogin({ ...ADMIN_FALLBACK_USER }, true);
+      }
       return {
         success: false,
         message:
           e?.message?.includes('Could not find the table') || e?.code === 'PGRST205'
             ? 'Database tables missing. Supabase SQL Editor me supabase/schema.sql run karo.'
-            : e?.message || 'Login failed. Please try again.',
+            : /failed to fetch/i.test(e?.message || '')
+              ? 'Server se connect nahi ho paya. Vercel env me Supabase keys check karo.'
+              : e?.message || 'Login failed. Please try again.',
       };
     }
   };
