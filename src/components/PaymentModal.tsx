@@ -24,7 +24,7 @@ export default function PaymentModal({
   amount,
   description,
   guest,
-  allowDemoPay = true,
+  allowDemoPay = false,
   onSuccess,
   onFailure,
 }: PaymentModalProps) {
@@ -82,20 +82,30 @@ export default function PaymentModal({
         onSuccess: (response) => {
           completeSuccess(response);
         },
-        onFailure: (error) => {
+        onFailure: (error: any) => {
           console.error('Payment failed:', error);
           setPaymentStatus('failure');
           setIsProcessing(false);
-          showToast('error', 'Payment failed. Please try again.', 'Error');
+          const msg =
+            error?.message ||
+            error?.description ||
+            'Payment failed. Please try again.';
+          showToast('error', msg, 'Error');
           onFailure?.(error);
         },
       });
+      // Checkout is open — keep idle UI; success comes via handler
       setIsProcessing(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Payment error:', error);
       setPaymentStatus('failure');
       setIsProcessing(false);
-      showToast('error', 'Failed to initiate payment. Please try again.', 'Error');
+      showToast(
+        'error',
+        error?.message ||
+          'Failed to start payment. Check Razorpay server keys on Vercel.',
+        'Error'
+      );
     }
   };
 
