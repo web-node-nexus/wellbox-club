@@ -48,5 +48,32 @@ For testing:
 2Factor API Key: 36a45c11-c185-11f1-af74-0200cd936042
 Razorpay Key: rzp_test_Ttz1VV7B9WjAtO
 
+## OTP auto-fill on mobile (important)
+
+Browser **cannot** read every SMS. Auto-fill needs the SMS format + correct domain.
+
+### 1) Update 2Factor SMS template (`OTP1` or new template)
+
+In [2Factor dashboard](https://2factor.in) → SMS templates, set body like:
+
+```text
+Your Jewellbox Club OTP is {otp}. Do not share it.
+
+@jewellbox.cloud #{otp}
+```
+
+- Last line must be exactly: `@` + your live domain + space + `#` + OTP  
+- Use the domain users actually open (example: `jewellbox.cloud`) — **no** `https://`  
+- If you open `www.jewellbox.cloud`, last line must use `www.jewellbox.cloud`  
+- After DLT / template approval, set `VITE_TWOFACTOR_SMS_TEMPLATE` to that template name on Vercel
+
+### 2) What users will see
+
+| Phone | Behaviour |
+|--------|-----------|
+| iPhone Safari | OTP bar above keyboard → tap to fill |
+| Android Chrome | Auto-fills if SMS has `@domain #otp` line |
+| Other browsers | Usually manual entry |
+
 ## Build Status
 ✅ Build successful

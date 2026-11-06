@@ -331,6 +331,7 @@ export default function Register() {
                 exit={{ opacity: 0, x: 20 }}
                 onSubmit={handleVerifyOTP}
                 className="space-y-4"
+                autoComplete="one-time-code"
               >
                 <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
                   <p className="text-sm text-green-700 flex items-center gap-2">

@@ -389,7 +389,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
               )}
 
               {step === 'otp' && (
-                <motion.form initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} onSubmit={handleVerifyOTP} className="space-y-4">
+                <motion.form initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} onSubmit={handleVerifyOTP} className="space-y-4" autoComplete="one-time-code">
                   <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
                     <p className="text-sm text-green-300 flex items-center gap-2">
                       <CheckCircle className="w-4 h-4" />
