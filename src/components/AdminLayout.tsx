@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,14 +7,31 @@ import {
   Menu, X, LogOut, Gem, Settings, FileText, BarChart3,
   Shield, Activity, ShoppingBag, Bell
 } from 'lucide-react';
+import {
+  countUnreadAdmin,
+  requestBrowserNotificationPermission,
+} from '../services/notificationService';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unread, setUnread] = useState(0);
+
+  const refreshUnread = useCallback(() => {
+    void countUnreadAdmin().then(setUnread).catch(() => setUnread(0));
+  }, []);
+
+  useEffect(() => {
+    refreshUnread();
+    const t = window.setInterval(refreshUnread, 20000);
+    void requestBrowserNotificationPermission();
+    return () => window.clearInterval(t);
+  }, [refreshUnread, location.pathname]);
 
   const navItems = [
     { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/admin/notifications', label: 'Notifications', icon: Bell },
     { path: '/admin/users', label: 'Users', icon: Users },
     { path: '/admin/contributions', label: 'Contributions', icon: Coins },
     { path: '/admin/commissions', label: 'Commissions', icon: DollarSign },
@@ -30,7 +47,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Mobile overlay */}
       <AnimatePresence>
         {sidebarOpen && (
           <motion.div
@@ -43,10 +59,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         )}
       </AnimatePresence>
 
-      {/* Sidebar - Fixed position */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-72 h-screen overflow-hidden bg-gradient-to-b from-slate-900 via-purple-950 to-slate-900 border-r border-amber-500/10 transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="flex flex-col h-full">
-          {/* Logo */}
           <div className="p-4 border-b border-amber-500/10">
             <Link to="/admin" className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
@@ -59,7 +73,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </Link>
           </div>
 
-          {/* User Info */}
           <div className="p-3 mx-3 mt-3 bg-amber-500/5 border border-amber-500/10 rounded-xl">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-purple-900 font-bold">
@@ -74,10 +87,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 p-2 mt-2 space-y-0.5 overflow-hidden">
+          <nav className="flex-1 p-2 mt-2 space-y-0.5 overflow-y-auto">
             {navItems.map(item => {
               const isActive = location.pathname === item.path;
+              const showBadge = item.path === '/admin/notifications' && unread > 0;
               return (
                 <Link
                   key={item.path}
@@ -91,13 +104,17 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 >
                   <item.icon className={`w-4 h-4 ${isActive ? 'text-amber-400' : ''}`} />
                   <span className="flex-1 text-xs">{item.label}</span>
-                  {isActive && <div className="w-1.5 h-1.5 bg-amber-400 rounded-full" />}
+                  {showBadge && (
+                    <span className="min-w-[1.25rem] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                      {unread > 99 ? '99+' : unread}
+                    </span>
+                  )}
+                  {isActive && !showBadge && <div className="w-1.5 h-1.5 bg-amber-400 rounded-full" />}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Logout */}
           <div className="p-2 border-t border-amber-500/10">
             <button
               onClick={logout}
@@ -110,9 +127,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      {/* Main Content - With left margin for sidebar */}
       <div className="lg:ml-72 min-h-screen flex flex-col">
-        {/* Top Bar */}
         <header className="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-xl border-b border-amber-500/10 px-4 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <button
@@ -122,10 +137,18 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               {sidebarOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
             </button>
             <div className="flex items-center gap-4 ml-auto">
-              <button className="p-2 rounded-xl hover:bg-white/10 transition-colors relative">
+              <Link
+                to="/admin/notifications"
+                className="p-2 rounded-xl hover:bg-white/10 transition-colors relative"
+                title="Notifications"
+              >
                 <Bell className="w-5 h-5 text-white/70" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-              </button>
+                {unread > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[1.1rem] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                    {unread > 9 ? '9+' : unread}
+                  </span>
+                )}
+              </Link>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-purple-900 text-sm font-bold">
                   {user?.name.charAt(0)}
@@ -135,7 +158,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        {/* Page Content */}
         <main className="flex-1 p-4 lg:p-8">
           <motion.div
             initial={{ opacity: 0, y: 10 }}

@@ -197,6 +197,17 @@ export async function requestWithdrawal(params: {
 
   const saved = rowToWithdrawal(data as DbWithdrawal);
   cache = [saved, ...cache.filter(w => w.id !== saved.id)];
+  try {
+    const { notifyAdmin } = await import('./notificationService');
+    await notifyAdmin({
+      type: 'withdrawal',
+      title: 'Withdrawal request',
+      message: `${params.user.name} requested ₹${saved.amount.toLocaleString()} via ${saved.method}`,
+      meta: { withdrawalId: saved.id, userId: saved.userId, amount: saved.amount },
+    });
+  } catch {
+    /* non-blocking */
+  }
   return saved;
 }
 

@@ -56,6 +56,7 @@ import AdminSettings from './pages/admin/AdminSettings';
 import AdminCMS from './pages/admin/AdminCMS';
 import AdminReports from './pages/admin/AdminReports';
 import AdminAuditLogs from './pages/admin/AdminAuditLogs';
+import AdminNotifications from './pages/admin/AdminNotifications';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -143,6 +144,7 @@ function AppRoutes() {
 
         {/* Admin Pages */}
         <Route path="/admin" element={<AdminRoute><AdminLayout><AdminDashboard /></AdminLayout></AdminRoute>} />
+        <Route path="/admin/notifications" element={<AdminRoute><AdminLayout><AdminNotifications /></AdminLayout></AdminRoute>} />
         <Route path="/admin/users" element={<AdminRoute><AdminLayout><AdminUsers /></AdminLayout></AdminRoute>} />
         <Route path="/admin/contributions" element={<AdminRoute><AdminLayout><AdminContributions /></AdminLayout></AdminRoute>} />
         <Route path="/admin/commissions" element={<AdminRoute><AdminLayout><AdminCommissions /></AdminLayout></AdminRoute>} />

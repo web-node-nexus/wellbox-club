@@ -1,30 +1,99 @@
+import { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, DollarSign, Crown, Gift, Info, Users, CheckCircle, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import {
+  Bell,
+  DollarSign,
+  Crown,
+  Gift,
+  Info,
+  Users,
+  CheckCircle,
+  Trash2,
+  Coins,
+  Loader2,
+} from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
+import {
+  AppNotification,
+  deleteNotification,
+  fetchUserNotifications,
+  formatNotificationTime,
+  markAllUserNotificationsRead,
+  markNotificationRead,
+} from '../services/notificationService';
+
+const iconFor = (type: string) => {
+  switch (type) {
+    case 'commission':
+      return { Icon: DollarSign, color: 'text-green-400' };
+    case 'member_joined':
+    case 'info':
+      return type === 'member_joined'
+        ? { Icon: Users, color: 'text-blue-400' }
+        : { Icon: Info, color: 'text-indigo-400' };
+    case 'investment':
+      return { Icon: Coins, color: 'text-amber-400' };
+    case 'gold_order':
+      return { Icon: Gift, color: 'text-purple-400' };
+    default:
+      return { Icon: Crown, color: 'text-amber-400' };
+  }
+};
 
 export default function Notifications() {
+  const { user } = useAuth();
   const { showToast } = useToast();
-  const [notifications, setNotifications] = useState([
-    { id: 1, type: 'commission', title: 'Commission Credited', message: '₹500 Level 1 commission from Priya Sharma', time: '2 hours ago', icon: DollarSign, color: 'text-green-400', read: false },
-    { id: 2, type: 'leader', title: 'Leader Payout', message: 'Monthly leader payout of ₹1,800 credited', time: '3 days ago', icon: Crown, color: 'text-amber-400', read: false },
-    { id: 3, type: 'gold', title: 'Gold Order Bonus', message: '₹450 commission from gold order', time: '1 week ago', icon: Gift, color: 'text-purple-400', read: true },
-    { id: 4, type: 'team', title: 'New Team Member', message: 'Amit Patel joined your team', time: '1 week ago', icon: Users, color: 'text-blue-400', read: true },
-    { id: 5, type: 'info', title: 'Welcome to Jewellbox', message: 'Your account has been created successfully', time: '2 weeks ago', icon: Info, color: 'text-indigo-400', read: true },
-  ]);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const markAsRead = (id: number) => {
-    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
+  const load = useCallback(async () => {
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const list = await fetchUserNotifications(user.id);
+      setNotifications(list);
+    } catch (e: any) {
+      showToast('error', e?.message || 'Could not load notifications', 'Error');
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.id, showToast]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const markAsRead = async (id: string) => {
+    try {
+      await markNotificationRead(id);
+      setNotifications(prev => prev.map(n => (n.id === id ? { ...n, read: true } : n)));
+    } catch (e: any) {
+      showToast('error', e?.message || 'Failed', 'Error');
+    }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
-    showToast('success', 'All notifications marked as read', 'Success');
+  const markAllAsRead = async () => {
+    if (!user?.id) return;
+    try {
+      await markAllUserNotificationsRead(user.id);
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      showToast('success', 'All notifications marked as read', 'Success');
+    } catch (e: any) {
+      showToast('error', e?.message || 'Failed', 'Error');
+    }
   };
 
-  const deleteNotification = (id: number) => {
-    setNotifications(notifications.filter(n => n.id !== id));
-    showToast('success', 'Notification deleted', 'Deleted');
+  const removeNotification = async (id: string) => {
+    try {
+      await deleteNotification(id);
+      setNotifications(prev => prev.filter(n => n.id !== id));
+      showToast('success', 'Notification deleted', 'Deleted');
+    } catch (e: any) {
+      showToast('error', e?.message || 'Failed', 'Error');
+    }
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -40,7 +109,7 @@ export default function Notifications() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={markAllAsRead}
+            onClick={() => void markAllAsRead()}
             className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm hover:bg-white/10 transition-colors"
           >
             <CheckCircle className="w-4 h-4" />
@@ -49,9 +118,12 @@ export default function Notifications() {
         )}
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 gap-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"
+        >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
               <Bell className="w-5 h-5 text-red-600" />
@@ -62,7 +134,12 @@ export default function Notifications() {
             </div>
           </div>
         </motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"
+        >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
               <CheckCircle className="w-5 h-5 text-blue-600" />
@@ -75,54 +152,68 @@ export default function Notifications() {
         </motion.div>
       </div>
 
-      {/* Notifications List */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        {notifications.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-16 text-gray-400">
+            <Loader2 className="w-8 h-8 animate-spin" />
+          </div>
+        ) : notifications.length === 0 ? (
           <div className="text-center py-12">
             <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500">No notifications yet</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
-            {notifications.map(notif => (
-              <motion.div
-                key={notif.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className={`flex items-start gap-4 p-4 hover:bg-gray-50 transition-colors ${!notif.read ? 'bg-blue-50/50' : ''}`}
-              >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${!notif.read ? 'bg-blue-100' : 'bg-gray-100'}`}>
-                  <notif.icon className={`w-5 h-5 ${notif.color}`} />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <p className="font-medium text-sm text-gray-900">{notif.title}</p>
-                      <p className="text-sm text-gray-600 mt-0.5">{notif.message}</p>
-                      <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {!notif.read && (
+            {notifications.map(notif => {
+              const { Icon, color } = iconFor(notif.type);
+              return (
+                <motion.div
+                  key={notif.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className={`flex items-start gap-4 p-4 hover:bg-gray-50 transition-colors ${
+                    !notif.read ? 'bg-blue-50/50' : ''
+                  }`}
+                >
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      !notif.read ? 'bg-blue-100' : 'bg-gray-100'
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 ${color}`} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-medium text-sm text-gray-900">{notif.title}</p>
+                        <p className="text-sm text-gray-600 mt-0.5">{notif.message}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {formatNotificationTime(notif.createdAt)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {!notif.read && (
+                          <button
+                            onClick={() => void markAsRead(notif.id)}
+                            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                            title="Mark as read"
+                          >
+                            <CheckCircle className="w-4 h-4 text-blue-600" />
+                          </button>
+                        )}
                         <button
-                          onClick={() => markAsRead(notif.id)}
-                          className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Mark as read"
+                          onClick={() => void removeNotification(notif.id)}
+                          className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete"
                         >
-                          <CheckCircle className="w-4 h-4 text-blue-600" />
+                          <Trash2 className="w-4 h-4 text-red-600" />
                         </button>
-                      )}
-                      <button
-                        onClick={() => deleteNotification(notif.id)}
-                        className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </div>

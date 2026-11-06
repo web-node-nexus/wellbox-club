@@ -183,6 +183,17 @@ export default function AdminUsers() {
           return [...withoutDup, adminRow];
         });
         showToast('success', `Member added. They can login with mobile ${mobile} + OTP`);
+        try {
+          const { notifyAdmin } = await import('../../services/notificationService');
+          await notifyAdmin({
+            type: 'member_joined',
+            title: 'Member added by admin',
+            message: `${saved.name} (${saved.mobile}) was added as ${saved.role}`,
+            meta: { userId: saved.id, mobile: saved.mobile, role: saved.role, source: 'admin' },
+          });
+        } catch {
+          /* non-blocking */
+        }
       }
       setShowModal(false);
       await loadUsers();

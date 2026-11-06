@@ -200,6 +200,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Grow upline team size / leader eligibility immediately on join
       await refreshUplineTeamSizes(saved).catch(() => undefined);
       bumpMembers();
+      try {
+        const { notifyAdmin, notifyUser } = await import('../services/notificationService');
+        await notifyAdmin({
+          type: 'member_joined',
+          title: 'New member joined',
+          message: `${saved.name} (${saved.mobile}) joined as ${saved.role}`,
+          meta: { userId: saved.id, mobile: saved.mobile, role: saved.role },
+        });
+        await notifyUser(saved.id, {
+          type: 'info',
+          title: 'Welcome to Jewellbox Club',
+          message: 'Your account was created successfully.',
+          meta: { role: saved.role },
+        });
+      } catch {
+        /* non-blocking */
+      }
       return { success: true, message: 'Registration successful!', user: saved };
     } catch (e: any) {
       return {

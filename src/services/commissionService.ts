@@ -187,11 +187,41 @@ export async function addCommission(input: {
     }
     const saved = rowToCommission(data as DbCommission);
     cache = [saved, ...cache.filter(c => c.id !== saved.id)];
+    void notifyCommissionCreated(saved);
     return saved;
   }
 
   cache = [rec, ...cache];
+  void notifyCommissionCreated(rec);
   return rec;
+}
+
+async function notifyCommissionCreated(saved: CommissionRecord) {
+  try {
+    const { notifyAdmin, notifyUser } = await import('./notificationService');
+    const label =
+      saved.type === 'commission_l1'
+        ? 'Level 1'
+        : saved.type === 'commission_l2'
+          ? 'Level 2'
+          : saved.type === 'leader_payout'
+            ? 'Leader payout'
+            : 'Gold order';
+    await notifyAdmin({
+      type: 'commission',
+      title: `${label} commission`,
+      message: `₹${saved.amount.toLocaleString()} — ${saved.description || saved.type}`,
+      meta: { commissionId: saved.id, userId: saved.userId, type: saved.type },
+    });
+    await notifyUser(saved.userId, {
+      type: 'commission',
+      title: 'Commission credited',
+      message: `₹${saved.amount.toLocaleString()} ${label} — ${saved.description || 'credited to wallet'}`,
+      meta: { commissionId: saved.id, type: saved.type },
+    });
+  } catch {
+    /* non-blocking */
+  }
 }
 
 export function getCommissionBalance(userId: string) {

@@ -202,6 +202,25 @@ export async function addInvestment(
     }
   }
 
+  try {
+    const { notifyAdmin, notifyUser } = await import('./notificationService');
+    const who = investor?.name || m || userId;
+    await notifyAdmin({
+      type: 'investment',
+      title: 'New investment',
+      message: `${who} invested ₹${saved.amount.toLocaleString()}`,
+      meta: { investmentId: saved.id, userId, amount: saved.amount, paymentId: paymentId || null },
+    });
+    await notifyUser(userId, {
+      type: 'investment',
+      title: 'Investment locked',
+      message: `₹${saved.amount.toLocaleString()} locked for 12 months`,
+      meta: { investmentId: saved.id },
+    });
+  } catch {
+    /* non-blocking */
+  }
+
   return saved;
 }
 
@@ -364,6 +383,21 @@ export async function saveGoldOrder(order: GoldOrderRecord) {
   if (error) {
     console.error('Supabase saveGoldOrder failed:', error.message);
     throw error;
+  }
+
+  // Notify admin only for new/pending orders (avoid spam on status updates)
+  if (order.status === 'pending') {
+    try {
+      const { notifyAdmin } = await import('./notificationService');
+      await notifyAdmin({
+        type: 'gold_order',
+        title: 'Gold order',
+        message: `${order.userName} ordered ${order.designName} (₹${Number(order.amount).toLocaleString()})`,
+        meta: { orderId: order.id, userId: order.userId, status: order.status },
+      });
+    } catch {
+      /* non-blocking */
+    }
   }
 }
 
