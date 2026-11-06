@@ -53,7 +53,8 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     if ((activeTab === 'leader' || activeTab === 'individual') && !formData.city.trim()) {
       newErrors.city = 'City is required';
     }
-    if (activeTab === 'member') {
+    // Member + Leader must pay first investment (same as members)
+    if (activeTab === 'member' || activeTab === 'leader') {
       const amt = Number(formData.investmentAmount);
       if (!amt || amt < BUSINESS_RULES.minJoinInvestment) {
         newErrors.investmentAmount = `Minimum first investment is ₹${BUSINESS_RULES.minJoinInvestment}`;
@@ -139,14 +140,14 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
 
       clearDemoOTP(formData.mobile);
 
-      // Members must pay before becoming a member
-      if (activeTab === 'member') {
+      // Member + Leader must pay before account is created
+      if (activeTab === 'member' || activeTab === 'leader') {
         setStep('payment');
         setLoading(false);
         return;
       }
 
-      // Leader / buyer: register after OTP
+      // Buyer only: register after OTP (no investment)
       finishRegistration();
     } catch {
       setErrors({ otp: 'Verification failed. Please try again.' });
@@ -188,7 +189,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
         return;
       }
 
-      if (activeTab === 'member') {
+      if (activeTab === 'member' || activeTab === 'leader') {
         await addInvestment(
           result.user.id,
           Number(formData.investmentAmount),
@@ -331,7 +332,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                     {errors.mobile && <p className="text-xs text-red-400 mt-1">{errors.mobile}</p>}
                   </div>
 
-                  {activeTab === 'member' && (
+                  {(activeTab === 'member' || activeTab === 'leader') && (
                     <div>
                       <label className="block text-xs font-medium text-white/60 mb-1.5">First Investment (₹) *</label>
                       <div className="relative">
@@ -347,6 +348,9 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                       </div>
                       {errors.investmentAmount && <p className="text-xs text-red-400 mt-1">{errors.investmentAmount}</p>}
                       <p className="text-[11px] text-amber-300/70 mt-1.5">
+                        {activeTab === 'leader'
+                          ? 'Leaders must join as investing members first. '
+                          : ''}
                         Min ₹{BUSINESS_RULES.minJoinInvestment}, no maximum. Locks 12 months — then redeem as gold. Withdraw only level income.
                       </p>
                     </div>
@@ -363,7 +367,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                     </div>
                   )}
 
-                  {activeTab === 'member' && (
+                  {(activeTab === 'member' || activeTab === 'leader') && (
                     <div>
                       <label className="block text-xs font-medium text-white/60 mb-1.5">Referral Code (Optional)</label>
                       <div className="relative">
@@ -444,7 +448,9 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                       <>
                         <CheckCircle className="w-5 h-5" />
-                        {activeTab === 'member' ? 'Verify & Continue to Pay' : 'Verify & Join'}
+                        {activeTab === 'member' || activeTab === 'leader'
+                          ? 'Verify & Continue to Pay'
+                          : 'Verify & Join'}
                       </>
                     )}
                   </motion.button>
@@ -463,9 +469,13 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
               {step === 'payment' && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
                   <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
-                    <p className="text-sm text-amber-200 font-semibold mb-1">Payment required to become a member</p>
+                    <p className="text-sm text-amber-200 font-semibold mb-1">
+                      {activeTab === 'leader'
+                        ? 'Payment required — leaders join as investing members first'
+                        : 'Payment required to become a member'}
+                    </p>
                     <p className="text-xs text-amber-200/70">
-                      Without this payment you will not be registered as a member. Amount is held 12 months for gold redemption.
+                      Without this payment you will not be registered. Amount is held 12 months for gold redemption.
                     </p>
                   </div>
 
@@ -515,7 +525,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                     <ArrowLeft className="w-4 h-4" /> Back
                   </button>
                   <p className="text-center text-[11px] text-red-300/80">
-                    Closing without payment = you will NOT become a member.
+                    Closing without payment = you will NOT be registered.
                   </p>
                 </motion.div>
               )}
@@ -532,7 +542,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                   </motion.div>
                   <h3 className="text-xl font-bold text-white mb-2">Welcome to Jewellbox Club!</h3>
                   <p className="text-sm text-white/60 mb-2">
-                    {activeTab === 'member'
+                    {activeTab === 'member' || activeTab === 'leader'
                       ? `₹${Number(formData.investmentAmount).toLocaleString()} invested — opening your dashboard…`
                       : 'Redirecting…'}
                   </p>

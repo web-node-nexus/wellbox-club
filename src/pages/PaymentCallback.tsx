@@ -80,7 +80,7 @@ export default function PaymentCallback() {
           });
 
           if (result.success && result.user) {
-            if (role === 'member' && pending.amount > 0) {
+            if ((role === 'member' || role === 'leader') && pending.amount > 0) {
               await addInvestment(
                 result.user.id,
                 pending.amount,
