@@ -11,6 +11,7 @@ import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clear
 import { addInvestment } from '../services/investmentService';
 import { BUSINESS_RULES } from '../data/businessRules';
 import { clearPendingPayment, savePendingPayment } from '../services/paymentPending';
+import { otpInputProps, useSmsOtpAutofill } from '../hooks/useSmsOtpAutofill';
 import PaymentModal from './PaymentModal';
 
 interface JoinModalProps {
@@ -36,6 +37,8 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
   const [sendingOTP, setSendingOTP] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPayment, setShowPayment] = useState(false);
+
+  useSmsOtpAutofill(isOpen && step === 'otp' && !loading, code => setOtp(code));
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -397,12 +400,12 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                   <div>
                     <label className="block text-xs font-medium text-white/60 mb-1.5">Enter OTP</label>
                     <input
-                      type="text"
+                      {...otpInputProps}
                       value={otp}
                       onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                       placeholder="6-digit OTP"
                       className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white text-center text-2xl font-mono tracking-widest focus:border-amber-500/50"
-                      maxLength={6}
+                      autoFocus
                       disabled={loading}
                     />
                     {errors.otp && <p className="text-xs text-red-400 mt-1">{errors.otp}</p>}

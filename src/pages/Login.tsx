@@ -16,6 +16,7 @@ import {
   ADMIN_OTP,
 } from '../services/otpService';
 import { fetchMemberByMobile } from '../services/memberDb';
+import { otpInputProps, useSmsOtpAutofill } from '../hooks/useSmsOtpAutofill';
 
 export default function Login() {
   const [mobile, setMobile] = useState('');
@@ -28,6 +29,8 @@ export default function Login() {
   const { translate } = useLanguage();
   const { showToast } = useToast();
   const navigate = useNavigate();
+
+  useSmsOtpAutofill(otpSent && !loading, code => setOtp(code));
 
   const ensureRegisteredMember = async (phone: string) => {
     if (isAdminMobile(phone)) return true;
@@ -248,13 +251,13 @@ export default function Login() {
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
-                    type="text"
+                    {...otpInputProps}
                     value={otp}
                     onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="Enter 6-digit OTP"
                     className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all text-center text-2xl font-mono tracking-widest"
                     required
-                    maxLength={6}
+                    autoFocus
                     disabled={loading}
                   />
                 </div>

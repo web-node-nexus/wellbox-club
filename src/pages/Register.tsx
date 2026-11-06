@@ -10,6 +10,7 @@ import { getMembershipByMobileAsync } from '../services/userStore';
 import { BUSINESS_RULES } from '../data/businessRules';
 import { clearPendingPayment, savePendingPayment } from '../services/paymentPending';
 import PaymentModal from '../components/PaymentModal';
+import { otpInputProps, useSmsOtpAutofill } from '../hooks/useSmsOtpAutofill';
 
 export default function Register() {
   const { referralCode } = useParams();
@@ -28,6 +29,8 @@ export default function Register() {
   const { register, login } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+
+  useSmsOtpAutofill(step === 'otp' && !loading, code => setOtp(code));
 
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -339,13 +342,13 @@ export default function Register() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Enter OTP</label>
                   <input
-                    type="text"
+                    {...otpInputProps}
                     value={otp}
                     onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="Enter 6-digit OTP"
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all text-center text-2xl font-mono tracking-widest"
                     required
-                    maxLength={6}
+                    autoFocus
                     disabled={loading}
                   />
                   <p className="text-xs text-gray-500 mt-2">OTP expires in 5 minutes</p>
