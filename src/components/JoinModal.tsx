@@ -30,7 +30,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     mobile: '',
     referralCode: '',
     city: '',
-    investmentAmount: String(BUSINESS_RULES.minJoinInvestment),
+    investmentAmount: String(BUSINESS_RULES.defaultJoinInvestment),
   });
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
@@ -238,7 +238,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
       mobile: '',
       referralCode: '',
       city: '',
-      investmentAmount: String(BUSINESS_RULES.minJoinInvestment),
+      investmentAmount: String(BUSINESS_RULES.defaultJoinInvestment),
     });
     setOtp('');
     setErrors({});
@@ -339,7 +339,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                       </div>
                       {errors.investmentAmount && <p className="text-xs text-red-400 mt-1">{errors.investmentAmount}</p>}
                       <p className="text-[11px] text-amber-300/70 mt-1.5">
-                        Pay now to become a member. Amount locks 12 months — then redeem as gold. Withdraw only level income.
+                        Min ₹{BUSINESS_RULES.minJoinInvestment}, no maximum. Locks 12 months — then redeem as gold. Withdraw only level income.
                       </p>
                     </div>
                   )}

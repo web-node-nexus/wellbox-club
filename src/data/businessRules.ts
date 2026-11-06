@@ -17,6 +17,8 @@ export const BUSINESS_RULES = {
   lockMonths: 12,
   /** Minimum first / monthly contribution to become a member */
   minJoinInvestment: 1000,
+  /** Prefill amount on Join / Register (user can raise; no max) */
+  defaultJoinInvestment: 10000,
 } as const;
 
 export function formatInr(amount: number) {

@@ -19,7 +19,7 @@ export default function Register() {
     name: '',
     mobile: '',
     referralCode: referralCode || '',
-    investmentAmount: '',
+    investmentAmount: String(BUSINESS_RULES.defaultJoinInvestment),
   });
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
@@ -299,7 +299,7 @@ export default function Register() {
                     />
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    Minimum ₹{BUSINESS_RULES.minJoinInvestment} required. Locked for 12 months for gold purchase.
+                    Minimum ₹{BUSINESS_RULES.minJoinInvestment}, no maximum. Locked for 12 months for gold purchase.
                   </p>
                 </div>
 
