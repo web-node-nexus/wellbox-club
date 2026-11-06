@@ -73,8 +73,8 @@ export default function Dashboard() {
   };
 
   const shareWhatsApp = () => {
-    // Same link as Copy Link — so WhatsApp opens with the register URL
-    const text = `Join Jewellbox Club! Use my link: ${referralLink}`;
+    // Exact same URL as Copy Link (put URL first so WhatsApp shows it clearly)
+    const text = `${referralLink}\n\nJoin Jewellbox Club — use my referral link above.`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 

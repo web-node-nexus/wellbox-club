@@ -25,7 +25,8 @@ export default function Referral() {
   };
 
   const shareWhatsApp = () => {
-    const text = `Join Jewellbox Club and start earning with gold! Use my referral link: ${referralLink}`;
+    // Same URL as Copy Link — URL first for WhatsApp
+    const text = `${referralLink}\n\nJoin Jewellbox Club — use my referral link above.`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     showToast('success', 'Opening WhatsApp...', 'Share');
   };
