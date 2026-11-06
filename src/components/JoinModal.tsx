@@ -11,7 +11,11 @@ import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clear
 import { addInvestment } from '../services/investmentService';
 import { BUSINESS_RULES } from '../data/businessRules';
 import { clearPendingPayment, savePendingPayment } from '../services/paymentPending';
-import { otpInputProps, useSmsOtpAutofill } from '../hooks/useSmsOtpAutofill';
+import {
+  otpInputProps,
+  readOtpFromClipboard,
+  useSmsOtpAutofill,
+} from '../hooks/useSmsOtpAutofill';
 import PaymentModal from './PaymentModal';
 
 interface JoinModalProps {
@@ -409,6 +413,20 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                       disabled={loading}
                     />
                     {errors.otp && <p className="text-xs text-red-400 mt-1">{errors.otp}</p>}
+                    <p className="text-[11px] text-white/40 mt-2">
+                      SMS me OTP Copy karo, phir Paste OTP dabao (browser SMS khud nahi padh sakta).
+                    </p>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const code = await readOtpFromClipboard();
+                        if (code) setOtp(code);
+                        else setErrors({ otp: 'Pehle SMS se OTP Copy karo, phir Paste dabao' });
+                      }}
+                      className="mt-2 w-full py-2.5 rounded-xl border border-amber-500/30 text-amber-300 text-sm font-semibold"
+                    >
+                      Paste OTP from SMS
+                    </button>
                   </div>
 
                   <motion.button

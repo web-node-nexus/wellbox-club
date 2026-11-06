@@ -16,7 +16,11 @@ import {
   ADMIN_OTP,
 } from '../services/otpService';
 import { fetchMemberByMobile } from '../services/memberDb';
-import { otpInputProps, useSmsOtpAutofill } from '../hooks/useSmsOtpAutofill';
+import {
+  otpInputProps,
+  readOtpFromClipboard,
+  useSmsOtpAutofill,
+} from '../hooks/useSmsOtpAutofill';
 
 export default function Login() {
   const [mobile, setMobile] = useState('');
@@ -261,7 +265,20 @@ export default function Login() {
                     disabled={loading}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-2">OTP expires in 5 minutes</p>
+                <p className="text-xs text-gray-500 mt-2">
+                  OTP expires in 5 minutes. Tip: SMS me OTP pe long-press → Copy, phir yahan Paste OTP.
+                </p>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const code = await readOtpFromClipboard();
+                    if (code) setOtp(code);
+                    else showToast('info', 'Pehle SMS se OTP Copy karo, phir Paste dabao', 'Paste OTP');
+                  }}
+                  className="mt-2 w-full py-2.5 rounded-xl border border-amber-200 text-amber-700 text-sm font-semibold"
+                >
+                  Paste OTP from SMS
+                </button>
               </div>
 
               <button

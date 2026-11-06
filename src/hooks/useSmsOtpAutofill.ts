@@ -1,14 +1,29 @@
 import { useEffect, useRef } from 'react';
 
+function digitsOnly(raw: string, max = 6) {
+  return String(raw || '')
+    .replace(/\D/g, '')
+    .slice(0, max);
+}
+
+/** Pull 4–6 digit OTP out of clipboard / SMS text */
+function extractOtp(text: string): string {
+  const t = String(text || '').trim();
+  if (/^\d{4,8}$/.test(t)) return t.slice(0, 6);
+  const m =
+    t.match(/\b(\d{6})\b/) ||
+    t.match(/\b(\d{4,5})\b/) ||
+    t.match(/(\d{6})/);
+  return m ? m[1].slice(0, 6) : '';
+}
+
 /**
- * Auto-fill OTP from SMS while this screen is open.
+ * Best-effort OTP fill without changing SMS template:
+ * 1) Web OTP (only if SMS has @domain #code — often missing)
+ * 2) iOS keyboard suggestion via autocomplete="one-time-code"
+ * 3) Clipboard: user copies OTP from SMS → returns to site → we paste
  *
- * iPhone (Safari/Chrome): shows OTP above keyboard — tap to fill
- *   (needs input autocomplete="one-time-code")
- *
- * Android Chrome: silent fill via Web OTP API — ONLY if SMS ends with:
- *   @your-domain.com #123456
- *   Example last line: @jewellbox.cloud #482913
+ * Silent SMS inbox read is NOT allowed by browsers without special SMS format.
  */
 export function useSmsOtpAutofill(
   enabled: boolean,
@@ -21,9 +36,7 @@ export function useSmsOtpAutofill(
     if (!enabled || typeof window === 'undefined') return;
 
     const apply = (raw: string) => {
-      const code = String(raw || '')
-        .replace(/\D/g, '')
-        .slice(0, 6);
+      const code = digitsOnly(raw);
       if (code.length >= 4) onCodeRef.current(code);
     };
 
@@ -33,7 +46,6 @@ export function useSmsOtpAutofill(
     const tryWebOtp = () => {
       const cred = (navigator as any).credentials;
       if (!cred?.get) return;
-
       cred
         .get({
           otp: { transport: ['sms'] },
@@ -42,28 +54,61 @@ export function useSmsOtpAutofill(
         .then((otp: { code?: string } | null) => {
           if (!cancelled && otp?.code) apply(otp.code);
         })
-        .catch(() => {
-          /* unsupported / timeout / user dismiss */
-        });
+        .catch(() => undefined);
+    };
+
+    const tryClipboard = async () => {
+      try {
+        if (!navigator.clipboard?.readText) return;
+        const text = await navigator.clipboard.readText();
+        const code = extractOtp(text);
+        if (code) apply(code);
+      } catch {
+        /* no permission / empty — user can tap Paste */
+      }
     };
 
     tryWebOtp();
+    void tryClipboard();
 
-    // Re-arm when user returns to the tab (common after opening SMS app)
     const onVisible = () => {
-      if (document.visibilityState === 'visible') tryWebOtp();
+      if (document.visibilityState !== 'visible') return;
+      tryWebOtp();
+      void tryClipboard();
     };
+    const onFocus = () => {
+      void tryClipboard();
+    };
+
     document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onFocus);
+
+    // Poll clipboard lightly while OTP screen is open (Android often allows after copy)
+    const poll = window.setInterval(() => {
+      void tryClipboard();
+    }, 2000);
 
     return () => {
       cancelled = true;
       ac.abort();
+      window.clearInterval(poll);
       document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onFocus);
     };
   }, [enabled]);
 }
 
-/** Props for OTP fields — required for iOS keyboard OTP suggestion */
+/** Call from a Paste button (user gesture → clipboard permission OK) */
+export async function readOtpFromClipboard(): Promise<string | null> {
+  try {
+    if (!navigator.clipboard?.readText) return null;
+    const code = extractOtp(await navigator.clipboard.readText());
+    return code.length >= 4 ? code : null;
+  } catch {
+    return null;
+  }
+}
+
 export const otpInputProps = {
   type: 'text' as const,
   inputMode: 'numeric' as const,

@@ -10,7 +10,11 @@ import { getMembershipByMobileAsync } from '../services/userStore';
 import { BUSINESS_RULES } from '../data/businessRules';
 import { clearPendingPayment, savePendingPayment } from '../services/paymentPending';
 import PaymentModal from '../components/PaymentModal';
-import { otpInputProps, useSmsOtpAutofill } from '../hooks/useSmsOtpAutofill';
+import {
+  otpInputProps,
+  readOtpFromClipboard,
+  useSmsOtpAutofill,
+} from '../hooks/useSmsOtpAutofill';
 
 export default function Register() {
   const { referralCode } = useParams();
@@ -352,7 +356,20 @@ export default function Register() {
                     autoFocus
                     disabled={loading}
                   />
-                  <p className="text-xs text-gray-500 mt-2">OTP expires in 5 minutes</p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Tip: SMS me OTP Copy karo → yahan Paste OTP.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const code = await readOtpFromClipboard();
+                      if (code) setOtp(code);
+                      else showToast('info', 'Pehle SMS se OTP Copy karo', 'Paste OTP');
+                    }}
+                    className="mt-2 w-full py-2.5 rounded-xl border border-amber-200 text-amber-700 text-sm font-semibold"
+                  >
+                    Paste OTP from SMS
+                  </button>
                 </div>
 
                 <button
