@@ -37,6 +37,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     investmentAmount: String(BUSINESS_RULES.defaultJoinInvestment),
   });
   const [otp, setOtp] = useState('');
+  const [otpFieldKey, setOtpFieldKey] = useState(0);
   const [loading, setLoading] = useState(false);
   const [sendingOTP, setSendingOTP] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -101,6 +102,8 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
         storeDemoOTP(formData.mobile, demoOTP);
         console.info('2Factor unavailable — demo OTP:', demoOTP);
       }
+      setOtp('');
+      setOtpFieldKey(k => k + 1);
       setStep('otp');
     } catch {
       setErrors({ mobile: 'Failed to send OTP. Please try again.' });
@@ -225,6 +228,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
 
   const handleResendOTP = async () => {
     setOtp('');
+    setOtpFieldKey(k => k + 1);
     setErrors({});
     try {
       await sendOTP(formData.mobile);
@@ -404,6 +408,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                   <div>
                     <label className="block text-xs font-medium text-white/60 mb-1.5">Enter OTP</label>
                     <input
+                      key={otpFieldKey}
                       {...otpInputProps}
                       value={otp}
                       onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}

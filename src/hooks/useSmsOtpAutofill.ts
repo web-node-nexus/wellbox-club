@@ -18,12 +18,9 @@ function extractOtp(text: string): string {
 }
 
 /**
- * Best-effort OTP fill without changing SMS template:
- * 1) Web OTP (only if SMS has @domain #code — often missing)
- * 2) iOS keyboard suggestion via autocomplete="one-time-code"
- * 3) Clipboard: user copies OTP from SMS → returns to site → we paste
- *
- * Silent SMS inbox read is NOT allowed by browsers without special SMS format.
+ * Web OTP only (Android Chrome when SMS supports it).
+ * Clipboard is NOT auto-read — old copied OTP was re-filling the field.
+ * Use Paste button (readOtpFromClipboard) instead.
  */
 export function useSmsOtpAutofill(
   enabled: boolean,
@@ -31,21 +28,28 @@ export function useSmsOtpAutofill(
 ) {
   const onCodeRef = useRef(onCode);
   onCodeRef.current = onCode;
+  const filledOnceRef = useRef(false);
 
   useEffect(() => {
-    if (!enabled || typeof window === 'undefined') return;
+    if (!enabled || typeof window === 'undefined') {
+      filledOnceRef.current = false;
+      return;
+    }
 
-    const apply = (raw: string) => {
-      const code = digitsOnly(raw);
-      if (code.length >= 4) onCodeRef.current(code);
-    };
-
+    filledOnceRef.current = false;
     const ac = new AbortController();
     let cancelled = false;
 
-    const tryWebOtp = () => {
-      const cred = (navigator as any).credentials;
-      if (!cred?.get) return;
+    const apply = (raw: string) => {
+      if (cancelled || filledOnceRef.current) return;
+      const code = digitsOnly(raw);
+      if (code.length < 4) return;
+      filledOnceRef.current = true;
+      onCodeRef.current(code);
+    };
+
+    const cred = (navigator as any).credentials;
+    if (cred?.get) {
       cred
         .get({
           otp: { transport: ['sms'] },
@@ -55,50 +59,17 @@ export function useSmsOtpAutofill(
           if (!cancelled && otp?.code) apply(otp.code);
         })
         .catch(() => undefined);
-    };
-
-    const tryClipboard = async () => {
-      try {
-        if (!navigator.clipboard?.readText) return;
-        const text = await navigator.clipboard.readText();
-        const code = extractOtp(text);
-        if (code) apply(code);
-      } catch {
-        /* no permission / empty — user can tap Paste */
-      }
-    };
-
-    tryWebOtp();
-    void tryClipboard();
-
-    const onVisible = () => {
-      if (document.visibilityState !== 'visible') return;
-      tryWebOtp();
-      void tryClipboard();
-    };
-    const onFocus = () => {
-      void tryClipboard();
-    };
-
-    document.addEventListener('visibilitychange', onVisible);
-    window.addEventListener('focus', onFocus);
-
-    // Poll clipboard lightly while OTP screen is open (Android often allows after copy)
-    const poll = window.setInterval(() => {
-      void tryClipboard();
-    }, 2000);
+    }
 
     return () => {
       cancelled = true;
       ac.abort();
-      window.clearInterval(poll);
-      document.removeEventListener('visibilitychange', onVisible);
-      window.removeEventListener('focus', onFocus);
+      filledOnceRef.current = false;
     };
   }, [enabled]);
 }
 
-/** Call from a Paste button (user gesture → clipboard permission OK) */
+/** Paste button only — does not run in background */
 export async function readOtpFromClipboard(): Promise<string | null> {
   try {
     if (!navigator.clipboard?.readText) return null;
@@ -114,10 +85,10 @@ export const otpInputProps = {
   inputMode: 'numeric' as const,
   pattern: '[0-9]*',
   autoComplete: 'one-time-code' as const,
-  name: 'one-time-code',
+  name: 'otp',
   id: 'otp-input',
   autoCorrect: 'off' as const,
-  autoCapitalize: 'characters' as const,
+  autoCapitalize: 'off' as const,
   spellCheck: false,
   maxLength: 6,
   enterKeyHint: 'done' as const,

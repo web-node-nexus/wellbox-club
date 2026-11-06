@@ -26,6 +26,8 @@ export default function Login() {
   const [mobile, setMobile] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
+  /** Remount OTP input so browser/clipboard can't stick old value */
+  const [otpFieldKey, setOtpFieldKey] = useState(0);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [sendingOTP, setSendingOTP] = useState(false);
@@ -90,6 +92,8 @@ export default function Login() {
           showToast('info', `Demo OTP: ${demoOTP} (API unavailable)`, 'Demo Mode');
         }
       }
+      setOtp('');
+      setOtpFieldKey(k => k + 1);
       setOtpSent(true);
     } catch {
       setError('Failed to send OTP. Please try again.');
@@ -153,6 +157,7 @@ export default function Login() {
 
   const handleResendOTP = async () => {
     setOtp('');
+    setOtpFieldKey(k => k + 1);
     setError('');
     try {
       const exists = await ensureRegisteredMember(mobile);
@@ -255,6 +260,7 @@ export default function Login() {
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
+                    key={otpFieldKey}
                     {...otpInputProps}
                     value={otp}
                     onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}

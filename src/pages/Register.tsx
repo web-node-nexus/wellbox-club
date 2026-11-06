@@ -26,6 +26,7 @@ export default function Register() {
     investmentAmount: String(BUSINESS_RULES.defaultJoinInvestment),
   });
   const [otp, setOtp] = useState('');
+  const [otpFieldKey, setOtpFieldKey] = useState(0);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [sendingOTP, setSendingOTP] = useState(false);
@@ -86,6 +87,8 @@ export default function Register() {
         storeDemoOTP(formData.mobile, demoOTP);
         showToast('info', `Demo OTP: ${demoOTP}`, 'Demo Mode');
       }
+      setOtp('');
+      setOtpFieldKey(k => k + 1);
       setStep('otp');
     } catch {
       setError('Failed to send OTP. Please try again.');
@@ -168,6 +171,7 @@ export default function Register() {
 
   const handleResendOTP = async () => {
     setOtp('');
+    setOtpFieldKey(k => k + 1);
     setError('');
     try {
       await sendOTP(formData.mobile);
@@ -347,6 +351,7 @@ export default function Register() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Enter OTP</label>
                   <input
+                    key={otpFieldKey}
                     {...otpInputProps}
                     value={otp}
                     onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
