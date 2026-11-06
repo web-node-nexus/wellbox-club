@@ -16,6 +16,7 @@ import {
   syncLeaderPayout,
 } from '../services/commissionService';
 import { ADMIN_FALLBACK_USER, isAdminMobile } from '../services/otpService';
+import { BUSINESS_RULES } from '../data/businessRules';
 
 export interface RegisteredUser {
   id: string;
@@ -319,7 +320,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const promoteToLeaderIfEligible = (teamSize: number) => {
-    if (!user || teamSize < 100) return;
+    const need = BUSINESS_RULES.leaderTeamRequirement;
+    if (!user || teamSize < need) return;
     if (user.isLeader || user.role === 'leader' || user.role === 'admin') {
       if (user.teamSize !== teamSize) {
         const updated = { ...user, teamSize, isLeader: true };
@@ -329,6 +331,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       return;
     }
+    // First time unlocking Leader badge at 100 team members
     const updated: RegisteredUser = {
       ...user,
       isLeader: true,
@@ -339,6 +342,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(updated);
     void upsertMember(updated);
     localStorage.setItem(SESSION_KEY, JSON.stringify(updated));
+    void import('../services/notificationService').then(({ notifyAdmin, notifyUser }) => {
+      void notifyUser(updated.id, {
+        type: 'info',
+        title: 'Leader badge unlocked',
+        message: `Congrats! Your team reached ${need} members. You are now a Leader.`,
+        meta: { teamSize },
+      });
+      void notifyAdmin({
+        type: 'info',
+        title: 'New Leader',
+        message: `${updated.name} unlocked Leader badge (${teamSize} team members)`,
+        meta: { userId: updated.id, teamSize },
+      });
+    });
   };
 
   const updateProfile = async (patch: Partial<RegisteredUser>) => {

@@ -320,16 +320,39 @@ export async function refreshUplineTeamSizes(member: RegisteredUser) {
 
     const size = getTeamTreeIds(parent.id, getMembersCache()).length;
     const shouldLead = size >= BUSINESS_RULES.leaderTeamRequirement;
-    const updated: RegisteredUser = {
-      ...parent,
-      teamSize: size,
-      isLeader: shouldLead || parent.isLeader || parent.role === 'leader' || parent.role === 'admin',
-      role:
-        shouldLead && parent.role !== 'admin' && parent.role !== 'individual'
-          ? 'leader'
-          : parent.role,
-    };
+    const wasLeader =
+      Boolean(parent.isLeader) || parent.role === 'leader' || parent.role === 'admin';
+
+    const updated: RegisteredUser = { ...parent, teamSize: size };
+    if (parent.role !== 'admin' && parent.role !== 'individual') {
+      // Member until 100 team; then Leader badge + role
+      updated.isLeader = shouldLead;
+      updated.role = shouldLead ? 'leader' : 'member';
+    } else if (parent.role === 'admin') {
+      updated.isLeader = true;
+    }
+
+    const newlyPromoted = shouldLead && !wasLeader && parent.role !== 'admin';
     await upsertMember(updated);
+    if (newlyPromoted) {
+      try {
+        const { notifyAdmin, notifyUser } = await import('./notificationService');
+        await notifyUser(updated.id, {
+          type: 'info',
+          title: 'Leader badge unlocked',
+          message: `Your team reached ${BUSINESS_RULES.leaderTeamRequirement} members. You are now a Leader.`,
+          meta: { teamSize: size },
+        });
+        await notifyAdmin({
+          type: 'info',
+          title: 'New Leader',
+          message: `${updated.name} unlocked Leader badge (${size} team members)`,
+          meta: { userId: updated.id, teamSize: size },
+        });
+      } catch {
+        /* non-blocking */
+      }
+    }
     current = updated;
   }
 }

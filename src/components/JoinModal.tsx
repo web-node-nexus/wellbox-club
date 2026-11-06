@@ -53,7 +53,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     if ((activeTab === 'leader' || activeTab === 'individual') && !formData.city.trim()) {
       newErrors.city = 'City is required';
     }
-    // Member + Leader must pay first investment (same as members)
+    // Member + Leader path: same investment (everyone starts as member)
     if (activeTab === 'member' || activeTab === 'leader') {
       const amt = Number(formData.investmentAmount);
       if (!amt || amt < BUSINESS_RULES.minJoinInvestment) {
@@ -155,6 +155,10 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     }
   };
 
+  /** Leader tab still creates a member account — badge unlocks at 100 team */
+  const registerRole: 'member' | 'leader' | 'individual' =
+    activeTab === 'individual' ? 'individual' : 'member';
+
   const goDashboard = (role: 'member' | 'leader' | 'individual') => {
     const path = role === 'individual' ? '/individual-dashboard' : '/dashboard';
     handleClose();
@@ -170,7 +174,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
         mobile: formData.mobile,
         referralCode: formData.referralCode,
         city: formData.city,
-        role: activeTab,
+        role: registerRole,
       });
 
       // Already registered (retry after paid) → just login + dashboard
@@ -180,7 +184,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
           const logged = await login(formData.mobile);
           if (logged.success) {
             setStep('success');
-            goDashboard(activeTab);
+            goDashboard(registerRole);
             return;
           }
         }
@@ -189,7 +193,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
         return;
       }
 
-      if (activeTab === 'member' || activeTab === 'leader') {
+      if (registerRole === 'member') {
         await addInvestment(
           result.user.id,
           Number(formData.investmentAmount),
@@ -201,7 +205,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
       await login(formData.mobile);
       setStep('success');
       setLoading(false);
-      goDashboard(activeTab);
+      goDashboard(registerRole);
     } catch (e: any) {
       setErrors({ otp: e?.message || 'Registration failed' });
       setLoading(false);
@@ -215,7 +219,8 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
       mobile: formData.mobile,
       referralCode: formData.referralCode,
       city: formData.city,
-      role: activeTab,
+      // Always member until team hits 100
+      role: 'member',
       amount: Number(formData.investmentAmount) || 0,
     });
     setShowPayment(true);
@@ -349,7 +354,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                       {errors.investmentAmount && <p className="text-xs text-red-400 mt-1">{errors.investmentAmount}</p>}
                       <p className="text-[11px] text-amber-300/70 mt-1.5">
                         {activeTab === 'leader'
-                          ? 'Leaders must join as investing members first. '
+                          ? `You join as a member (L1/L2 income same as members). Leader badge unlocks at ${BUSINESS_RULES.leaderTeamRequirement} team members. `
                           : ''}
                         Min ₹{BUSINESS_RULES.minJoinInvestment}, no maximum. Locks 12 months — then redeem as gold. Withdraw only level income.
                       </p>
@@ -471,11 +476,14 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                   <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
                     <p className="text-sm text-amber-200 font-semibold mb-1">
                       {activeTab === 'leader'
-                        ? 'Payment required — leaders join as investing members first'
+                        ? 'Pay to join as a member — Leader badge after 100 team members'
                         : 'Payment required to become a member'}
                     </p>
                     <p className="text-xs text-amber-200/70">
                       Without this payment you will not be registered. Amount is held 12 months for gold redemption.
+                      {activeTab === 'leader'
+                        ? ` L1 (${BUSINESS_RULES.level1Percent}%) & L2 (${BUSINESS_RULES.level2Percent}%) work the same as for members.`
+                        : ''}
                     </p>
                   </div>
 
@@ -543,9 +551,14 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                   <h3 className="text-xl font-bold text-white mb-2">Welcome to Jewellbox Club!</h3>
                   <p className="text-sm text-white/60 mb-2">
                     {activeTab === 'member' || activeTab === 'leader'
-                      ? `₹${Number(formData.investmentAmount).toLocaleString()} invested — opening your dashboard…`
+                      ? `₹${Number(formData.investmentAmount).toLocaleString()} invested as member — opening your dashboard…`
                       : 'Redirecting…'}
                   </p>
+                  {activeTab === 'leader' && (
+                    <p className="text-xs text-amber-300/80">
+                      Build a team of {BUSINESS_RULES.leaderTeamRequirement} to unlock your Leader badge.
+                    </p>
+                  )}
                 </motion.div>
               )}
             </div>
