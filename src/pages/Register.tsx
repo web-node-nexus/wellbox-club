@@ -362,14 +362,14 @@ export default function Register() {
                     disabled={loading}
                   />
                   <p className="text-xs text-gray-500 mt-2">
-                    Tip: SMS me OTP Copy karo → yahan Paste OTP.
+                    Tip: copy the OTP from SMS, then tap Paste OTP.
                   </p>
                   <button
                     type="button"
                     onClick={async () => {
                       const code = await readOtpFromClipboard();
                       if (code) setOtp(code);
-                      else showToast('info', 'Pehle SMS se OTP Copy karo', 'Paste OTP');
+                      else showToast('info', 'Copy the OTP from SMS first', 'Paste OTP');
                     }}
                     className="mt-2 w-full py-2.5 rounded-xl border border-amber-200 text-amber-700 text-sm font-semibold"
                   >

@@ -272,14 +272,14 @@ export default function Login() {
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  OTP expires in 5 minutes. Tip: SMS me OTP pe long-press → Copy, phir yahan Paste OTP.
+                  OTP expires in 5 minutes. Tip: long-press the code in SMS → Copy, then tap Paste OTP.
                 </p>
                 <button
                   type="button"
                   onClick={async () => {
                     const code = await readOtpFromClipboard();
                     if (code) setOtp(code);
-                    else showToast('info', 'Pehle SMS se OTP Copy karo, phir Paste dabao', 'Paste OTP');
+                    else showToast('info', 'Copy the OTP from SMS first, then tap Paste OTP', 'Paste OTP');
                   }}
                   className="mt-2 w-full py-2.5 rounded-xl border border-amber-200 text-amber-700 text-sm font-semibold"
                 >

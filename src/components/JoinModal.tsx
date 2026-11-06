@@ -419,14 +419,14 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                     />
                     {errors.otp && <p className="text-xs text-red-400 mt-1">{errors.otp}</p>}
                     <p className="text-[11px] text-white/40 mt-2">
-                      SMS me OTP Copy karo, phir Paste OTP dabao (browser SMS khud nahi padh sakta).
+                      Copy the OTP from SMS, then tap Paste OTP (browsers cannot read SMS automatically).
                     </p>
                     <button
                       type="button"
                       onClick={async () => {
                         const code = await readOtpFromClipboard();
                         if (code) setOtp(code);
-                        else setErrors({ otp: 'Pehle SMS se OTP Copy karo, phir Paste dabao' });
+                        else setErrors({ otp: 'Copy the OTP from SMS first, then tap Paste OTP' });
                       }}
                       className="mt-2 w-full py-2.5 rounded-xl border border-amber-500/30 text-amber-300 text-sm font-semibold"
                     >
