@@ -63,15 +63,18 @@ export default function Dashboard() {
   const nextPayout = nextLeaderPayoutDate();
   const daysToPayout = daysUntil(nextPayout);
 
+  const referralLink = `${window.location.origin}/register/${user.referralCode}`;
+
   const copyReferral = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/register/${user.referralCode}`);
+    navigator.clipboard.writeText(referralLink);
     setCopied(true);
     showToast('success', 'Referral link copied!', 'Copied');
     setTimeout(() => setCopied(false), 2000);
   };
 
   const shareWhatsApp = () => {
-    const text = `Join Jewellbox Club! Use my code ${user.referralCode} — earn Level 1 (10%) & Level 2 (5%).`;
+    // Same link as Copy Link — so WhatsApp opens with the register URL
+    const text = `Join Jewellbox Club! Use my link: ${referralLink}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
