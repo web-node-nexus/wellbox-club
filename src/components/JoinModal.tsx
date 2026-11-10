@@ -53,7 +53,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     if ((activeTab === 'leader' || activeTab === 'individual') && !formData.city.trim()) {
       newErrors.city = 'City is required';
     }
-    // Member + Leader path: same investment (everyone starts as member)
+    // Member + Leader path: same investment amount rules
     if (activeTab === 'member' || activeTab === 'leader') {
       const amt = Number(formData.investmentAmount);
       if (!amt || amt < BUSINESS_RULES.minJoinInvestment) {
@@ -155,9 +155,9 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
     }
   };
 
-  /** Leader tab still creates a member account — badge unlocks at 100 team */
+  /** Leader only if they joined via Leader form; Member form stays member forever */
   const registerRole: 'member' | 'leader' | 'individual' =
-    activeTab === 'individual' ? 'individual' : 'member';
+    activeTab === 'individual' ? 'individual' : activeTab === 'leader' ? 'leader' : 'member';
 
   const goDashboard = (role: 'member' | 'leader' | 'individual') => {
     const path = role === 'individual' ? '/individual-dashboard' : '/dashboard';
@@ -219,8 +219,7 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
       mobile: formData.mobile,
       referralCode: formData.referralCode,
       city: formData.city,
-      // Always member until team hits 100
-      role: 'member',
+      role: registerRole === 'individual' ? 'member' : registerRole,
       amount: Number(formData.investmentAmount) || 0,
     });
     setShowPayment(true);
@@ -354,8 +353,8 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                       {errors.investmentAmount && <p className="text-xs text-red-400 mt-1">{errors.investmentAmount}</p>}
                       <p className="text-[11px] text-amber-300/70 mt-1.5">
                         {activeTab === 'leader'
-                          ? `You join as a member (L1/L2 income same as members). Leader badge unlocks at ${BUSINESS_RULES.leaderTeamRequirement} team members. `
-                          : ''}
+                          ? `You join as a Leader (L1/L2 same as members). Leader ${BUSINESS_RULES.leaderPercent}% team income unlocks at ${BUSINESS_RULES.leaderTeamRequirement} team members. `
+                          : 'You join as a Member — Leader status is only for those who register via the Leader form. '}
                         Min ₹{BUSINESS_RULES.minJoinInvestment}, no maximum. Locks 12 months — then redeem as gold. Withdraw only level income.
                       </p>
                     </div>
@@ -476,13 +475,13 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                   <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
                     <p className="text-sm text-amber-200 font-semibold mb-1">
                       {activeTab === 'leader'
-                        ? 'Pay to join as a member — Leader badge after 100 team members'
+                        ? 'Payment required to join as a Leader'
                         : 'Payment required to become a member'}
                     </p>
                     <p className="text-xs text-amber-200/70">
                       Without this payment you will not be registered. Amount is held 12 months for gold redemption.
                       {activeTab === 'leader'
-                        ? ` L1 (${BUSINESS_RULES.level1Percent}%) & L2 (${BUSINESS_RULES.level2Percent}%) work the same as for members.`
+                        ? ` L1 (${BUSINESS_RULES.level1Percent}%) & L2 (${BUSINESS_RULES.level2Percent}%) work the same as for members. Leader ${BUSINESS_RULES.leaderPercent}% after ${BUSINESS_RULES.leaderTeamRequirement} team.`
                         : ''}
                     </p>
                   </div>
@@ -550,13 +549,15 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
                   </motion.div>
                   <h3 className="text-xl font-bold text-white mb-2">Welcome to Jewellbox Club!</h3>
                   <p className="text-sm text-white/60 mb-2">
-                    {activeTab === 'member' || activeTab === 'leader'
-                      ? `₹${Number(formData.investmentAmount).toLocaleString()} invested as member — opening your dashboard…`
-                      : 'Redirecting…'}
+                    {activeTab === 'leader'
+                      ? `₹${Number(formData.investmentAmount).toLocaleString()} invested as Leader — opening your dashboard…`
+                      : activeTab === 'member'
+                        ? `₹${Number(formData.investmentAmount).toLocaleString()} invested as member — opening your dashboard…`
+                        : 'Redirecting…'}
                   </p>
                   {activeTab === 'leader' && (
                     <p className="text-xs text-amber-300/80">
-                      Build a team of {BUSINESS_RULES.leaderTeamRequirement} to unlock your Leader badge.
+                      Grow your team to {BUSINESS_RULES.leaderTeamRequirement} to unlock Leader {BUSINESS_RULES.leaderPercent}% income.
                     </p>
                   )}
                 </motion.div>

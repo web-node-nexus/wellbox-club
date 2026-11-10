@@ -143,32 +143,43 @@ export default function Dashboard() {
             <p className="text-sm font-medium opacity-90 flex items-center gap-2">
               <Target className="w-4 h-4" />
               {stats.isLeader
-                ? `Leader active · payout every month on ${BUSINESS_RULES.leaderPayoutDay}rd`
-                : `Leader path · need ${BUSINESS_RULES.leaderTeamRequirement} team members`}
+                ? stats.leaderEligible
+                  ? `Leader active · payout every month on ${BUSINESS_RULES.leaderPayoutDay}rd`
+                  : `Leader · need ${BUSINESS_RULES.leaderTeamRequirement} team for ${BUSINESS_RULES.leaderPercent}% income`
+                : 'Member · team growth (Leader only if you joined via Leader form)'}
             </p>
             <p className="text-3xl font-bold mt-1">
-              {stats.teamSize} / {stats.leaderRequirement} members
+              {stats.isLeader
+                ? `${stats.teamSize} / ${stats.leaderRequirement} members`
+                : `${stats.teamSize} team members`}
             </p>
-            {!stats.isLeader && (
+            {stats.isLeader && !stats.leaderEligible && (
               <p className="text-sm opacity-90 mt-1">
-                {Math.max(0, stats.leaderRequirement - stats.teamSize)} more to unlock Leader badge + {BUSINESS_RULES.leaderPercent}% team income
+                {Math.max(0, stats.leaderRequirement - stats.teamSize)} more for Leader {BUSINESS_RULES.leaderPercent}% team income
               </p>
             )}
-            {stats.isLeader && (
+            {stats.isLeader && stats.leaderEligible && (
               <p className="text-sm opacity-90 mt-1">
                 Next credit in {daysToPayout} day(s) · {nextPayout.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
               </p>
             )}
+            {!stats.isLeader && (
+              <p className="text-sm opacity-90 mt-1">
+                You earn L1 {BUSINESS_RULES.level1Percent}% and L2 {BUSINESS_RULES.level2Percent}% — members do not become Leaders by team size
+              </p>
+            )}
           </div>
-          <div className="sm:w-48">
-            <div className="h-3 rounded-full bg-black/20 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-white"
-                style={{ width: `${stats.leaderProgress}%` }}
-              />
+          {stats.isLeader && (
+            <div className="sm:w-48">
+              <div className="h-3 rounded-full bg-black/20 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-white"
+                  style={{ width: `${stats.leaderProgress}%` }}
+                />
+              </div>
+              <p className="text-xs mt-2 text-right font-semibold">{stats.leaderProgress}%</p>
             </div>
-            <p className="text-xs mt-2 text-right font-semibold">{stats.leaderProgress}%</p>
-          </div>
+          )}
         </div>
       </motion.div>
 
@@ -206,7 +217,7 @@ export default function Dashboard() {
             color: 'from-amber-500 to-orange-600',
             hint: stats.isLeader
               ? `${BUSINESS_RULES.leaderPercent}% · credit on 3rd`
-              : `Unlock at ${BUSINESS_RULES.leaderTeamRequirement} members`,
+              : 'Leaders only — join via Leader form',
             link: stats.isLeader ? '/income/leader' : '/team',
           },
         ].map((card, i) => (
@@ -277,7 +288,11 @@ export default function Dashboard() {
         <Link to="/team" className="bg-white rounded-2xl p-5 border border-gray-100 hover:border-purple-200 shadow-sm">
           <Users className="w-8 h-8 text-purple-600 mb-2" />
           <p className="font-bold text-gray-900">My Team</p>
-          <p className="text-sm text-gray-500">{stats.teamSize} members · grow to {BUSINESS_RULES.leaderTeamRequirement} for Leader</p>
+          <p className="text-sm text-gray-500">
+            {stats.isLeader
+              ? `${stats.teamSize} members · ${BUSINESS_RULES.leaderTeamRequirement} for Leader income`
+              : `${stats.teamSize} members`}
+          </p>
         </Link>
         <Link to="/gold-showroom" className="bg-white rounded-2xl p-5 border border-gray-100 hover:border-amber-200 shadow-sm">
           <Gem className="w-8 h-8 text-amber-600 mb-2" />

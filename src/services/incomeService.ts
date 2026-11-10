@@ -72,8 +72,7 @@ export function getLeaderIncomeEstimate(userId: string, user?: RegisteredUser | 
   const isLeader = !!(
     user?.isLeader ||
     user?.role === 'leader' ||
-    user?.role === 'admin' ||
-    teamSize >= BUSINESS_RULES.leaderTeamRequirement
+    user?.role === 'admin'
   );
 
   const fromLedger = sumCommissionsByType(userId, 'leader_payout');
@@ -167,10 +166,7 @@ export function getDashboardStats(user: RegisteredUser) {
   const investments = getInvestments(user.id);
   const goldBonus = getGoldOrderCommission(user.id);
   const isLeader =
-    user.isLeader ||
-    user.role === 'leader' ||
-    user.role === 'admin' ||
-    teamSize >= BUSINESS_RULES.leaderTeamRequirement;
+    user.isLeader || user.role === 'leader' || user.role === 'admin';
 
   return {
     ownContribution: own,

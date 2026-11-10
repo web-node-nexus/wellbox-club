@@ -136,7 +136,7 @@ export default function Support() {
         <div className="space-y-3">
           {[
             { q: 'How do I withdraw my commission?', a: 'Go to Wallet & Withdraw page, enter amount, select payment method, and submit request. Processed within 24-48 hours.' },
-            { q: 'When do I become a Leader?', a: 'When your total team reaches 100 members (direct + indirect), you automatically become a Leader.' },
+            { q: 'When do I become a Leader?', a: 'Only if you registered via the Leader form. Member-form joiners stay Members even with 100+ team size.' },
             { q: 'How is leader payout calculated?', a: 'Leaders earn 5% of their team\'s total monthly contribution income, credited on 3rd of every month.' },
             { q: 'Can I convert my contribution to gold?', a: 'Yes! After 12 months lock period, you can withdraw or convert your contribution to gold purchase.' },
           ].map((faq, i) => (

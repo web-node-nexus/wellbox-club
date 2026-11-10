@@ -394,7 +394,7 @@ export default function Admin() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="p-6 border-b border-gray-100">
               <h3 className="font-semibold text-gray-900">Leaders ({leaders.length})</h3>
-              <p className="text-sm text-gray-500 mt-1">Members with 100+ team members automatically become leaders. Admin can also manually promote.</p>
+              <p className="text-sm text-gray-500 mt-1">Leaders are those who joined via the Leader form (or admin promote). Team size alone does not auto-promote members.</p>
             </div>
             <div className="divide-y divide-gray-50">
               {leaders.map(l => (

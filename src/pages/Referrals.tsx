@@ -99,8 +99,10 @@ export default function Referrals() {
               <Crown className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{user.isLeader ? 'Active' : `${100 - allTeamMembers.length} more`}</p>
-              <p className="text-sm text-gray-500">Leader Status</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {user.isLeader || user.role === 'leader' ? 'Leader' : 'Member'}
+              </p>
+              <p className="text-sm text-gray-500">Join role (not by team size)</p>
             </div>
           </div>
         </motion.div>
