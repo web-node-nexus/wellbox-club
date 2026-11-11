@@ -22,6 +22,7 @@ import {
   markAllUserNotificationsRead,
   markNotificationRead,
 } from '../services/notificationService';
+import { enablePaymentPushReminders, pushSupported } from '../services/pushService';
 
 const iconFor = (type: string) => {
   switch (type) {
@@ -34,6 +35,8 @@ const iconFor = (type: string) => {
         : { Icon: Info, color: 'text-indigo-400' };
     case 'investment':
       return { Icon: Coins, color: 'text-amber-400' };
+    case 'payment_reminder':
+      return { Icon: Bell, color: 'text-rose-400' };
     case 'gold_order':
       return { Icon: Gift, color: 'text-purple-400' };
     default:
@@ -46,6 +49,8 @@ export default function Notifications() {
   const { showToast } = useToast();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushStatus, setPushStatus] = useState('');
 
   const load = useCallback(async () => {
     if (!user?.id) {
@@ -100,23 +105,47 @@ export default function Notifications() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold">Notifications</h1>
-          <p className="text-white/50 mt-1">Stay updated with your activity</p>
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Notifications</h1>
+          <p className="text-gray-500 mt-1">
+            Stay updated · payment reminders start 5 days before due (every 6 hours)
+          </p>
         </div>
-        {unreadCount > 0 && (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => void markAllAsRead()}
-            className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm hover:bg-white/10 transition-colors"
-          >
-            <CheckCircle className="w-4 h-4" />
-            Mark All as Read
-          </motion.button>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {pushSupported() && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              disabled={pushBusy || !user?.id}
+              onClick={async () => {
+                if (!user?.id) return;
+                setPushBusy(true);
+                const r = await enablePaymentPushReminders(user.id);
+                setPushBusy(false);
+                setPushStatus(r.message);
+                showToast(r.ok ? 'success' : 'error', r.message, r.ok ? 'Push' : 'Error');
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-xl text-sm font-semibold disabled:opacity-50"
+            >
+              {pushBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bell className="w-4 h-4" />}
+              Enable Push Reminders
+            </motion.button>
+          )}
+          {unreadCount > 0 && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => void markAllAsRead()}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm hover:bg-gray-50 transition-colors"
+            >
+              <CheckCircle className="w-4 h-4" />
+              Mark All as Read
+            </motion.button>
+          )}
+        </div>
       </div>
+      {pushStatus && <p className="text-xs text-gray-500">{pushStatus}</p>}
 
       <div className="grid grid-cols-2 gap-4">
         <motion.div

@@ -8,6 +8,7 @@ export type NotificationType =
   | 'commission'
   | 'withdrawal'
   | 'gold_order'
+  | 'payment_reminder'
   | 'info';
 
 export type AppNotification = {

@@ -77,3 +77,28 @@ Your Jewellbox Club OTP is {otp}. Do not share it.
 
 ## Build Status
 ✅ Build successful
+
+## Monthly payment reminders (manual pay + push)
+
+Payment stays **manual** (no auto-debit). Reminders start **5 days before** next due date, every **6 hours**.
+
+### 1) Supabase SQL
+Run `supabase/push_reminders_migration.sql` in SQL Editor.
+
+### 2) Vercel env
+```
+VAPID_PUBLIC_KEY=…          # pair with private (npx web-push generate-vapid-keys)
+VAPID_PRIVATE_KEY=…         # server only — never expose to client
+VITE_VAPID_PUBLIC_KEY=…     # same as VAPID_PUBLIC_KEY
+CRON_SECRET=pick-a-long-random-string
+SUPABASE_URL=…              # or rely on VITE_SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY=… # preferred; anon key also works with current RLS
+```
+Public key fallback is already in `/api/vapid-public-key` + cron; set matching `VAPID_PRIVATE_KEY` on Vercel for push to work.
+
+### 3) Cron
+`vercel.json` runs `/api/cron/payment-reminders` every 6 hours.  
+If Hobby plan only allows daily cron, use an external cron (cron-job.org) hitting that URL with `Authorization: Bearer <CRON_SECRET>`.
+
+### 4) User side
+Open app → allow notifications → **Enable Push Reminders** on Notifications / Contributions.

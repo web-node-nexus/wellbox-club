@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,6 +8,7 @@ import {
   Link2, ShoppingBag, Sun, Moon, TrendingUp
 } from 'lucide-react';
 import LogoutModal from './LogoutModal';
+import { maybeAutoEnablePush } from '../services/pushService';
 
 export default function Layout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
@@ -15,6 +16,12 @@ export default function Layout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  // Opt into Web Push so payment reminders work when app is closed
+  useEffect(() => {
+    if (!user?.id || user.role === 'admin' || user.role === 'individual') return;
+    void maybeAutoEnablePush(user.id);
+  }, [user?.id, user?.role]);
 
   // Different navigation for individual users
   const individualNavItems = [

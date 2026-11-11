@@ -16,8 +16,14 @@ import {
   getUnlockedInvested,
   type Investment,
 } from '../services/investmentService';
-import { BUSINESS_RULES } from '../data/businessRules';
+import { BUSINESS_RULES, formatInr } from '../data/businessRules';
 import { clearPendingPayment, savePendingPayment } from '../services/paymentPending';
+import {
+  getNextContributionDueDate,
+  getSuggestedContributionAmount,
+  reminderWindowMeta,
+} from '../services/contributionDue';
+import { enablePaymentPushReminders, pushSupported } from '../services/pushService';
 
 export default function Contributions() {
   const { user } = useAuth();
@@ -51,6 +57,13 @@ export default function Contributions() {
     setInvestments(getInvestments(user.id));
     setTick(t => t + 1);
   };
+
+  const nextDue = getNextContributionDueDate({
+    joinDate: user.joinDate,
+    investments,
+  });
+  const suggestedAmount = getSuggestedContributionAmount(investments);
+  const dueMeta = reminderWindowMeta(nextDue, suggestedAmount);
 
   const totalContributed = getTotalInvested(user.id);
   const lockedAmount = getLockedInvested(user.id);
@@ -142,6 +155,60 @@ export default function Contributions() {
             <IndianRupee className="w-4 h-4" />
             Invest Now
           </motion.button>
+        </div>
+      </div>
+
+      <div
+        className={`rounded-2xl p-4 border ${
+          dueMeta.inWindow
+            ? 'bg-rose-50 border-rose-200'
+            : 'bg-amber-50 border-amber-100'
+        }`}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <AlertCircle
+              className={`w-5 h-5 mt-0.5 ${dueMeta.inWindow ? 'text-rose-600' : 'text-amber-600'}`}
+            />
+            <div>
+              <p className="font-semibold text-gray-900">
+                Next contribution due {dueMeta.dueDate}
+                {dueMeta.inWindow
+                  ? dueMeta.daysLeft === 0
+                    ? ' · due today'
+                    : ` · ${dueMeta.daysLeft} day(s) left`
+                  : ''}
+              </p>
+              <p className="text-sm text-gray-600 mt-0.5">
+                Suggested {formatInr(suggestedAmount)}. Reminders start 5 days before due, every 6
+                hours (in-app + push if enabled). Payment stays manual — nothing auto-deducts.
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {pushSupported() && (
+              <button
+                type="button"
+                onClick={async () => {
+                  const r = await enablePaymentPushReminders(user.id);
+                  showToast(r.ok ? 'success' : 'error', r.message, r.ok ? 'Push' : 'Error');
+                }}
+                className="px-3 py-2 rounded-xl text-sm font-medium bg-white border border-gray-200"
+              >
+                Enable Push
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                setInvestAmount(String(suggestedAmount));
+                setShowInvestModal(true);
+              }}
+              className="px-3 py-2 rounded-xl text-sm font-semibold bg-amber-500 text-white"
+            >
+              Pay Now
+            </button>
+          </div>
         </div>
       </div>
 
