@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -42,6 +42,20 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
   const [sendingOTP, setSendingOTP] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPayment, setShowPayment] = useState(false);
+
+  // Sync tab when opened from Leader Program / Member CTAs
+  useEffect(() => {
+    if (!isOpen) return;
+    setActiveTab(initialTab);
+    setStep('form');
+    setOtp('');
+    setErrors({});
+    setShowPayment(false);
+    setFormData(p => ({
+      ...p,
+      investmentAmount: String(BUSINESS_RULES.defaultJoinInvestment),
+    }));
+  }, [isOpen, initialTab]);
 
   useSmsOtpAutofill(isOpen && step === 'otp' && !loading, code => setOtp(code));
 
@@ -98,10 +112,13 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
 
       try {
         await sendOTP(formData.mobile);
+        setErrors({});
       } catch {
         const demoOTP = generateDemoOTP();
         storeDemoOTP(formData.mobile, demoOTP);
-        console.info('2Factor unavailable — demo OTP:', demoOTP);
+        setErrors({
+          otp: `SMS gateway unavailable. Demo OTP: ${demoOTP}`,
+        });
       }
       setOtp('');
       setOtpFieldKey(k => k + 1);
@@ -193,7 +210,10 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
         return;
       }
 
-      if (registerRole === 'member') {
+      if (
+        (registerRole === 'member' || registerRole === 'leader') &&
+        Number(formData.investmentAmount) > 0
+      ) {
         await addInvestment(
           result.user.id,
           Number(formData.investmentAmount),

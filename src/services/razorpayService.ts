@@ -7,12 +7,6 @@
 const RAZORPAY_KEY_ID =
   import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TwScjdiSaPmJyT';
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
-
 const loadRazorpayScript = (): Promise<boolean> => {
   return new Promise(resolve => {
     if (window.Razorpay) {

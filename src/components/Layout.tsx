@@ -33,12 +33,14 @@ export default function Layout({ children }: { children: ReactNode }) {
     { path: '/support', label: 'Support', icon: HelpCircle },
   ];
 
+  const isLeaderUser = Boolean(user?.isLeader || user?.role === 'leader');
+
   const memberNavItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/contributions', label: 'My Contribution', icon: Coins },
     { path: '/income/level1', label: 'Level 1 Income', icon: DollarSign },
     { path: '/income/level2', label: 'Level 2 Income', icon: TrendingUp },
-    ...(user?.isLeader ? [{ path: '/income/leader', label: 'Leader Income', icon: Crown }] : []),
+    ...(isLeaderUser ? [{ path: '/income/leader', label: 'Leader Income', icon: Crown }] : []),
     { path: '/team', label: 'My Team', icon: Users },
     { path: '/wallet', label: 'Wallet & Withdraw', icon: Wallet },
     { path: '/gold-showroom', label: 'Gold Showroom', icon: Gem },
@@ -85,7 +87,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                   Jewellbox
                 </h1>
                 <p className={`text-xs ${darkMode ? 'text-amber-400' : 'text-amber-600'} -mt-1 tracking-wider font-semibold`}>
-                  {user?.isLeader || user?.role === 'leader' ? 'LEADER DASHBOARD' : 'MEMBER DASHBOARD'}
+                  {isLeaderUser ? 'LEADER DASHBOARD' : 'MEMBER DASHBOARD'}
                 </p>
               </div>
             </Link>
@@ -103,7 +105,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-500/15 text-purple-700 text-xs font-bold rounded-full">
                     Member
                   </span>
-                  {(user?.isLeader || user?.role === 'leader') && (
+                  {isLeaderUser && (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-500/20 text-amber-600 text-xs font-bold rounded-full">
                       <Crown className="w-3 h-3" /> Leader Badge
                     </span>
@@ -176,7 +178,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               {sidebarOpen ? <X className={`w-6 h-6 ${darkMode ? 'text-white' : 'text-gray-900'}`} /> : <Menu className={`w-6 h-6 ${darkMode ? 'text-white' : 'text-gray-900'}`} />}
             </button>
             <div className="flex items-center gap-4 ml-auto">
-              {user?.isLeader && (
+              {isLeaderUser && (
                 <div className={`hidden sm:flex items-center gap-2 px-4 py-2 ${darkMode ? 'bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-amber-500/30' : 'bg-gradient-to-r from-amber-100 to-yellow-100 border-amber-300'} rounded-full border shadow-sm`}>
                   <Crown className={`w-5 h-5 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
                   <span className={`text-sm font-bold ${darkMode ? 'text-amber-300' : 'text-amber-700'}`}>Leader Status Active</span>

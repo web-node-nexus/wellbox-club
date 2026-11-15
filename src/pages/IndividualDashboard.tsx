@@ -37,49 +37,16 @@ export default function IndividualDashboard() {
   useEffect(() => {
     if (!user) return;
     
-    // Load orders from localStorage
+    // Real orders only (no demo seed)
     const savedOrders = localStorage.getItem(`individual_orders_${user.id}`);
     if (savedOrders) {
-      setOrders(JSON.parse(savedOrders));
+      try {
+        setOrders(JSON.parse(savedOrders));
+      } catch {
+        setOrders([]);
+      }
     } else {
-      // Demo orders
-      const demoOrders: GoldOrder[] = [
-        {
-          id: 'ORD001',
-          designName: 'Royal Necklace Set',
-          weight: 45.5,
-          purity: '22K',
-          image: designImages['Royal Necklace Set'],
-          status: 'delivered',
-          orderDate: '2024-05-15',
-          deliveryDate: '2024-05-22',
-          trackingId: 'TRK123456789',
-          amount: 285000,
-        },
-        {
-          id: 'ORD002',
-          designName: 'Gold Coin 10g',
-          weight: 10,
-          purity: '24K',
-          image: designImages['Gold Coin 10g'],
-          status: 'shipped',
-          orderDate: '2024-06-10',
-          trackingId: 'TRK987654321',
-          amount: 62500,
-        },
-        {
-          id: 'ORD003',
-          designName: 'Diamond Ring',
-          weight: 4.8,
-          purity: '24K',
-          image: designImages['Minimalist Ring'],
-          status: 'processing',
-          orderDate: '2024-06-18',
-          amount: 30000,
-        },
-      ];
-      setOrders(demoOrders);
-      localStorage.setItem(`individual_orders_${user.id}`, JSON.stringify(demoOrders));
+      setOrders([]);
     }
 
     // Load wishlist from localStorage

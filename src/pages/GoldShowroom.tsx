@@ -27,8 +27,40 @@ export default function GoldShowroom() {
   const [orderAmount, setOrderAmount] = useState('');
   const [refresh, setRefresh] = useState(0);
 
-  const categories = ['all', ...new Set(goldDesigns.map(d => d.category))];
-  const filtered = selectedCategory === 'all' ? goldDesigns : goldDesigns.filter(d => d.category === selectedCategory);
+  const catalog = useMemo(() => {
+    try {
+      const raw = localStorage.getItem('admin_gold_designs');
+      if (raw) {
+        const parsed = JSON.parse(raw) as any[];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const fromAdmin: GoldDesign[] = parsed
+            .filter((d: any) => d?.isActive !== false)
+            .map((d: any, i: number) => ({
+              id: String(d.id || `admin_${i}`),
+              name: String(d.name || 'Gold Design'),
+              category: String(d.category || 'Other'),
+              weightGrams: Number(d.weightGrams ?? d.weight) || 0,
+              purity: (d.purity === '24K' ? '24K' : '22K') as GoldDesign['purity'],
+              makingCharges: String(d.makingCharges || d.making || ''),
+              images: Array.isArray(d.images)
+                ? d.images
+                : d.image
+                  ? [d.image]
+                  : [],
+              description: String(d.description || d.desc || 'Premium gold jewellery'),
+            }));
+          if (fromAdmin.length > 0) return [...fromAdmin, ...goldDesigns];
+        }
+      }
+    } catch {
+      /* fall through */
+    }
+    return goldDesigns;
+  }, [refresh]);
+
+  const categories = ['all', ...new Set(catalog.map(d => d.category))];
+  const filtered =
+    selectedCategory === 'all' ? catalog : catalog.filter(d => d.category === selectedCategory);
 
   const unlocked = user ? getUnlockedInvested(user.id) : 0;
   const locked = user ? getLockedInvested(user.id) : 0;

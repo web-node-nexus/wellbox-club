@@ -5,7 +5,12 @@ import { useEffect, useState } from 'react';
 import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
 import PaymentModal from '../components/PaymentModal';
-import { getInvestments, getTotalInvested, addInvestment } from '../services/investmentService';
+import {
+  fetchInvestmentsForUser,
+  getInvestments,
+  getTotalInvested,
+  addInvestment,
+} from '../services/investmentService';
 import {
   fetchCommissions,
   getCommissionBalance,
@@ -18,6 +23,7 @@ import {
   type WithdrawalRecord,
 } from '../services/withdrawalService';
 import { BUSINESS_RULES } from '../data/businessRules';
+import { clearPendingPayment, savePendingPayment } from '../services/paymentPending';
 
 export default function WalletPage() {
   const { user, updateProfile } = useAuth();
@@ -53,6 +59,7 @@ export default function WalletPage() {
     setUpiId(user.upiId || '');
     Promise.all([
       fetchCommissions(user.id).catch(() => undefined),
+      fetchInvestmentsForUser(user.id, user.mobile).catch(() => undefined),
       fetchWithdrawals(user.id)
         .then(setMyWithdrawals)
         .catch(() => setMyWithdrawals([])),
@@ -223,7 +230,6 @@ export default function WalletPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {
-                  setPaymentAmount(BUSINESS_RULES.minJoinInvestment);
                   setActiveTab('investment');
                 }}
                 className="flex-1 py-4 bg-white/30 hover:bg-white/40 rounded-xl font-semibold text-lg transition-colors backdrop-blur flex items-center justify-center gap-2"
@@ -473,12 +479,36 @@ export default function WalletPage() {
               </p>
             </div>
 
-            <Link to="/gold-showroom">
-              <button className="mt-6 w-full py-4 bg-amber-500 hover:bg-amber-600 rounded-xl font-semibold text-lg transition-colors flex items-center justify-center gap-2">
-                <Gem className="w-5 h-5" />
-                Order Gold from Showroom
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  const amt = BUSINESS_RULES.defaultJoinInvestment;
+                  setPaymentAmount(amt);
+                  savePendingPayment({
+                    kind: 'invest',
+                    userId: user.id,
+                    mobile: user.mobile,
+                    amount: amt,
+                    returnTo: '/wallet',
+                  });
+                  setShowPaymentModal(true);
+                }}
+                className="w-full py-4 bg-white/20 hover:bg-white/30 rounded-xl font-semibold text-lg transition-colors flex items-center justify-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                Add Investment
               </button>
-            </Link>
+              <Link to="/gold-showroom">
+                <button
+                  type="button"
+                  className="w-full py-4 bg-amber-500 hover:bg-amber-600 rounded-xl font-semibold text-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  <Gem className="w-5 h-5" />
+                  Order Gold
+                </button>
+              </Link>
+            </div>
           </div>
 
           {/* Investment History */}
@@ -629,12 +659,15 @@ export default function WalletPage() {
         description="Additional investment — Jewellbox Club"
         onSuccess={async (response) => {
           try {
+            clearPendingPayment();
             await addInvestment(
               user.id,
               paymentAmount || BUSINESS_RULES.minJoinInvestment,
               response?.razorpay_payment_id,
               user.mobile
             );
+            await fetchInvestmentsForUser(user.id, user.mobile).catch(() => undefined);
+            setLedgerTick(t => t + 1);
             showToast('success', 'Investment added (locked 12 months)', 'Success');
             setShowPaymentModal(false);
           } catch (e: any) {
@@ -642,6 +675,7 @@ export default function WalletPage() {
           }
         }}
         onFailure={() => {
+          clearPendingPayment();
           showToast('error', 'Payment failed. Please try again.', 'Error');
         }}
       />

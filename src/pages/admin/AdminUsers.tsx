@@ -256,7 +256,7 @@ export default function AdminUsers() {
     }
   };
 
-  const handleBulkAction = (action: 'block' | 'unblock' | 'delete' | 'promote') => {
+  const handleBulkAction = async (action: 'block' | 'unblock' | 'delete' | 'promote') => {
     if (selectedUsers.length === 0) {
       showToast('error', 'Please select users first');
       return;
@@ -267,23 +267,55 @@ export default function AdminUsers() {
       return;
     }
 
-    switch (action) {
-      case 'block':
-        setUsers(users.map(u => selectedUsers.includes(u.id) ? { ...u, status: 'blocked' } : u));
-        showToast('success', `${count} users blocked`);
-        break;
-      case 'unblock':
-        setUsers(users.map(u => selectedUsers.includes(u.id) ? { ...u, status: 'active' } : u));
-        showToast('success', `${count} users unblocked`);
-        break;
-      case 'delete':
+    try {
+      if (action === 'promote') {
+        const next = [...users];
+        for (const id of selectedUsers) {
+          const u = next.find(x => x.id === id);
+          if (!u || u.role === 'admin') continue;
+          const saved = await upsertMember({
+            id: u.id,
+            name: u.name,
+            mobile: normalizeMobile(u.phone),
+            email: u.email || undefined,
+            phone: u.phone,
+            referralCode: u.referralCode,
+            referredBy: u.referredBy || '',
+            city: u.city || '',
+            role: 'leader',
+            isLeader: true,
+            teamSize: u.teamSize,
+            joinDate: u.joinDate,
+          });
+          const row = toAdminUser(saved);
+          const idx = next.findIndex(x => x.id === id);
+          if (idx >= 0) next[idx] = row;
+        }
+        setUsers(next);
+        showToast('success', `${count} user(s) promoted to Leader in database`);
+      } else if (action === 'delete') {
+        for (const id of selectedUsers) {
+          const { error } = await supabase.from('members').delete().eq('id', id);
+          if (error) throw error;
+        }
         setUsers(users.filter(u => !selectedUsers.includes(u.id)));
-        showToast('success', `${count} users deleted`);
-        break;
-      case 'promote':
-        setUsers(users.map(u => selectedUsers.includes(u.id) ? { ...u, isLeader: true } : u));
-        showToast('success', `${count} users promoted to Leader`);
-        break;
+        showToast('success', `${count} user(s) deleted from database`);
+      } else {
+        // Block/unblock is UI-only until a status column exists in members
+        setUsers(
+          users.map(u =>
+            selectedUsers.includes(u.id)
+              ? { ...u, status: action === 'block' ? 'blocked' : 'active' }
+              : u
+          )
+        );
+        showToast(
+          'success',
+          `${count} user(s) marked ${action === 'block' ? 'blocked' : 'active'} (UI-only — not stored in DB yet)`
+        );
+      }
+    } catch (e: any) {
+      showToast('error', e?.message || `Bulk ${action} failed`);
     }
     setSelectedUsers([]);
     setShowBulkActions(false);

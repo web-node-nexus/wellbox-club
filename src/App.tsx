@@ -58,27 +58,38 @@ import AdminReports from './pages/admin/AdminReports';
 import AdminAuditLogs from './pages/admin/AdminAuditLogs';
 import AdminNotifications from './pages/admin/AdminNotifications';
 
+function AuthLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-amber-50">
+      <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
+  if (!authReady) return <AuthLoading />;
   if (!user) return <Navigate to="/login" replace />;
   return <>{children}</>;
 }
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
+  if (!authReady) return <AuthLoading />;
   if (!user || user.role !== 'admin') return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 }
 
 function SmartRedirect() {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
+  if (!authReady) return <AuthLoading />;
   if (!user) return <Navigate to="/login" replace />;
-  
+
   // Redirect based on user role
   if (user.role === 'individual') {
     return <Navigate to="/individual-dashboard" replace />;
   }
-  
+
   // Default dashboard for member/leader
   return <Layout><Dashboard /></Layout>;
 }
@@ -156,6 +167,9 @@ function AppRoutes() {
         <Route path="/admin/cms" element={<AdminRoute><AdminLayout><AdminCMS /></AdminLayout></AdminRoute>} />
         <Route path="/admin/reports" element={<AdminRoute><AdminLayout><AdminReports /></AdminLayout></AdminRoute>} />
         <Route path="/admin/audit-logs" element={<AdminRoute><AdminLayout><AdminAuditLogs /></AdminLayout></AdminRoute>} />
+
+        {/* Unknown paths */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <JoinModal isOpen={joinOpen} onClose={() => setJoinOpen(false)} initialTab={joinTab} />
     </>
