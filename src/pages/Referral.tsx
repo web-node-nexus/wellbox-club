@@ -193,7 +193,7 @@ export default function Referral() {
           </li>
           <li className="flex items-start gap-2">
             <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-            <span>Highlight the 30% cheaper gold prices from our showroom</span>
+            <span>Highlight gold on more discount from our showroom</span>
           </li>
           <li className="flex items-start gap-2">
             <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
