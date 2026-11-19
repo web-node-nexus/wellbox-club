@@ -22,9 +22,16 @@ interface JoinModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialTab?: 'member' | 'leader' | 'individual';
+  /** When true (default), hide Member/Leader/Buyer toggle — only the CTA role form shows */
+  lockTab?: boolean;
 }
 
-export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: JoinModalProps) {
+export default function JoinModal({
+  isOpen,
+  onClose,
+  initialTab = 'member',
+  lockTab = true,
+}: JoinModalProps) {
   const { register, login } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'member' | 'leader' | 'individual'>(initialTab);
@@ -313,25 +320,94 @@ export default function JoinModal({ isOpen, onClose, initialTab = 'member' }: Jo
 
             <div className="bg-gradient-to-r from-amber-500/20 to-purple-500/20 p-6 pb-4 border-b border-white/5">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-xl flex items-center justify-center">
-                  <Crown className="w-5 h-5 text-purple-900" />
+                <div
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                    activeTab === 'leader'
+                      ? 'bg-gradient-to-br from-purple-500 to-pink-500'
+                      : activeTab === 'individual'
+                        ? 'bg-gradient-to-br from-blue-500 to-cyan-500'
+                        : 'bg-gradient-to-br from-yellow-400 to-amber-600'
+                  }`}
+                >
+                  {activeTab === 'leader' ? (
+                    <Crown className="w-5 h-5 text-white" />
+                  ) : activeTab === 'individual' ? (
+                    <ShoppingBag className="w-5 h-5 text-white" />
+                  ) : (
+                    <User className="w-5 h-5 text-purple-900" />
+                  )}
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold font-[var(--font-heading)] text-white">Join Jewellbox Club</h2>
+                  <h2 className="text-xl font-bold font-[var(--font-heading)] text-white">
+                    {activeTab === 'leader'
+                      ? 'Join as Leader'
+                      : activeTab === 'individual'
+                        ? 'Join as Buyer'
+                        : 'Join as Member'}
+                  </h2>
                   <p className="text-xs text-amber-300/70">OTP signup — no password needed</p>
                 </div>
               </div>
-              <div className="flex gap-2 bg-black/30 rounded-xl p-1">
-                <button type="button" onClick={() => resetTab('member')} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'member' ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 shadow-lg' : 'text-white/60 hover:text-white'}`}>
-                  <User className="w-4 h-4 inline mr-1" /> Member
-                </button>
-                <button type="button" onClick={() => resetTab('leader')} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'leader' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' : 'text-white/60 hover:text-white'}`}>
-                  <Crown className="w-4 h-4 inline mr-1" /> Leader
-                </button>
-                <button type="button" onClick={() => resetTab('individual')} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'individual' ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg' : 'text-white/60 hover:text-white'}`}>
-                  <ShoppingBag className="w-4 h-4 inline mr-1" /> Buyer
-                </button>
-              </div>
+              {lockTab ? (
+                <div
+                  className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold ${
+                    activeTab === 'leader'
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                      : activeTab === 'individual'
+                        ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
+                        : 'bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900'
+                  }`}
+                >
+                  {activeTab === 'leader' ? (
+                    <Crown className="w-4 h-4" />
+                  ) : activeTab === 'individual' ? (
+                    <ShoppingBag className="w-4 h-4" />
+                  ) : (
+                    <User className="w-4 h-4" />
+                  )}
+                  {activeTab === 'leader'
+                    ? 'Leader registration'
+                    : activeTab === 'individual'
+                      ? 'Buyer registration'
+                      : 'Member registration'}
+                </div>
+              ) : (
+                <div className="flex gap-2 bg-black/30 rounded-xl p-1">
+                  <button
+                    type="button"
+                    onClick={() => resetTab('member')}
+                    className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                      activeTab === 'member'
+                        ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 shadow-lg'
+                        : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    <User className="w-4 h-4 inline mr-1" /> Member
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => resetTab('leader')}
+                    className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                      activeTab === 'leader'
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                        : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    <Crown className="w-4 h-4 inline mr-1" /> Leader
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => resetTab('individual')}
+                    className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                      activeTab === 'individual'
+                        ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
+                        : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    <ShoppingBag className="w-4 h-4 inline mr-1" /> Buyer
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="p-6">
