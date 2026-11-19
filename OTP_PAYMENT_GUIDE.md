@@ -97,8 +97,8 @@ SUPABASE_SERVICE_ROLE_KEY=… # preferred; anon key also works with current RLS
 Public key fallback is already in `/api/vapid-public-key` + cron; set matching `VAPID_PRIVATE_KEY` on Vercel for push to work.
 
 ### 3) Cron
-`vercel.json` runs `/api/cron/payment-reminders` every 6 hours.  
-If Hobby plan only allows daily cron, use an external cron (cron-job.org) hitting that URL with `Authorization: Bearer <CRON_SECRET>`.
+Vercel Hobby allows **1 cron/day** — `vercel.json` runs `/api/cron/payment-reminders` at `0 4 * * *` (04:00 UTC).  
+For every-6-hour reminders, use an external cron (cron-job.org) hitting that URL with `Authorization: Bearer <CRON_SECRET>`.
 
 ### 4) User side
 Open app → allow notifications → **Enable Push Reminders** on Notifications / Contributions.
