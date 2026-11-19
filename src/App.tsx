@@ -115,7 +115,7 @@ function AppRoutes() {
   return (
     <>
       <ScrollToTop />
-      <Navbar onJoinClick={() => openJoin('member')} />
+      <Navbar />
       <Routes>
         {/* Public Pages */}
         <Route path="/" element={<PublicPageWrapper><Landing onJoinClick={openJoin} /></PublicPageWrapper>} />

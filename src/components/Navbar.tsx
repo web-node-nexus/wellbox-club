@@ -5,11 +5,7 @@ import { Crown, Menu, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
 
-interface NavbarProps {
-  onJoinClick: () => void;
-}
-
-export default function Navbar({ onJoinClick }: NavbarProps) {
+export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
@@ -129,19 +125,11 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
               ))}
             </div>
 
-            {/* CTA Buttons */}
+            {/* Sign In only — Join is via landing CTAs (Member / Leader) */}
             <div className="hidden lg:flex items-center gap-2">
               <Link to="/login" className="px-3 py-1.5 text-xs font-medium text-amber-300 hover:text-amber-200 transition-colors whitespace-nowrap">
                 {translate('common.signIn')}
               </Link>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onJoinClick}
-                className="px-4 py-2 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-purple-900 font-semibold text-xs rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-shadow whitespace-nowrap"
-              >
-                {translate('common.joinNow')}
-              </motion.button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -206,13 +194,6 @@ export default function Navbar({ onJoinClick }: NavbarProps) {
                   >
                     {translate('common.signIn')}
                   </Link>
-                  <button
-                    type="button"
-                    onClick={() => { setMobileOpen(false); onJoinClick(); }}
-                    className="flex w-full min-h-12 items-center justify-center px-4 py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-purple-900 rounded-xl font-semibold text-base"
-                  >
-                    {translate('common.joinNow')}
-                  </button>
                 </div>
               </div>
             </motion.div>
