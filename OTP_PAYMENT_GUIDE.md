@@ -80,7 +80,7 @@ Your Jewellbox Club OTP is {otp}. Do not share it.
 
 ## Monthly Autopay (Razorpay Subscriptions)
 
-Join / Contribute uses **UPI Autopay**: amount ₹1000–₹10000, **same amount every month for 24 months**.
+Join / Contribute uses **UPI Autopay**: amount ₹1–₹10000, **same amount every month for 24 months**.
 
 ### Setup
 1. Run `supabase/autopay_migration.sql` in Supabase SQL Editor.

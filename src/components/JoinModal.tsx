@@ -75,7 +75,7 @@ export default function JoinModal({
     if ((activeTab === 'leader' || activeTab === 'individual') && !formData.city.trim()) {
       newErrors.city = 'City is required';
     }
-    // Member + Leader path: same investment amount rules (Autopay ₹1000–₹10000)
+    // Member + Leader path: same investment amount rules (Autopay ₹1–₹10000)
     if (activeTab === 'member' || activeTab === 'leader') {
       const amt = Number(formData.investmentAmount);
       if (!amt || amt < BUSINESS_RULES.minJoinInvestment) {

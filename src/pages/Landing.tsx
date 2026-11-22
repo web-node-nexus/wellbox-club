@@ -1020,9 +1020,9 @@ export default function Landing({ onJoinClick }: LandingProps) {
                   </label>
                   <input
                     type="range"
-                    min={1000}
+                    min={1}
                     max={10000}
-                    step={500}
+                    step={1}
                     value={calcContribution}
                     onChange={e => setCalcContribution(Number(e.target.value))}
                     className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-gradient-to-br [&::-webkit-slider-thumb]:from-amber-400 [&::-webkit-slider-thumb]:to-yellow-600 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg"
