@@ -337,7 +337,7 @@ export default function Login() {
                 to="/register"
                 className="inline-flex items-center justify-center w-full py-3 rounded-xl border border-amber-300 bg-amber-50 text-amber-800 text-sm font-semibold"
               >
-                Join Now — become a member (₹1,000+)
+                Join Now — become a member (₹1+)
               </Link>
             )}
           </div>

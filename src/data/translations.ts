@@ -117,7 +117,7 @@ export const translations = {
     steps: {
       step1: {
         title: { en: 'Join & Contribute', hi: 'जुड़ें और योगदान करें', kn: 'ಸೇರಿ ಮತ್ತು ಕೊಡುಗೆ ನೀಡಿ' },
-        desc: { en: 'Sign up with a referral code, make your first monthly contribution starting from ₹1,000. Your gold savings begin!', hi: 'रेफरल कोड से साइन अप करें, ₹1,000 से अपनी पहली मासिक योगदान करें। आपकी सोने की बचत शुरू!', kn: 'ರೆಫರಲ್ ಕೋಡ್‌ನೊಂದಿಗೆ ಸೈನ್ ಅಪ್ ಮಾಡಿ, ₹1,000 ರಿಂದ ನಿಮ್ಮ ಮೊದಲ ಮಾಸಿಕ ಕೊಡುಗೆಯನ್ನು ನೀಡಿ. ನಿಮ್ಮ ಚಿನ್ನದ ಉಳಿತಾಯ ಪ್ರಾರಂಭವಾಗುತ್ತದೆ!' },
+        desc: { en: 'Sign up with a referral code, make your first monthly contribution starting from ₹1. Your gold savings begin!', hi: 'रेफरल कोड से साइन अप करें, ₹1 से अपनी पहली मासिक योगदान करें। आपकी सोने की बचत शुरू!', kn: 'ರೆಫರಲ್ ಕೋಡ್‌ನೊಂದಿಗೆ ಸೈನ್ ಅಪ್ ಮಾಡಿ, ₹1 ರಿಂದ ನಿಮ್ಮ ಮೊದಲ ಮಾಸಿಕ ಕೊಡುಗೆಯನ್ನು ನೀಡಿ. ನಿಮ್ಮ ಚಿನ್ನದ ಉಳಿತಾಯ ಪ್ರಾರಂಭವಾಗುತ್ತದೆ!' },
       },
       step2: {
         title: { en: 'Build Your Team', hi: 'अपनी टीम बनाएं', kn: 'ನಿಮ್ಮ ತಂಡವನ್ನು ನಿರ್ಮಿಸಿ' },
@@ -168,7 +168,7 @@ export const translations = {
       },
       step2: {
         title: { en: 'Make Monthly Contributions', hi: 'मासिक योगदान करें' },
-        desc: { en: 'Start saving for gold with monthly contributions from ₹1,000. Your money is securely locked for 12 months — building your gold fund while you earn.', hi: '₹1,000 से मासिक योगदान के साथ सोने के लिए बचत शुरू करें। आपका पैसा 12 महीने के लिए सुरक्षित रूप से लॉक हो जाता है — कमाई करते हुए आपका सोना कोष बनाता है।' },
+        desc: { en: 'Start saving for gold with monthly contributions from ₹1. Your money is securely locked for 12 months — building your gold fund while you earn.', hi: '₹1 से मासिक योगदान के साथ सोने के लिए बचत शुरू करें। आपका पैसा 12 महीने के लिए सुरक्षित रूप से लॉक हो जाता है — कमाई करते हुए आपका सोना कोष बनाता है।' },
       },
       step3: {
         title: { en: 'Earn Commissions', hi: 'कमीशन कमाएं' },
@@ -428,7 +428,7 @@ export const translations = {
     howItWorks: { en: 'How It Works', hi: 'कैसे काम करता है', kn: 'ಇದು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ' },
     simpleSteps: { en: '3 simple steps to start your gold journey', hi: 'सोने की यात्रा शुरू करने के 3 आसान कदम', kn: 'ನಿಮ್ಮ ಚಿನ್ನದ ಪ್ರಯಾಣವನ್ನು ಪ್ರಾರಂಭಿಸಲು 3 ಸರಳ ಹಂತಗಳು' },
     joinAndContribute: { en: 'Join & Contribute', hi: 'जुड़ें और योगदान करें', kn: 'ಸೇರಿ ಮತ್ತು ಕೊಡುಗೆ ನೀಡಿ' },
-    joinDesc: { en: 'Sign up with a referral code, make your first monthly contribution starting from ₹1,000.', hi: 'रेफरल कोड से साइन अप करें, ₹1,000 से मासिक योगदान शुरू करें।', kn: 'ರೆಫರಲ್ ಕೋಡ್‌ನೊಂದಿಗೆ ಸೈನ್ ಅಪ್ ಮಾಡಿ, ₹1,000 ರಿಂದ ಮಾಸಿಕ ಕೊಡುಗೆಯನ್ನು ಪ್ರಾರಂಭಿಸಿ.' },
+    joinDesc: { en: 'Sign up with a referral code, make your first monthly contribution starting from ₹1.', hi: 'रेफरल कोड से साइन अप करें, ₹1 से मासिक योगदान शुरू करें।', kn: 'ರೆಫರಲ್ ಕೋಡ್‌ನೊಂದಿಗೆ ಸೈನ್ ಅಪ್ ಮಾಡಿ, ₹1 ರಿಂದ ಮಾಸಿಕ ಕೊಡುಗೆಯನ್ನು ಪ್ರಾರಂಭಿಸಿ.' },
     buildTeam: { en: 'Build Your Team', hi: 'अपनी टीम बनाएं', kn: 'ನಿಮ್ಮ ತಂಡವನ್ನು ನಿರ್ಮಿಸಿ' },
     buildDesc: { en: 'Share your unique referral code. Earn 10% on Level 1 and 5% on Level 2 contributions.', hi: 'अपना रेफरल कोड शेयर करें। Level 1 पर 10% और Level 2 पर 5% कमाएं।', kn: 'ನಿಮ್ಮ ಅನನ್ಯ ರೆಫರಲ್ ಕೋಡ್ ಅನ್ನು ಹಂಚಿಕೊಳ್ಳಿ. ಲೆವೆಲ್ 1 ರಲ್ಲಿ 10% ಮತ್ತು ಲೆವೆಲ್ 2 ಕೊಡುಗೆಗಳಲ್ಲಿ 5% ಗಳಿಸಿ.' },
     earnAndOwn: { en: 'Earn & Own Gold', hi: 'कमाएं और सोना अपना बनाएं', kn: 'ಗಳಿಸಿ ಮತ್ತು ಚಿನ್ನವನ್ನು ಹೊಂದಿ' },
