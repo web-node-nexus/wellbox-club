@@ -85,7 +85,8 @@ Join / Contribute uses **UPI Autopay**: amount ₹1000–₹10000, **same amount
 ### Setup
 1. Run `supabase/autopay_migration.sql` in Supabase SQL Editor.
 2. Razorpay Dashboard → Subscriptions → Settings → UPI Autopay ON (already done).
-3. Webhooks → add `https://YOUR_DOMAIN/api/razorpay-webhook`  
+3. Webhooks → add (live domain):
+   `https://www.jewellbox.cloud/api/razorpay-webhook`  
    Events: `subscription.charged`, `subscription.activated`, `subscription.halted`, `subscription.cancelled`, `subscription.completed`  
    Optional env: `RAZORPAY_WEBHOOK_SECRET`
 
