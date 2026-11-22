@@ -78,6 +78,19 @@ Your Jewellbox Club OTP is {otp}. Do not share it.
 ## Build Status
 ✅ Build successful
 
+## Monthly Autopay (Razorpay Subscriptions)
+
+Join / Contribute uses **UPI Autopay**: amount ₹1000–₹10000, **same amount every month for 24 months**.
+
+### Setup
+1. Run `supabase/autopay_migration.sql` in Supabase SQL Editor.
+2. Razorpay Dashboard → Subscriptions → Settings → UPI Autopay ON (already done).
+3. Webhooks → add `https://YOUR_DOMAIN/api/razorpay-webhook`  
+   Events: `subscription.charged`, `subscription.activated`, `subscription.halted`, `subscription.cancelled`, `subscription.completed`  
+   Optional env: `RAZORPAY_WEBHOOK_SECRET`
+
+First payment creates membership + investment; later months are credited via webhook → `investments` table.
+
 ## Monthly payment reminders (manual pay + push)
 
 Payment stays **manual** (no auto-debit). Reminders start **5 days before** next due date, every **6 hours**.

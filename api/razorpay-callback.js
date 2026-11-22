@@ -6,10 +6,17 @@ export default async function handler(req, res) {
   const pick = (obj = {}) => ({
     razorpay_payment_id: obj.razorpay_payment_id || obj.razorpayPaymentId || '',
     razorpay_order_id: obj.razorpay_order_id || obj.razorpayOrderId || '',
+    razorpay_subscription_id:
+      obj.razorpay_subscription_id || obj.razorpaySubscriptionId || '',
     razorpay_signature: obj.razorpay_signature || obj.razorpaySignature || '',
   });
 
-  let fields = { razorpay_payment_id: '', razorpay_order_id: '', razorpay_signature: '' };
+  let fields = {
+    razorpay_payment_id: '',
+    razorpay_order_id: '',
+    razorpay_subscription_id: '',
+    razorpay_signature: '',
+  };
 
   if (req.method === 'POST') {
     const body = typeof req.body === 'string' ? (() => {
@@ -32,6 +39,8 @@ export default async function handler(req, res) {
   const q = new URLSearchParams();
   if (fields.razorpay_payment_id) q.set('razorpay_payment_id', fields.razorpay_payment_id);
   if (fields.razorpay_order_id) q.set('razorpay_order_id', fields.razorpay_order_id);
+  if (fields.razorpay_subscription_id)
+    q.set('razorpay_subscription_id', fields.razorpay_subscription_id);
   if (fields.razorpay_signature) q.set('razorpay_signature', fields.razorpay_signature);
 
   const dest = `/payment/callback${q.toString() ? `?${q.toString()}` : ''}`;

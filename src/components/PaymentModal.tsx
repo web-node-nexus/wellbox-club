@@ -12,6 +12,8 @@ interface PaymentModalProps {
   description: string;
   guest?: { name: string; mobile: string };
   allowDemoPay?: boolean;
+  /** Monthly Autopay for 24 months at this amount (default true) */
+  autopay?: boolean;
   /** Called only for demo pay or rare non-redirect handler */
   onSuccess?: (response: any) => void;
   onFailure?: (error: any) => void;
@@ -24,6 +26,7 @@ export default function PaymentModal({
   description,
   guest,
   allowDemoPay = false,
+  autopay = true,
   onSuccess,
   onFailure,
 }: PaymentModalProps) {
@@ -72,12 +75,13 @@ export default function PaymentModal({
       await initiatePayment({
         amount,
         description,
+        autopay,
+        userId: user?.id,
         prefill: {
           name: payer.name,
           contact: payer.mobile,
         },
         onSuccess: response => {
-          // Rare: handler without redirect
           completeSuccess(response);
         },
         onFailure: (error: any) => {
@@ -95,7 +99,6 @@ export default function PaymentModal({
           onFailure?.(error);
         },
       });
-      // Redirect mode: browser will leave this page on success
       setIsProcessing(false);
     } catch (error: any) {
       setPaymentStatus('failure');
@@ -160,16 +163,26 @@ export default function PaymentModal({
               <>
                 <div className="bg-white/5 rounded-xl p-4 mb-6 border border-white/10">
                   <div className="flex justify-between mb-2">
-                    <span className="text-sm text-white/60">Amount</span>
+                    <span className="text-sm text-white/60">
+                      {autopay ? 'Monthly Autopay' : 'Amount'}
+                    </span>
                     <span className="text-2xl font-bold text-amber-400">
                       {formatAmount(amount)}
                     </span>
                   </div>
                   <p className="text-xs text-white/50">{description}</p>
+                  {autopay && (
+                    <p className="text-xs text-emerald-300/90 mt-2">
+                      Same amount every month for 24 months via UPI Autopay. Approve once — then
+                      auto-debit on the same date.
+                    </p>
+                  )}
                 </div>
 
                 <p className="text-xs text-white/50 mb-4 text-center">
-                  Pay on Razorpay / UPI. Window closes automatically when payment is confirmed — no extra button.
+                  {autopay
+                    ? 'Razorpay opens UPI Autopay mandate. Window closes when first payment is confirmed.'
+                    : 'Pay on Razorpay / UPI. Window closes automatically when payment is confirmed.'}
                 </p>
 
                 <button
@@ -186,7 +199,9 @@ export default function PaymentModal({
                   ) : (
                     <>
                       <CreditCard className="w-5 h-5" />
-                      Pay {formatAmount(amount)}
+                      {autopay
+                        ? `Start Autopay ${formatAmount(amount)}/mo`
+                        : `Pay ${formatAmount(amount)}`}
                     </>
                   )}
                 </button>

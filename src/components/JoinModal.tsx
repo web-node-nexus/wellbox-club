@@ -11,6 +11,7 @@ import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clear
 import { addInvestment } from '../services/investmentService';
 import { BUSINESS_RULES } from '../data/businessRules';
 import { clearPendingPayment, savePendingPayment } from '../services/paymentPending';
+import { saveMemberSubscription } from '../services/autopayService';
 import {
   otpInputProps,
   readOtpFromClipboard,
@@ -74,11 +75,13 @@ export default function JoinModal({
     if ((activeTab === 'leader' || activeTab === 'individual') && !formData.city.trim()) {
       newErrors.city = 'City is required';
     }
-    // Member + Leader path: same investment amount rules
+    // Member + Leader path: same investment amount rules (Autopay ₹1000–₹10000)
     if (activeTab === 'member' || activeTab === 'leader') {
       const amt = Number(formData.investmentAmount);
       if (!amt || amt < BUSINESS_RULES.minJoinInvestment) {
         newErrors.investmentAmount = `Minimum first investment is ₹${BUSINESS_RULES.minJoinInvestment}`;
+      } else if (amt > BUSINESS_RULES.maxJoinInvestment) {
+        newErrors.investmentAmount = `Maximum Autopay amount is ₹${BUSINESS_RULES.maxJoinInvestment}`;
       }
     }
     setErrors(newErrors);
@@ -190,7 +193,7 @@ export default function JoinModal({
     window.location.assign(path);
   };
 
-  const finishRegistration = async (paymentId?: string) => {
+  const finishRegistration = async (paymentId?: string, paymentResponse?: any) => {
     setLoading(true);
     try {
       const result = await register({
@@ -227,6 +230,24 @@ export default function JoinModal({
           paymentId,
           formData.mobile
         );
+
+        const subId =
+          paymentResponse?.razorpay_subscription_id ||
+          sessionStorage.getItem('jb_rzp_subscription_id') ||
+          '';
+        if (subId) {
+          await saveMemberSubscription({
+            userId: result.user.id,
+            mobile: formData.mobile,
+            razorpaySubscriptionId: subId,
+            razorpayPlanId: paymentResponse?.autopay_plan_id || '',
+            amount: Number(formData.investmentAmount),
+            totalCount:
+              paymentResponse?.autopay_total_count || BUSINESS_RULES.autopayMonths,
+            status: 'active',
+            paidCount: 1,
+          }).catch(err => console.warn('saveMemberSubscription', err));
+        }
       }
 
       await login(formData.mobile);
@@ -255,7 +276,7 @@ export default function JoinModal({
   const handlePaymentSuccess = (response: any) => {
     clearPendingPayment();
     setShowPayment(false);
-    void finishRegistration(response?.razorpay_payment_id);
+    void finishRegistration(response?.razorpay_payment_id, response);
   };
 
   const handleResendOTP = async () => {
@@ -451,7 +472,9 @@ export default function JoinModal({
                         {activeTab === 'leader'
                           ? `You join as a Leader (L1/L2 same as members). Leader ${BUSINESS_RULES.leaderPercent}% team income unlocks at ${BUSINESS_RULES.leaderTeamRequirement} team members. `
                           : 'You join as a Member — Leader status is only for those who register via the Leader form. '}
-                        Min ₹{BUSINESS_RULES.minJoinInvestment}, no maximum. Locks 12 months — then redeem as gold. Withdraw only level income.
+                        ₹{BUSINESS_RULES.minJoinInvestment}–₹{BUSINESS_RULES.maxJoinInvestment}.
+                        Autopay: same amount every month for {BUSINESS_RULES.autopayMonths} months.
+                        Each payment locks 12 months — then redeem as gold.
                       </p>
                     </div>
                   )}
@@ -599,25 +622,33 @@ export default function JoinModal({
 
                   <div>
                     <label className="block text-xs font-medium text-white/60 mb-1.5">
-                      Adjust amount (min ₹{BUSINESS_RULES.minJoinInvestment})
+                      Monthly Autopay amount (₹{BUSINESS_RULES.minJoinInvestment}–₹
+                      {BUSINESS_RULES.maxJoinInvestment})
                     </label>
                     <input
                       type="number"
                       min={BUSINESS_RULES.minJoinInvestment}
+                      max={BUSINESS_RULES.maxJoinInvestment}
                       value={formData.investmentAmount}
                       onChange={e => setFormData(p => ({ ...p, investmentAmount: e.target.value }))}
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-amber-500/50"
                     />
+                    <p className="text-[11px] text-emerald-300/80 mt-1.5">
+                      UPI Autopay for {BUSINESS_RULES.autopayMonths} months — same amount every month.
+                    </p>
                   </div>
 
                   <button
                     type="button"
-                    disabled={Number(formData.investmentAmount) < BUSINESS_RULES.minJoinInvestment}
+                    disabled={
+                      Number(formData.investmentAmount) < BUSINESS_RULES.minJoinInvestment ||
+                      Number(formData.investmentAmount) > BUSINESS_RULES.maxJoinInvestment
+                    }
                     onClick={openRazorpayCheckout}
                     className="w-full py-4 rounded-xl font-semibold bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     <CreditCard className="w-5 h-5" />
-                    Pay ₹{Number(formData.investmentAmount || 0).toLocaleString()} & Join
+                    Start Autopay ₹{Number(formData.investmentAmount || 0).toLocaleString()}/mo & Join
                   </button>
 
                   <button
@@ -646,14 +677,20 @@ export default function JoinModal({
                   <h3 className="text-xl font-bold text-white mb-2">Welcome to Jewellbox Club!</h3>
                   <p className="text-sm text-white/60 mb-2">
                     {activeTab === 'leader'
-                      ? `₹${Number(formData.investmentAmount).toLocaleString()} invested as Leader — opening your dashboard…`
+                      ? `₹${Number(formData.investmentAmount).toLocaleString()}/mo Autopay as Leader — opening dashboard…`
                       : activeTab === 'member'
-                        ? `₹${Number(formData.investmentAmount).toLocaleString()} invested as member — opening your dashboard…`
+                        ? `₹${Number(formData.investmentAmount).toLocaleString()}/mo Autopay as member — opening dashboard…`
                         : 'Redirecting…'}
                   </p>
+                  {(activeTab === 'member' || activeTab === 'leader') && (
+                    <p className="text-xs text-emerald-300/80">
+                      Autopay active for {BUSINESS_RULES.autopayMonths} months at the same amount.
+                    </p>
+                  )}
                   {activeTab === 'leader' && (
-                    <p className="text-xs text-amber-300/80">
-                      Grow your team to {BUSINESS_RULES.leaderTeamRequirement} to unlock Leader {BUSINESS_RULES.leaderPercent}% income.
+                    <p className="text-xs text-amber-300/80 mt-1">
+                      Grow your team to {BUSINESS_RULES.leaderTeamRequirement} to unlock Leader{' '}
+                      {BUSINESS_RULES.leaderPercent}% income.
                     </p>
                   )}
                 </motion.div>
@@ -665,7 +702,8 @@ export default function JoinModal({
             isOpen={showPayment}
             onClose={() => setShowPayment(false)}
             amount={Number(formData.investmentAmount) || 0}
-            description="First investment — Jewellbox Club membership"
+            description={`Monthly Autopay × ${BUSINESS_RULES.autopayMonths} months — Jewellbox Club`}
+            autopay
             guest={{ name: formData.name, mobile: formData.mobile }}
             onSuccess={handlePaymentSuccess}
             onFailure={() => setErrors({ otp: 'Payment failed. Member not created.' })}

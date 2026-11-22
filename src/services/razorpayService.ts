@@ -26,7 +26,11 @@ interface PaymentOptions {
   currency?: string;
   description?: string;
   prefill?: { name?: string; email?: string; contact?: string };
+  /** When true (default for join), opens Razorpay Subscription Autopay for 24 months */
+  autopay?: boolean;
+  userId?: string;
   onOrderCreated?: (orderId: string) => void;
+  onSubscriptionCreated?: (subscriptionId: string) => void;
   onSuccess: (response: any) => void;
   onFailure: (error: any) => void;
 }
@@ -104,6 +108,7 @@ export const initiatePayment = async (options: PaymentOptions) => {
   const signal = { stopped: false };
   let pollTimer: ReturnType<typeof setInterval> | null = null;
   let rzp: any = null;
+  const useAutopay = options.autopay !== false;
 
   const cleanup = () => {
     signal.stopped = true;
@@ -161,11 +166,67 @@ export const initiatePayment = async (options: PaymentOptions) => {
     const isLoaded = await loadRazorpayScript();
     if (!isLoaded) throw new Error('Failed to load Razorpay SDK');
 
+    const contact = (options.prefill?.contact || '').replace(/\D/g, '').slice(-10);
+
+    // ——— Autopay (Subscription): same amount every month for 24 months ———
+    if (useAutopay) {
+      const { createAutopaySubscription } = await import('./autopayService');
+      const sub = await createAutopaySubscription({
+        amount: options.amount,
+        name: options.prefill?.name,
+        mobile: contact,
+        userId: options.userId,
+      });
+      options.onSubscriptionCreated?.(sub.subscriptionId);
+      sessionStorage.setItem('jb_rzp_subscription_id', sub.subscriptionId);
+      sessionStorage.removeItem('jb_rzp_order_id');
+
+      const razorpayOptions = {
+        key: sub.keyId || RAZORPAY_KEY_ID,
+        subscription_id: sub.subscriptionId,
+        name: 'Jewellbox Club',
+        description:
+          options.description ||
+          `Monthly Autopay ₹${options.amount.toLocaleString('en-IN')} × 24 months`,
+        handler: function (response: any) {
+          finishSuccess({
+            ...response,
+            razorpay_subscription_id:
+              response.razorpay_subscription_id || sub.subscriptionId,
+            autopay: true,
+            autopay_amount: options.amount,
+            autopay_plan_id: sub.planId,
+            autopay_total_count: sub.totalCount,
+          });
+        },
+        prefill: {
+          name: options.prefill?.name || '',
+          email: options.prefill?.email || '',
+          contact: contact || undefined,
+        },
+        theme: { color: '#F59E0B' },
+        modal: {
+          ondismiss: function () {
+            finishFailure({ message: 'Payment cancelled', code: 'dismissed' });
+          },
+          escape: true,
+          confirm_close: false,
+        },
+        retry: { enabled: true, max_count: 3 },
+      };
+
+      rzp = new window.Razorpay(razorpayOptions);
+      rzp.on('payment.failed', function (response: any) {
+        finishFailure(response?.error || response);
+      });
+      rzp.open();
+      return rzp;
+    }
+
+    // ——— One-time order (fallback) ———
     const order = await createRazorpayOrder(options.amount, options.description);
     options.onOrderCreated?.(order.id);
     sessionStorage.setItem('jb_rzp_order_id', order.id);
-
-    const contact = (options.prefill?.contact || '').replace(/\D/g, '').slice(-10);
 
     const razorpayOptions = {
       key: order.keyId || RAZORPAY_KEY_ID,
@@ -174,7 +235,6 @@ export const initiatePayment = async (options: PaymentOptions) => {
       currency: order.currency || 'INR',
       name: 'Jewellbox Club',
       description: options.description || 'Payment for Jewellbox Club',
-      // Handler = Checkout auto-closes when Razorpay confirms (same as other sites)
       handler: function (response: any) {
         finishSuccess(response);
       },
@@ -186,7 +246,6 @@ export const initiatePayment = async (options: PaymentOptions) => {
       theme: { color: '#F59E0B' },
       modal: {
         ondismiss: function () {
-          // User closed — but money may already be deducted; check once more
           void (async () => {
             try {
               const st = await fetchRazorpayOrderStatus(order.id);
@@ -216,14 +275,12 @@ export const initiatePayment = async (options: PaymentOptions) => {
       finishFailure(response?.error || response);
     });
 
-    // Silent poll — closes Checkout as soon as order is paid (fixes stuck UPI QR)
     pollTimer = setInterval(() => {
       void checkPaidAndClose(order.id);
     }, 2500);
     document.addEventListener('visibilitychange', onVisible);
     window.addEventListener('focus', onVisible);
 
-    // Safety stop after 8 minutes
     setTimeout(() => {
       signal.stopped = true;
       if (pollTimer) {

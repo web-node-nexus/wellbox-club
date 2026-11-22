@@ -2,8 +2,10 @@
 
 interface RazorpayOptions {
   key: string;
-  amount: number;
-  currency: string;
+  amount?: number;
+  currency?: string;
+  order_id?: string;
+  subscription_id?: string;
   name: string;
   description?: string;
   image?: string;
@@ -18,12 +20,19 @@ interface RazorpayOptions {
   };
   modal?: {
     ondismiss?: () => void;
+    escape?: boolean;
+    confirm_close?: boolean;
+  };
+  retry?: {
+    enabled?: boolean;
+    max_count?: number;
   };
 }
 
 interface RazorpayResponse {
   razorpay_payment_id: string;
   razorpay_order_id?: string;
+  razorpay_subscription_id?: string;
   razorpay_signature?: string;
 }
 

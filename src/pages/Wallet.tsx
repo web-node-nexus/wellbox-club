@@ -24,6 +24,7 @@ import {
 } from '../services/withdrawalService';
 import { BUSINESS_RULES } from '../data/businessRules';
 import { clearPendingPayment, savePendingPayment } from '../services/paymentPending';
+import { saveMemberSubscription } from '../services/autopayService';
 
 export default function WalletPage() {
   const { user, updateProfile } = useAuth();
@@ -497,7 +498,7 @@ export default function WalletPage() {
                 className="w-full py-4 bg-white/20 hover:bg-white/30 rounded-xl font-semibold text-lg transition-colors flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                Add Investment
+                Start Autopay
               </button>
               <Link to="/gold-showroom">
                 <button
@@ -657,18 +658,40 @@ export default function WalletPage() {
         onClose={() => setShowPaymentModal(false)}
         amount={paymentAmount || BUSINESS_RULES.minJoinInvestment}
         description="Additional investment — Jewellbox Club"
+        autopay
         onSuccess={async (response) => {
           try {
             clearPendingPayment();
+            const amt = paymentAmount || BUSINESS_RULES.minJoinInvestment;
             await addInvestment(
               user.id,
-              paymentAmount || BUSINESS_RULES.minJoinInvestment,
+              amt,
               response?.razorpay_payment_id,
               user.mobile
             );
+            const subId =
+              response?.razorpay_subscription_id ||
+              sessionStorage.getItem('jb_rzp_subscription_id') ||
+              '';
+            if (subId) {
+              await saveMemberSubscription({
+                userId: user.id,
+                mobile: user.mobile,
+                razorpaySubscriptionId: subId,
+                razorpayPlanId: response?.autopay_plan_id || '',
+                amount: amt,
+                totalCount: response?.autopay_total_count || BUSINESS_RULES.autopayMonths,
+                status: 'active',
+                paidCount: 1,
+              }).catch(() => undefined);
+            }
             await fetchInvestmentsForUser(user.id, user.mobile).catch(() => undefined);
             setLedgerTick(t => t + 1);
-            showToast('success', 'Investment added (locked 12 months)', 'Success');
+            showToast(
+              'success',
+              `Autopay ₹${amt.toLocaleString()}/mo for ${BUSINESS_RULES.autopayMonths} months`,
+              'Autopay Active'
+            );
             setShowPaymentModal(false);
           } catch (e: any) {
             showToast('error', e?.message || 'Could not save investment', 'Error');

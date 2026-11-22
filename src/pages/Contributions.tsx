@@ -24,6 +24,11 @@ import {
   reminderWindowMeta,
 } from '../services/contributionDue';
 import { enablePaymentPushReminders, pushSupported } from '../services/pushService';
+import {
+  fetchUserSubscriptions,
+  saveMemberSubscription,
+  type MemberSubscription,
+} from '../services/autopayService';
 
 export default function Contributions() {
   const { user } = useAuth();
@@ -33,6 +38,7 @@ export default function Contributions() {
   const [investAmount, setInvestAmount] = useState('');
   const [investError, setInvestError] = useState('');
   const [investments, setInvestments] = useState<Investment[]>([]);
+  const [subs, setSubs] = useState<MemberSubscription[]>([]);
   const [, setTick] = useState(0);
 
   useEffect(() => {
@@ -44,6 +50,12 @@ export default function Contributions() {
         if (!cancelled) setInvestments(list);
       } catch {
         if (!cancelled) setInvestments(getInvestments(user.id));
+      }
+      try {
+        const s = await fetchUserSubscriptions(user.id);
+        if (!cancelled) setSubs(s);
+      } catch {
+        if (!cancelled) setSubs([]);
       }
     })();
     return () => {
@@ -80,6 +92,10 @@ export default function Contributions() {
       setInvestError(`Minimum investment is ₹${BUSINESS_RULES.minJoinInvestment}`);
       return;
     }
+    if (amount > BUSINESS_RULES.maxJoinInvestment) {
+      setInvestError(`Maximum Autopay amount is ₹${BUSINESS_RULES.maxJoinInvestment}`);
+      return;
+    }
     setInvestError('');
     setShowInvestModal(false);
     savePendingPayment({
@@ -92,7 +108,7 @@ export default function Contributions() {
     setShowPayment(true);
   };
 
-  const handlePaymentSuccess = async (response?: { razorpay_payment_id?: string }) => {
+  const handlePaymentSuccess = async (response?: any) => {
     try {
       clearPendingPayment();
       await addInvestment(
@@ -101,11 +117,29 @@ export default function Contributions() {
         response?.razorpay_payment_id,
         user.mobile
       );
+      const subId =
+        response?.razorpay_subscription_id ||
+        sessionStorage.getItem('jb_rzp_subscription_id') ||
+        '';
+      if (subId) {
+        await saveMemberSubscription({
+          userId: user.id,
+          mobile: user.mobile,
+          razorpaySubscriptionId: subId,
+          razorpayPlanId: response?.autopay_plan_id || '',
+          amount: Number(investAmount),
+          totalCount: response?.autopay_total_count || BUSINESS_RULES.autopayMonths,
+          status: 'active',
+          paidCount: 1,
+        }).catch(() => undefined);
+        const s = await fetchUserSubscriptions(user.id).catch(() => []);
+        setSubs(s);
+      }
       refresh();
       showToast(
         'success',
-        `₹${Number(investAmount).toLocaleString()} invested — locked 12 months.`,
-        'Investment Successful'
+        `Autopay ₹${Number(investAmount).toLocaleString()}/mo started for ${BUSINESS_RULES.autopayMonths} months.`,
+        'Autopay Active'
       );
       setShowPayment(false);
       setInvestAmount('');
@@ -158,6 +192,20 @@ export default function Contributions() {
         </div>
       </div>
 
+      {subs.length > 0 && (
+        <div className="rounded-2xl p-4 border border-emerald-200 bg-emerald-50">
+          <p className="font-semibold text-gray-900">Your Autopay</p>
+          <ul className="mt-2 space-y-1 text-sm text-gray-700">
+            {subs.slice(0, 3).map(s => (
+              <li key={s.id}>
+                ₹{s.amount.toLocaleString('en-IN')}/mo · {s.paidCount}/{s.totalCount} paid ·{' '}
+                <span className="capitalize">{s.status}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div
         className={`rounded-2xl p-4 border ${
           dueMeta.inWindow
@@ -180,8 +228,9 @@ export default function Contributions() {
                   : ''}
               </p>
               <p className="text-sm text-gray-600 mt-0.5">
-                Suggested {formatInr(suggestedAmount)}. Reminders start 5 days before due, every 6
-                hours (in-app + push if enabled). Payment stays manual — nothing auto-deducts.
+                {subs.some(s => s.status === 'active' || s.status === 'authenticated')
+                  ? `Autopay on — same amount monthly for up to ${BUSINESS_RULES.autopayMonths} months.`
+                  : `Suggested ${formatInr(suggestedAmount)}. Start Autopay (₹${BUSINESS_RULES.minJoinInvestment}–₹${BUSINESS_RULES.maxJoinInvestment}) for ${BUSINESS_RULES.autopayMonths} months.`}
               </p>
             </div>
           </div>
@@ -391,7 +440,7 @@ export default function Contributions() {
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-gray-900">Monthly Investment</h3>
+              <h3 className="text-2xl font-bold text-gray-900">Start Monthly Autopay</h3>
               <button onClick={() => setShowInvestModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
                 <X className="w-5 h-5" />
               </button>
@@ -405,7 +454,9 @@ export default function Contributions() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Investment Amount (₹) *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Monthly amount (₹{BUSINESS_RULES.minJoinInvestment}–₹{BUSINESS_RULES.maxJoinInvestment}) *
+                </label>
                 <input
                   type="number"
                   value={investAmount}
@@ -414,12 +465,16 @@ export default function Contributions() {
                     setInvestError('');
                   }}
                   min={BUSINESS_RULES.minJoinInvestment}
-                  placeholder={`Minimum ₹${BUSINESS_RULES.minJoinInvestment}`}
+                  max={BUSINESS_RULES.maxJoinInvestment}
+                  placeholder={`₹${BUSINESS_RULES.minJoinInvestment}–₹${BUSINESS_RULES.maxJoinInvestment}`}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                 />
                 {investError && <p className="text-sm text-red-600 mt-1">{investError}</p>}
-                <div className="flex gap-2 mt-2">
-                  {[BUSINESS_RULES.minJoinInvestment, 100, 500, 1000].map(val => (
+                <p className="text-xs text-emerald-700 mt-1">
+                  Same amount auto-debited monthly for {BUSINESS_RULES.autopayMonths} months (UPI Autopay).
+                </p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {[1000, 3000, 5000, 10000].map(val => (
                     <button
                       key={val}
                       type="button"
@@ -460,7 +515,8 @@ export default function Contributions() {
         isOpen={showPayment}
         onClose={() => setShowPayment(false)}
         amount={Number(investAmount) || BUSINESS_RULES.minJoinInvestment}
-        description="Monthly investment — Jewellbox Club"
+        description={`Monthly Autopay × ${BUSINESS_RULES.autopayMonths} months — Jewellbox Club`}
+        autopay
         onSuccess={handlePaymentSuccess}
         onFailure={() => showToast('error', 'Payment failed. Please try again.', 'Error')}
       />

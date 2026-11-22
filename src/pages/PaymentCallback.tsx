@@ -7,6 +7,8 @@ import {
   verifyRazorpayPayment,
   waitUntilOrderPaid,
 } from '../services/razorpayService';
+import { saveMemberSubscription, verifyAutopayPayment } from '../services/autopayService';
+import { BUSINESS_RULES } from '../data/businessRules';
 import {
   clearPendingPayment,
   loadPendingPayment,
@@ -32,13 +34,23 @@ export default function PaymentCallback() {
           params.get('razorpay_order_id') ||
           sessionStorage.getItem('jb_rzp_order_id') ||
           '';
+        const subscriptionId =
+          params.get('razorpay_subscription_id') ||
+          sessionStorage.getItem('jb_rzp_subscription_id') ||
+          '';
         const signature = params.get('razorpay_signature') || '';
 
-        if (!paymentId && !orderId) {
+        if (!paymentId && !orderId && !subscriptionId) {
           throw new Error('Payment details missing. Please try again from Join.');
         }
 
-        if (paymentId && orderId && signature) {
+        if (paymentId && subscriptionId && signature) {
+          await verifyAutopayPayment({
+            razorpay_payment_id: paymentId,
+            razorpay_subscription_id: subscriptionId,
+            razorpay_signature: signature,
+          });
+        } else if (paymentId && orderId && signature) {
           await verifyRazorpayPayment({
             razorpay_payment_id: paymentId,
             razorpay_order_id: orderId,
@@ -87,6 +99,17 @@ export default function PaymentCallback() {
                 payRef,
                 pending.mobile
               );
+              if (subscriptionId) {
+                await saveMemberSubscription({
+                  userId: result.user.id,
+                  mobile: pending.mobile,
+                  razorpaySubscriptionId: subscriptionId,
+                  amount: pending.amount,
+                  totalCount: BUSINESS_RULES.autopayMonths,
+                  status: 'active',
+                  paidCount: 1,
+                }).catch(() => undefined);
+              }
             }
           } else if (!/already registered/i.test(result.message || '')) {
             throw new Error(result.message || 'Registration failed after payment');
@@ -101,6 +124,7 @@ export default function PaymentCallback() {
 
           clearPendingPayment();
           sessionStorage.removeItem('jb_rzp_order_id');
+          sessionStorage.removeItem('jb_rzp_subscription_id');
           if (!cancelled) {
             setStatus('ok');
             setMessage('Payment successful! Opening your dashboard…');
@@ -118,11 +142,23 @@ export default function PaymentCallback() {
             payRef,
             pending.mobile
           );
+          if (subscriptionId) {
+            await saveMemberSubscription({
+              userId: pending.userId,
+              mobile: pending.mobile,
+              razorpaySubscriptionId: subscriptionId,
+              amount: pending.amount,
+              totalCount: BUSINESS_RULES.autopayMonths,
+              status: 'active',
+              paidCount: 1,
+            }).catch(() => undefined);
+          }
           clearPendingPayment();
           sessionStorage.removeItem('jb_rzp_order_id');
+          sessionStorage.removeItem('jb_rzp_subscription_id');
           if (!cancelled) {
             setStatus('ok');
-            setMessage('Investment added successfully!');
+            setMessage('Investment / Autopay started successfully!');
             setTimeout(() => navigate(pending.returnTo || '/contributions'), 1000);
           }
         }
