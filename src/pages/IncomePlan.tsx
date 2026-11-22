@@ -145,9 +145,9 @@ export default function IncomePlan({ onJoinClick }: PageProps) {
                 </label>
                 <input
                   type="range"
-                  min={1}
+                  min={1000}
                   max={10000}
-                  step={1}
+                  step={100}
                   value={contribution}
                   onChange={e => setContribution(Number(e.target.value))}
                   className="w-full h-3 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 sm:[&::-webkit-slider-thumb]:w-8 sm:[&::-webkit-slider-thumb]:h-8 [&::-webkit-slider-thumb]:bg-gradient-to-br [&::-webkit-slider-thumb]:from-amber-400 [&::-webkit-slider-thumb]:to-yellow-600 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer"

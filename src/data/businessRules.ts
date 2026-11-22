@@ -16,7 +16,7 @@ export const BUSINESS_RULES = {
   /** Contribution / investment lock months */
   lockMonths: 12,
   /** Minimum first / monthly contribution to become a member */
-  minJoinInvestment: 1,
+  minJoinInvestment: 1000,
   /** Prefill amount on Join / Register */
   defaultJoinInvestment: 10000,
   /** Max Autopay / join contribution amount */

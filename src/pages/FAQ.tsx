@@ -7,7 +7,7 @@ export default function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
   const faqs = [
     { q: 'What is Jewellbox Club?', a: 'Jewellbox Club is India\'s premium gold investment and referral platform where members contribute monthly, earn commissions by building teams, and access gold directly from manufacturers at wholesale prices.' },
-    { q: 'How much do I need to invest?', a: 'You can start with a minimum monthly contribution of ₹1. There is no joining fee. Your contribution is locked for 12 months after which you can convert to gold from the showroom.' },
+    { q: 'How much do I need to invest?', a: 'You can start with a minimum monthly contribution of ₹1,000 (maximum ₹10,000 for Autopay). There is no joining fee. Your contribution is locked for 12 months after which you can convert to gold from the showroom.' },
     { q: 'How does the referral commission work?', a: 'You earn 10% commission on your direct referral\'s contribution (Level 1) and 5% on their referral\'s contribution (Level 2). All commissions are credited to your withdrawable wallet instantly.' },
     { q: 'When can I withdraw my commission?', a: 'Commission wallet balance can be withdrawn anytime! Submit a withdrawal request and it gets processed within 24-48 hours directly to your bank account.' },
     { q: 'What happens to my contribution after 12 months?', a: 'After the 12-month lock period, you have two options: (1) Withdraw the full amount to your bank account, or (2) Convert it into gold purchase from our showroom at manufacturer prices.' },

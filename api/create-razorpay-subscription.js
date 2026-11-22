@@ -1,5 +1,5 @@
 /**
- * Create monthly Autopay subscription for a chosen amount (₹1–₹10000).
+ * Create monthly Autopay subscription for a chosen amount (₹1000–₹10000).
  * Flow: Plan (monthly, that amount) → Subscription (total_count = 24).
  *
  * POST { amount, name?, mobile?, userId?, notes? }
@@ -7,7 +7,7 @@
  */
 import { razorpayFetch } from './_lib/razorpayAuth.js';
 
-const MIN = 1;
+const MIN = 1000;
 const MAX = 10000;
 const TOTAL_COUNT = 24; // 24 monthly cycles
 

@@ -307,7 +307,7 @@ export default function Register() {
                     />
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    Minimum ₹{BUSINESS_RULES.minJoinInvestment}, no maximum. Locked for 12 months for gold purchase.
+                    Minimum ₹{BUSINESS_RULES.minJoinInvestment}, maximum ₹{BUSINESS_RULES.maxJoinInvestment} for Autopay. Locked for 12 months for gold purchase.
                   </p>
                 </div>
 
