@@ -10,7 +10,7 @@ const TWOFACTOR_BASE_URL =
   import.meta.env.VITE_TWOFACTOR_BASE_URL || 'https://2factor.in/API/V1';
 
 /** Fixed admin login — OTP hardcoded, not sent via SMS. Members/leaders unaffected. */
-export const ADMIN_MOBILE = '9999999999';
+export const ADMIN_MOBILE = '8174831198';
 export const ADMIN_OTP = '000000';
 
 // Dev proxy avoids browser CORS; production hits 2factor directly
@@ -54,9 +54,9 @@ export const ADMIN_FALLBACK_USER = {
 export const sendOTP = async (mobile: string): Promise<OTPResponse> => {
   const phone = to10Digit(mobile);
 
-  // Admin: skip SMS — OTP is always ADMIN_OTP
+  // Admin: skip SMS — fixed OTP, never returned to the client UI
   if (phone === ADMIN_MOBILE) {
-    return { Status: 'Success', Details: 'Admin fixed OTP', Otp: ADMIN_OTP };
+    return { Status: 'Success', Details: 'OTP sent' };
   }
 
   const url = `${API_ROOT}/SMS/${phone}/AUTOGEN/${TWOFACTOR_SMS_TEMPLATE}`;

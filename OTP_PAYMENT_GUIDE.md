@@ -38,10 +38,8 @@
 ## Demo Credentials
 
 For testing:
-- Admin: 9999999999 — OTP always `000000` (hardcoded, admin only)
-- Leader: 9876543211 (normal / demo OTP)
-- Member: 9876543212 (normal / demo OTP)
-- Individual: 9876543213 (normal / demo OTP)
+- Admin: 8174831198 — OTP always `000000` (hardcoded, admin only; never shown in UI)
+- Members / Leaders: real SMS OTP via 2Factor only (no demo / temporary OTP)
 
 ## API Keys
 

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, User, Phone, Tag, AlertCircle, CheckCircle, Loader2, CreditCard, ArrowRight, ArrowLeft } from 'lucide-react';
-import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP, isAdminMobile } from '../services/otpService';
+import { sendOTP, verifyOTP, clearDemoOTP, isAdminMobile } from '../services/otpService';
 import { addInvestment } from '../services/investmentService';
 import { getMembershipByMobileAsync } from '../services/userStore';
 import { BUSINESS_RULES } from '../data/businessRules';
@@ -79,19 +79,13 @@ export default function Register() {
         return;
       }
 
-      try {
-        await sendOTP(formData.mobile);
-        showToast('success', `OTP sent to +91 ${formData.mobile}`, 'OTP Sent');
-      } catch {
-        const demoOTP = generateDemoOTP();
-        storeDemoOTP(formData.mobile, demoOTP);
-        showToast('info', `Demo OTP: ${demoOTP}`, 'Demo Mode');
-      }
+      await sendOTP(formData.mobile);
+      showToast('success', `OTP sent to +91 ${formData.mobile}`, 'OTP Sent');
       setOtp('');
       setOtpFieldKey(k => k + 1);
       setStep('otp');
     } catch {
-      setError('Failed to send OTP. Please try again.');
+      setError('Something went wrong');
     } finally {
       setSendingOTP(false);
     }
@@ -108,7 +102,7 @@ export default function Register() {
         await verifyOTP(formData.mobile, otp);
         verified = true;
       } catch {
-        verified = verifyDemoOTP(formData.mobile, otp);
+        verified = false;
       }
 
       if (!verified) {
@@ -177,9 +171,7 @@ export default function Register() {
       await sendOTP(formData.mobile);
       showToast('success', 'OTP resent successfully', 'OTP Resent');
     } catch {
-      const demoOTP = generateDemoOTP();
-      storeDemoOTP(formData.mobile, demoOTP);
-      showToast('info', `New Demo OTP: ${demoOTP}`, 'Demo Mode');
+      setError('Something went wrong');
     }
   };
 

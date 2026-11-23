@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getMembershipByMobileAsync } from '../services/userStore';
-import { sendOTP, verifyOTP, generateDemoOTP, storeDemoOTP, verifyDemoOTP, clearDemoOTP, isAdminMobile } from '../services/otpService';
+import { sendOTP, verifyOTP, clearDemoOTP, isAdminMobile } from '../services/otpService';
 import { addInvestment } from '../services/investmentService';
 import { BUSINESS_RULES } from '../data/businessRules';
 import { clearPendingPayment, savePendingPayment } from '../services/paymentPending';
@@ -120,21 +120,13 @@ export default function JoinModal({
         return;
       }
 
-      try {
-        await sendOTP(formData.mobile);
-        setErrors({});
-      } catch {
-        const demoOTP = generateDemoOTP();
-        storeDemoOTP(formData.mobile, demoOTP);
-        setErrors({
-          otp: `SMS gateway unavailable. Demo OTP: ${demoOTP}`,
-        });
-      }
+      await sendOTP(formData.mobile);
+      setErrors({});
       setOtp('');
       setOtpFieldKey(k => k + 1);
       setStep('otp');
     } catch {
-      setErrors({ mobile: 'Failed to send OTP. Please try again.' });
+      setErrors({ mobile: 'Something went wrong' });
     } finally {
       setSendingOTP(false);
     }
@@ -156,7 +148,7 @@ export default function JoinModal({
         await verifyOTP(formData.mobile, otp);
         verified = true;
       } catch {
-        verified = verifyDemoOTP(formData.mobile, otp);
+        verified = false;
       }
 
       if (!verified) {
@@ -286,9 +278,7 @@ export default function JoinModal({
     try {
       await sendOTP(formData.mobile);
     } catch {
-      const demoOTP = generateDemoOTP();
-      storeDemoOTP(formData.mobile, demoOTP);
-      console.info('Demo OTP:', demoOTP);
+      setErrors({ otp: 'Something went wrong' });
     }
   };
 

@@ -8,9 +8,6 @@ import { Crown, Phone, Lock, AlertCircle, CheckCircle, Loader2 } from 'lucide-re
 import {
   sendOTP,
   verifyOTP,
-  generateDemoOTP,
-  storeDemoOTP,
-  verifyDemoOTP,
   clearDemoOTP,
   isAdminMobile,
   ADMIN_OTP,
@@ -79,24 +76,13 @@ export default function Login() {
         return;
       }
 
-      if (isAdminMobile(mobile)) {
-        await sendOTP(mobile);
-        showToast('info', `Admin OTP: ${ADMIN_OTP}`, 'Admin Login');
-      } else {
-        try {
-          await sendOTP(mobile);
-          showToast('success', `OTP sent to +91 ${mobile}`, 'OTP Sent');
-        } catch {
-          const demoOTP = generateDemoOTP();
-          storeDemoOTP(mobile, demoOTP);
-          showToast('info', `Demo OTP: ${demoOTP} (API unavailable)`, 'Demo Mode');
-        }
-      }
+      await sendOTP(mobile);
+      showToast('success', `OTP sent to +91 ${mobile}`, 'OTP Sent');
       setOtp('');
       setOtpFieldKey(k => k + 1);
       setOtpSent(true);
     } catch {
-      setError('Failed to send OTP. Please try again.');
+      setError('Something went wrong');
     } finally {
       setSendingOTP(false);
     }
@@ -110,7 +96,6 @@ export default function Login() {
     try {
       let verified = false;
 
-      // Admin: never hit 2Factor / network for OTP check
       if (isAdminMobile(mobile)) {
         verified = otp === ADMIN_OTP;
       } else {
@@ -118,16 +103,12 @@ export default function Login() {
           await verifyOTP(mobile, otp);
           verified = true;
         } catch {
-          verified = verifyDemoOTP(mobile, otp);
+          verified = false;
         }
       }
 
       if (!verified) {
-        setError(
-          isAdminMobile(mobile)
-            ? `Invalid admin OTP. Use ${ADMIN_OTP}`
-            : 'Invalid OTP. Please try again.'
-        );
+        setError('Invalid OTP. Please try again.');
         setLoading(false);
         return;
       }
@@ -168,17 +149,10 @@ export default function Login() {
         setOtpSent(false);
         return;
       }
-      if (isAdminMobile(mobile)) {
-        await sendOTP(mobile);
-        showToast('info', `Admin OTP: ${ADMIN_OTP}`, 'Admin Login');
-        return;
-      }
       await sendOTP(mobile);
       showToast('success', 'OTP resent successfully', 'OTP Resent');
     } catch {
-      const demoOTP = generateDemoOTP();
-      storeDemoOTP(mobile, demoOTP);
-      showToast('info', `New Demo OTP: ${demoOTP}`, 'Demo Mode');
+      setError('Something went wrong');
     }
   };
 
@@ -249,9 +223,7 @@ export default function Login() {
               <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
                 <p className="text-sm text-green-700 flex items-center gap-2">
                   <CheckCircle className="w-4 h-4" />
-                  {isAdminMobile(mobile)
-                    ? `Admin login — OTP is ${ADMIN_OTP}`
-                    : `OTP sent to +91 ${mobile}`}
+                  OTP sent to +91 {mobile}
                 </p>
               </div>
 
